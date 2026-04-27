@@ -24,21 +24,65 @@ export interface LitLocation {
   city: string | null;
   country: string | null;
   country_code: string | null;
+  ip_address: string | null;
   created_at: Date;
 }
 
+export interface GpsConsent {
+  id: number;
+  ip_address: string;
+  consented: boolean;
+  latitude: number | null;
+  longitude: number | null;
+  created_at: Date;
+}
+
+// Check if IP has already consented to GPS
+export async function getGpsConsentByIp(ipAddress: string): Promise<GpsConsent | null> {
+  const pool = getPool();
+  const [rows] = await pool.execute<mysql.RowDataPacket[]>(
+    `SELECT id, ip_address, consented, latitude, longitude, created_at 
+     FROM gps_consent WHERE ip_address = ?`,
+    [ipAddress]
+  );
+  return rows.length > 0 ? (rows[0] as GpsConsent) : null;
+}
+
+// Record GPS consent (and optionally location)
+export async function recordGpsConsent(
+  ipAddress: string,
+  consented: boolean,
+  latitude?: number,
+  longitude?: number
+): Promise<void> {
+  const pool = getPool();
+  await pool.execute(
+    `INSERT INTO gps_consent (ip_address, consented, latitude, longitude) 
+     VALUES (?, ?, ?, ?)
+     ON DUPLICATE KEY UPDATE 
+       consented = VALUES(consented),
+       latitude = VALUES(latitude),
+       longitude = VALUES(longitude),
+       updated_at = CURRENT_TIMESTAMP`,
+    [ipAddress, consented, latitude || null, longitude || null]
+  );
+}
+
+// Add a new lit location with IP
 export async function addLocation(
   latitude: number,
   longitude: number,
+  ipAddress: string,
+  userAgent?: string,
   city?: string,
   country?: string,
   countryCode?: string
 ): Promise<number> {
   const pool = getPool();
   const [result] = await pool.execute<mysql.ResultSetHeader>(
-    `INSERT INTO lit_locations (latitude, longitude, city, country, country_code) 
-     VALUES (?, ?, ?, ?, ?)`,
-    [latitude, longitude, city || null, country || null, countryCode || null]
+    `INSERT INTO lit_locations (latitude, longitude, ip_address, user_agent, city, country, country_code) 
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
+    [latitude, longitude, ipAddress, userAgent || null, city || null, country || null, countryCode || null]
   );
   return result.insertId;
 }
@@ -46,7 +90,7 @@ export async function addLocation(
 export async function getAllLocations(): Promise<LitLocation[]> {
   const pool = getPool();
   const [rows] = await pool.execute<mysql.RowDataPacket[]>(
-    `SELECT id, latitude, longitude, city, country, country_code, created_at 
+    `SELECT id, latitude, longitude, city, country, country_code, ip_address, created_at 
      FROM lit_locations 
      ORDER BY created_at DESC`
   );

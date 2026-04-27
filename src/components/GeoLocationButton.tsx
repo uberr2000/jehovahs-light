@@ -41,6 +41,18 @@ export default function GeoLocationButton({ onLocationReceived, language }: GeoL
   const [message, setMessage] = useState('');
   const t = translations[language];
 
+  const recordDeclinedConsent = async () => {
+    try {
+      await fetch('/api/consent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ consented: false }),
+      });
+    } catch (error) {
+      console.error('Failed to record consent:', error);
+    }
+  };
+
   const handleGetLocation = async () => {
     if (!navigator.geolocation) {
       setStatus('error');
@@ -55,7 +67,6 @@ export default function GeoLocationButton({ onLocationReceived, language }: GeoL
         const { latitude, longitude } = position.coords;
         
         try {
-          // Call API to add location
           const response = await fetch('/api/locations', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -77,10 +88,12 @@ export default function GeoLocationButton({ onLocationReceived, language }: GeoL
           setMessage(t.error);
         }
       },
-      (error) => {
+      async (error) => {
         if (error.code === error.PERMISSION_DENIED) {
           setStatus('denied');
           setMessage(t.denied);
+          // Record that user declined
+          await recordDeclinedConsent();
         } else {
           setStatus('error');
           setMessage(t.error);

@@ -34,30 +34,43 @@ interface StatsData {
   countries: number;
 }
 
+interface UserConsent {
+  consented: boolean;
+  hasLocation: boolean;
+  latitude: number | null;
+  longitude: number | null;
+}
+
 const translations = {
   en: {
     title: "Jehovah's Light",
     subtitle: 'Beacon of Hope for the World',
     description: 'Each light represents a soul touched by Jehovah\'s love. Share your location and become part of this global beacon of faith.',
     shareTitle: 'Share Your Light',
+    alreadyShared: 'Your light shines on the world',
     footerVerse: '"For with you is the fountain of life; in your light we see light." — Psalm 36:9',
     rights: 'All rights reserved',
+    welcomeBack: 'Welcome back! Your light is already shining.',
   },
   'zh-TW': {
     title: '耶和華的光',
     subtitle: '世界的希望燈塔',
     description: '每一道光都代表一個被耶和華的愛觸摸的靈魂。分享您的位置，成為這個全球信仰燈塔的一部分。',
     shareTitle: '分享您的光',
+    alreadyShared: '您的光照耀著世界',
     footerVerse: '「因為，在你那裡有生命的源頭；在你的光中，我們必得見光。」— 詩篇 36:9',
     rights: '版權所有',
+    welcomeBack: '歡迎回來！您的光已經在發光了。',
   },
   'zh-CN': {
-    title: '耶和華的光',
-    subtitle: '世界的希望燈塔',
+    title: '耶和华的光',
+    subtitle: '世界的希望灯塔',
     description: '每一道光都代表一个被耶和华的爱触摸的灵魂。分享您的位置，成为这个全球信仰灯塔的一部分。',
     shareTitle: '分享您的光',
+    alreadyShared: '您的光照耀着世界',
     footerVerse: '「因为，在你那里有生命的源头；在你的光中，我们必得见光。」— 诗篇 36:9',
     rights: '版权所有',
+    welcomeBack: '欢迎回来！您的光已经在发光了。',
   },
 };
 
@@ -66,6 +79,7 @@ export default function Home() {
   const [locale, setLocale] = useState<Locale>('en');
   const [locations, setLocations] = useState<Location[]>([]);
   const [stats, setStats] = useState<StatsData>({ total: 0, today: 0, countries: 0 });
+  const [userConsent, setUserConsent] = useState<UserConsent | null>(null);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -82,7 +96,7 @@ export default function Home() {
     }
   }, []);
 
-  // Fetch locations on mount
+  // Fetch locations and user consent on mount
   useEffect(() => {
     async function fetchData() {
       try {
@@ -90,6 +104,17 @@ export default function Home() {
         const data = await response.json();
         setLocations(data.locations || []);
         setStats(data.stats || { total: 0, today: 0, countries: 0 });
+        
+        // Check if user has already consented
+        if (data.userConsent) {
+          setUserConsent(data.userConsent);
+          if (data.userConsent.hasLocation && data.userConsent.latitude && data.userConsent.longitude) {
+            setUserLocation({
+              latitude: data.userConsent.latitude,
+              longitude: data.userConsent.longitude,
+            });
+          }
+        }
       } catch (error) {
         console.error('Failed to fetch locations:', error);
       } finally {
@@ -106,6 +131,7 @@ export default function Home() {
 
   const handleLocationReceived = (lat: number, lng: number) => {
     setUserLocation({ latitude: lat, longitude: lng });
+    setUserConsent({ consented: true, hasLocation: true, latitude: lat, longitude: lng });
     // Refresh locations
     fetch('/api/locations')
       .then(res => res.json())
@@ -118,6 +144,8 @@ export default function Home() {
   if (showIntro) {
     return <LighthouseIntro onComplete={() => setShowIntro(false)} language={locale} />;
   }
+
+  const hasSharedLocation = userConsent?.hasLocation;
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white overflow-hidden">
@@ -160,15 +188,27 @@ export default function Home() {
           <Stats {...stats} language={locale} />
         </div>
 
-        {/* Geolocation Button */}
+        {/* GPS Button or Welcome Back message */}
         <div className="text-center mb-8">
-          <h3 className="text-lg md:text-xl font-semibold text-yellow-400 mb-4">
-            {t.shareTitle}
-          </h3>
-          <GeoLocationButton 
-            onLocationReceived={handleLocationReceived}
-            language={locale}
-          />
+          {hasSharedLocation ? (
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex items-center gap-2 text-green-400">
+                <span className="text-2xl">✨</span>
+                <span className="text-lg font-semibold">{t.alreadyShared}</span>
+              </div>
+              <p className="text-sm text-gray-400">{t.welcomeBack}</p>
+            </div>
+          ) : (
+            <>
+              <h3 className="text-lg md:text-xl font-semibold text-yellow-400 mb-4">
+                {t.shareTitle}
+              </h3>
+              <GeoLocationButton 
+                onLocationReceived={handleLocationReceived}
+                language={locale}
+              />
+            </>
+          )}
         </div>
 
         {/* Footer */}

@@ -1,8 +1,8 @@
 'use client';
 
 import { useRef, useMemo, useEffect, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Sphere, Stars, useTexture } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Sphere, Stars } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface LightPoint {
@@ -31,26 +31,27 @@ function latLngToVector3(lat: number, lng: number, radius: number): THREE.Vector
   return new THREE.Vector3(x, y, z);
 }
 
-// Procedural Earth texture with continents
+// Procedural Earth texture with continents (lighter version)
 function createEarthTexture(): THREE.CanvasTexture {
   const canvas = document.createElement('canvas');
   canvas.width = 2048;
   canvas.height = 1024;
   const ctx = canvas.getContext('2d')!;
 
-  // Dark ocean background
+  // Lighter ocean background
   const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0, '#0a0a1a');
-  gradient.addColorStop(0.5, '#0f0f2a');
-  gradient.addColorStop(1, '#0a0a1a');
+  gradient.addColorStop(0, '#1a2a4a');
+  gradient.addColorStop(0.5, '#1e3a5a');
+  gradient.addColorStop(1, '#1a2a4a');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Continent data (simplified polygons)
-  const continents: { color: string; points: [number, number][] }[] = [
+  // Continent data (lighter greens and browns)
+  const continents: { color: string; glowColor: string; points: [number, number][] }[] = [
     // North America
     {
-      color: '#1a3a1a',
+      color: '#2d5a2d',
+      glowColor: '#4a8a4a',
       points: [
         [180, 100], [280, 80], [380, 100], [420, 180], [400, 280],
         [320, 350], [240, 380], [160, 340], [140, 260], [160, 180]
@@ -58,7 +59,8 @@ function createEarthTexture(): THREE.CanvasTexture {
     },
     // South America
     {
-      color: '#1a4a1a',
+      color: '#2d6a2d',
+      glowColor: '#4a9a4a',
       points: [
         [380, 420], [440, 400], [500, 450], [520, 550], [480, 700],
         [420, 780], [360, 750], [340, 650], [350, 550], [360, 480]
@@ -66,7 +68,8 @@ function createEarthTexture(): THREE.CanvasTexture {
     },
     // Europe
     {
-      color: '#2a3a2a',
+      color: '#3a5a3a',
+      glowColor: '#5a8a5a',
       points: [
         [900, 120], [1000, 100], [1080, 130], [1100, 200], [1040, 260],
         [960, 280], [900, 240], [880, 180]
@@ -74,7 +77,8 @@ function createEarthTexture(): THREE.CanvasTexture {
     },
     // Africa
     {
-      color: '#2a4a2a',
+      color: '#4a6a3a',
+      glowColor: '#6a9a5a',
       points: [
         [920, 320], [1020, 300], [1100, 350], [1140, 450], [1120, 580],
         [1040, 680], [960, 660], [900, 580], [880, 450], [890, 380]
@@ -82,7 +86,8 @@ function createEarthTexture(): THREE.CanvasTexture {
     },
     // Asia
     {
-      color: '#1a3a1a',
+      color: '#3a5a3a',
+      glowColor: '#5a8a5a',
       points: [
         [1100, 80], [1300, 60], [1500, 100], [1700, 150], [1800, 250],
         [1780, 350], [1680, 400], [1500, 380], [1340, 340], [1200, 280],
@@ -91,7 +96,8 @@ function createEarthTexture(): THREE.CanvasTexture {
     },
     // Australia
     {
-      color: '#3a3a1a',
+      color: '#5a5a2d',
+      glowColor: '#8a8a4a',
       points: [
         [1520, 580], [1640, 560], [1720, 600], [1740, 700], [1680, 760],
         [1560, 750], [1500, 700], [1500, 640]
@@ -99,7 +105,8 @@ function createEarthTexture(): THREE.CanvasTexture {
     },
     // Antarctica
     {
-      color: '#2a3a4a',
+      color: '#4a5a6a',
+      glowColor: '#7a8a9a',
       points: [
         [0, 920], [300, 900], [600, 920], [900, 900], [1200, 920],
         [1500, 900], [1800, 920], [2048, 920], [2048, 1024],
@@ -108,7 +115,8 @@ function createEarthTexture(): THREE.CanvasTexture {
     },
     // Greenland
     {
-      color: '#3a4a5a',
+      color: '#5a6a7a',
+      glowColor: '#8a9aaa',
       points: [
         [520, 40], [620, 30], [680, 60], [680, 140], [620, 180],
         [540, 160], [500, 100]
@@ -118,6 +126,7 @@ function createEarthTexture(): THREE.CanvasTexture {
 
   // Draw continents
   continents.forEach(continent => {
+    // Fill
     ctx.fillStyle = continent.color;
     ctx.beginPath();
     continent.points.forEach((point, i) => {
@@ -127,17 +136,17 @@ function createEarthTexture(): THREE.CanvasTexture {
     ctx.closePath();
     ctx.fill();
 
-    // Add glow effect
-    ctx.strokeStyle = '#3a5a3a';
-    ctx.lineWidth = 2;
+    // Glow effect (border)
+    ctx.strokeStyle = continent.glowColor;
+    ctx.lineWidth = 3;
     ctx.stroke();
   });
 
-  // Add some noise/texture
+  // Add subtle noise
   const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const data = imageData.data;
   for (let i = 0; i < data.length; i += 4) {
-    const noise = (Math.random() - 0.5) * 15;
+    const noise = (Math.random() - 0.5) * 20;
     data[i] = Math.max(0, Math.min(255, data[i] + noise));
     data[i + 1] = Math.max(0, Math.min(255, data[i + 1] + noise));
     data[i + 2] = Math.max(0, Math.min(255, data[i + 2] + noise));
@@ -170,7 +179,6 @@ function Earth({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
     lightPoints.forEach((point) => {
       const pos = latLngToVector3(point.latitude, point.longitude, 2.02);
       positions.push(pos.x, pos.y, pos.z);
-      // Golden yellow color for lights
       colors.push(1.0, 0.85, 0.3);
       sizes.push(0.8);
     });
@@ -205,30 +213,30 @@ function Earth({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
       <Sphere ref={earthRef} args={[2, 64, 64]}>
         <meshStandardMaterial
           map={earthTexture}
-          roughness={0.7}
-          metalness={0.1}
-          emissive="#0a1520"
-          emissiveIntensity={0.3}
+          roughness={0.6}
+          metalness={0.2}
+          emissive="#152535"
+          emissiveIntensity={0.5}
         />
       </Sphere>
 
       {/* Atmosphere glow */}
-      <Sphere ref={atmosphereRef} args={[2.05, 64, 64]}>
+      <Sphere ref={atmosphereRef} args={[2.08, 64, 64]}>
         <meshBasicMaterial
-          color="#1a4a8a"
+          color="#3a6aaa"
           transparent
-          opacity={0.1}
+          opacity={0.15}
           side={THREE.BackSide}
         />
       </Sphere>
 
-      {/* Ocean grid lines */}
+      {/* Grid lines */}
       <Sphere args={[2.001, 36, 18]}>
         <meshBasicMaterial
-          color="#0a2a4a"
+          color="#2a4a6a"
           wireframe
           transparent
-          opacity={0.15}
+          opacity={0.2}
         />
       </Sphere>
 
@@ -247,7 +255,7 @@ function Earth({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
       )}
 
       {/* Glowing effect for each light point */}
-      {lightPoints.slice(0, 100).map((point, index) => (
+      {lightPoints.slice(0, 80).map((point, index) => (
         <LightGlow
           key={point.created_at || index}
           position={latLngToVector3(point.latitude, point.longitude, 2.02)}
@@ -259,11 +267,11 @@ function Earth({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
         <UserLightMarker position={userMarkerPos} />
       )}
 
-      {/* Lighting */}
-      <ambientLight intensity={0.2} />
-      <directionalLight position={[5, 3, 5]} intensity={0.5} color="#ffffff" />
-      <directionalLight position={[-5, -3, -5]} intensity={0.2} color="#4a6a9a" />
-      <pointLight position={[0, 0, 5]} intensity={0.3} color="#ffd700" />
+      {/* Lighting - brighter */}
+      <ambientLight intensity={0.4} />
+      <directionalLight position={[5, 3, 5]} intensity={0.8} color="#ffffff" />
+      <directionalLight position={[-5, -3, -5]} intensity={0.4} color="#6a8aba" />
+      <pointLight position={[0, 0, 5]} intensity={0.5} color="#ffd700" />
     </group>
   );
 }
@@ -310,13 +318,10 @@ function UserLightMarker({ position }: { position: THREE.Vector3 }) {
 
   return (
     <group position={position}>
-      {/* Inner bright core */}
       <mesh ref={meshRef}>
         <sphereGeometry args={[1, 16, 16]} />
         <meshBasicMaterial color="#ffffff" blending={THREE.AdditiveBlending} />
       </mesh>
-
-      {/* Expanding ring effect */}
       <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[0.1, 0.15, 32]} />
         <meshBasicMaterial

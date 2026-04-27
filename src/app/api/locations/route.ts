@@ -1,16 +1,41 @@
-import { NextResponse } from 'next/server';
-import { getAllLocations, getStats } from '@/lib/db';
+import { NextRequest, NextResponse } from 'next/server';
+import { 
+  getAllLocations, 
+  getStats, 
+  addLocation, 
+  checkLocationExists,
+  getGpsConsentByIp,
+  recordGpsConsent
+} from '@/lib/db';
 
-export async function GET() {
+// Get client IP from request headers (Cloudflare sends CF-Connecting-IP)
+function getClientIp(request: NextRequest): string {
+  return request.headers.get('cf-connecting-ip') || 
+         request.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+         request.headers.get('x-real-ip') ||
+         'unknown';
+}
+
+// GET /api/locations - Get all locations and stats, plus user's GPS consent status
+export async function GET(request: NextRequest) {
   try {
-    const [locations, stats] = await Promise.all([
+    const clientIp = getClientIp(request);
+    
+    const [locations, stats, consent] = await Promise.all([
       getAllLocations(),
       getStats(),
+      getGpsConsentByIp(clientIp),
     ]);
 
     return NextResponse.json({
       locations,
       stats,
+      userConsent: consent ? {
+        consented: consent.consented,
+        hasLocation: consent.latitude !== null && consent.longitude !== null,
+        latitude: consent.latitude,
+        longitude: consent.longitude,
+      } : null,
     });
   } catch (error) {
     console.error('Error fetching locations:', error);
@@ -20,9 +45,6 @@ export async function GET() {
     );
   }
 }
-
-import { NextRequest } from 'next/server';
-import { addLocation, checkLocationExists } from '@/lib/db';
 
 interface GeoLocationResponse {
   city?: string;
@@ -51,8 +73,11 @@ async function getGeoLocation(lat: number, lng: number): Promise<GeoLocationResp
   }
 }
 
+// POST /api/locations - Add a new lit location
 export async function POST(request: NextRequest) {
   try {
+    const clientIp = getClientIp(request);
+    const userAgent = request.headers.get('user-agent') || undefined;
     const body = await request.json();
     const { latitude, longitude } = body;
 
@@ -71,6 +96,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Record consent with location
+    await recordGpsConsent(clientIp, true, latitude, longitude);
+
     // Check if location already exists within 1km
     const exists = await checkLocationExists(latitude, longitude);
     if (exists) {
@@ -87,6 +115,8 @@ export async function POST(request: NextRequest) {
     const id = await addLocation(
       latitude,
       longitude,
+      clientIp,
+      userAgent,
       geoData.city,
       geoData.country,
       geoData.country_code
