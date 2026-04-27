@@ -1,0 +1,43 @@
+{
+  "site": {
+    "title": "Jehovah's Light",
+    "description": "Light up the world with Jehovah's guiding light"
+  },
+  "hero": {
+    "title": "Jehovah's Light",
+    "subtitle": "Beacon of Hope for the World",
+    "description": "Each light represents a soul touched by Jehovah's love. Share your location and become part of this global beacon of faith."
+  },
+  "geolocation": {
+    "title": "Share Your Light",
+    "request": "Allow location sharing to light up your position on Earth",
+    "button": "Share My Location",
+    "denied": "Location access denied. You can still view the lights from around the world.",
+    "error": "Unable to get your location. Please try again.",
+    "success": "Your light has been added to the world!",
+    "loading": "Locating you..."
+  },
+  "globe": {
+    "title": "Global Lights",
+    "totalLights": "Total Lights",
+    "countries": "Countries",
+    "recentLights": "Recent Lights"
+  },
+  "lighthouse": {
+    "title": "A Lighthouse in the Darkness",
+    "verse": "\"The LORD is my light and my salvation— whom shall I fear?\"",
+    "reference": "Psalm 27:1"
+  },
+  "stats": {
+    "totalLights": "Total Lights Lit",
+    "todayLights": "Lights Today",
+    "countries": "Countries Reached"
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "verse": "\"For with you is the fountain of life; in your light we see light.\" — Psalm 36:9"
+  },
+  "language": {
+    "select": "Select Language"
+  }
+}

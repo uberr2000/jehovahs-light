@@ -1,0 +1,43 @@
+{
+  "site": {
+    "title": "耶和華的光",
+    "description": "用耶和華的引導之光照亮世界"
+  },
+  "hero": {
+    "title": "耶和華的光",
+    "subtitle": "世界的希望燈塔",
+    "description": "每一道光都代表一個被耶和華的愛觸摸的靈魂。分享您的位置，成為這個全球信仰燈塔的一部分。"
+  },
+  "geolocation": {
+    "title": "分享您的光",
+    "request": "允許分享位置以在地球上點亮您的位置",
+    "button": "分享我的位置",
+    "denied": "位置存取被拒絕。您仍然可以觀看來自世界各地的光。",
+    "error": "無法獲取您的位置。請重試。",
+    "success": "您的光已經被添加到世界上！",
+    "loading": "正在定位您..."
+  },
+  "globe": {
+    "title": "全球光芒",
+    "totalLights": "總光芒數",
+    "countries": "國家數",
+    "recentLights": "最近的光芒"
+  },
+  "lighthouse": {
+    "title": "黑暗中的燈塔",
+    "verse": "「耶和華是我的亮光，是我的拯救，我還怕誰呢？」",
+    "reference": "詩篇 27:1"
+  },
+  "stats": {
+    "totalLights": "總光芒數",
+    "todayLights": "今日光芒",
+    "countries": "觸及國家"
+  },
+  "footer": {
+    "rights": "版權所有",
+    "verse": "「因為，在你那裡有生命的源頭；在你的光中，我們必得見光。」— 詩篇 36:9"
+  },
+  "language": {
+    "select": "選擇語言"
+  }
+}
