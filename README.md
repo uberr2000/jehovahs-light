@@ -45,7 +45,12 @@ npm run dev
 
 ## Environment Variables
 
+See `.env.example`. **PORT** must be set in `.env` (Next.js / standalone
+`server.js` read it). Never add `--port` to `package.json` `start`.
+Server deploy: [docs/deploy.md](docs/deploy.md) (PM2 id 14).
+
 ```
+PORT=3000
 DB_HOST=localhost
 DB_USER=jehovahs_light
 DB_PASSWORD=your_password
