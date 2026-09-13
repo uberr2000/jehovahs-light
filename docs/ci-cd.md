@@ -15,7 +15,8 @@ Runs on `pull_request` and `push` targeting **`develop`**.
 | --- | --- |
 | Node | **22** (`actions/setup-node`, Next.js 16 needs `>= 20.9`) |
 | Install | `npm ci` |
-| Lint | `npm run lint` (`eslint` + `eslint-config-next` 16.2.4) |
+| Lint | `npm run lint` (`eslint` + `eslint-config-next` 16.2.4).
+  `deploy/**` is ignored (PM2 CommonJS). |
 | Build | `npm run build` |
 
 Job env uses harmless placeholders so a build that reads `.env.example` keys

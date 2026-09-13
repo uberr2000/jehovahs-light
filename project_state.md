@@ -47,6 +47,7 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - `deploy/ecosystem.config.cjs`
 - `docs/deploy.md`
 - `docs/ci-cd.md`
+- `eslint.config.mjs` — ignores `deploy/**`
 - `src/app/` — pages and API routes
 - `src/lib/db.ts`
 
@@ -66,6 +67,7 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 
 - Load PORT from `.env` via PM2 id 14 (standalone); keep `next start`
 - Add GitHub Actions CI + develop SSH deploy (no Production CD)
+- Make `npm run lint` green for CI (ignore `deploy/**`, hook/import fixes)
 
 ## Key Decisions Made
 
