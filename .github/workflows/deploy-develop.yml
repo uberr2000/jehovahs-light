@@ -1,0 +1,183 @@
+# SSH deploy to the develop host only.
+# Production CD is out of scope — do not add a production workflow here.
+#
+# Required repository secrets (fail early if any is empty):
+#   DEPLOY_HOST
+#   DEPLOY_USER
+#   DEPLOY_SSH_KEY
+#
+# Host path: /var/www/html/jehovahs-light.ink.net.tw/
+# PM2 process id 14 / name jehovahs-light
+# PORT must already exist in the host .env — this job never edits package.json.
+#
+# Sibling apps on the same host must not be touched:
+#   /var/www/html/ai.srdc.org.tw
+#   /var/www/html/member.rsh-care.com
+name: Deploy develop
+
+on:
+  push:
+    branches: [develop]
+
+concurrency:
+  group: deploy-develop
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: SSH deploy develop
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Require deploy secrets
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          missing=0
+          if [ -z "${DEPLOY_HOST}" ]; then
+            echo "error: repository secret DEPLOY_HOST is missing or empty"
+            missing=1
+          fi
+          if [ -z "${DEPLOY_USER}" ]; then
+            echo "error: repository secret DEPLOY_USER is missing or empty"
+            missing=1
+          fi
+          if [ -z "${DEPLOY_SSH_KEY}" ]; then
+            echo "error: repository secret DEPLOY_SSH_KEY is missing or empty"
+            missing=1
+          fi
+          if [ "${missing}" -ne 0 ]; then
+            echo
+            echo "Set DEPLOY_HOST, DEPLOY_USER, and DEPLOY_SSH_KEY on this repo"
+            echo "before the first live SSH deploy. The workflow is shipped;"
+            echo "a missing-secret failure here is expected until they exist."
+            echo "See docs/ci-cd.md."
+            exit 1
+          fi
+
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          command_timeout: 30m
+          script: |
+            set -euo pipefail
+
+            DEPLOY_PATH="/var/www/html/jehovahs-light.ink.net.tw"
+            # Never operate on sibling apps on this host.
+            FORBIDDEN_PATHS="/var/www/html/ai.srdc.org.tw /var/www/html/member.rsh-care.com"
+
+            if [ -s "${HOME}/.nvm/nvm.sh" ]; then
+              # shellcheck disable=SC1091
+              . "${HOME}/.nvm/nvm.sh"
+            fi
+            export PATH="${PATH}:/usr/local/bin:${HOME}/.local/bin"
+
+            if [ ! -d "${DEPLOY_PATH}" ]; then
+              echo "error: deploy path does not exist: ${DEPLOY_PATH}"
+              exit 1
+            fi
+
+            cd "${DEPLOY_PATH}"
+            pwd_now="$(pwd -P)"
+            if [ "${pwd_now}" != "${DEPLOY_PATH}" ] && [ "${pwd_now}" != "${DEPLOY_PATH%/}" ]; then
+              echo "error: refused to run outside ${DEPLOY_PATH} (pwd=${pwd_now})"
+              exit 1
+            fi
+            for forbidden in ${FORBIDDEN_PATHS}; do
+              case "${pwd_now}" in
+                "${forbidden}"|"${forbidden}"/*)
+                  echo "error: refused to touch sibling app path ${forbidden}"
+                  exit 1
+                  ;;
+              esac
+            done
+
+            if [ ! -d .git ]; then
+              echo "error: ${DEPLOY_PATH} is not a git working tree"
+              exit 1
+            fi
+
+            # Fail on a dirty tree. Do NOT git reset --hard — that is the
+            # same lesson as the ai.srdc.org.tw dirty package.json incident.
+            if [ -n "$(git status --porcelain)" ]; then
+              echo "error: working tree is dirty at ${DEPLOY_PATH}"
+              echo "Refuse to deploy (no git reset --hard)."
+              echo "Inspect and commit or stash local edits on the host, then re-run."
+              git status --porcelain
+              exit 1
+            fi
+
+            if [ ! -f .env ]; then
+              echo "error: missing ${DEPLOY_PATH}/.env"
+              echo "PORT must already be set in the host .env. Copy .env.example and set PORT + DB_*."
+              echo "Never add --port to package.json start."
+              exit 1
+            fi
+            if ! grep -qE '^[[:space:]]*PORT=' .env; then
+              echo "error: PORT is not set in ${DEPLOY_PATH}/.env"
+              echo "PORT comes from the host .env only. package.json start stays \"next start\"."
+              exit 1
+            fi
+
+            git fetch origin develop
+
+            current_branch="$(git rev-parse --abbrev-ref HEAD)"
+            if [ "${current_branch}" = "develop" ]; then
+              git pull --ff-only origin develop
+            else
+              echo "host is on '${current_branch}', checking out develop"
+              git checkout develop
+              git pull --ff-only origin develop
+            fi
+
+            command -v node >/dev/null
+            command -v npm >/dev/null
+            command -v pm2 >/dev/null
+            echo "node $(node -v) npm $(npm -v)"
+
+            npm ci
+            npm run build
+
+            if [ ! -d .next/standalone ]; then
+              echo "error: .next/standalone missing after build (next.config.ts output: 'standalone')"
+              exit 1
+            fi
+            # Next standalone does not copy public / .next/static (CDN assumed).
+            # https://nextjs.org/docs/app/api-reference/config/next-config-js/output
+            if [ -d public ]; then
+              rm -rf .next/standalone/public
+              cp -a public .next/standalone/public
+            fi
+            mkdir -p .next/standalone/.next
+            if [ ! -d .next/static ]; then
+              echo "error: .next/static missing after build"
+              exit 1
+            fi
+            rm -rf .next/standalone/.next/static
+            cp -a .next/static .next/standalone/.next/static
+
+            if ! pm2 describe 14 >/dev/null 2>&1; then
+              echo "error: PM2 process id 14 is not running"
+              echo "Do not start a second jehovahs-light process from CI."
+              echo "Start id 14 once on the host (see docs/deploy.md), then re-run this workflow."
+              exit 1
+            fi
+            if ! pm2 show 14 | grep -q 'jehovahs-light'; then
+              echo "error: PM2 id 14 is not named jehovahs-light — aborting to avoid the wrong process"
+              pm2 show 14
+              exit 1
+            fi
+
+            # Prefer reload of the existing id. Never pm2 start a second app.
+            pm2 reload 14
+
+            echo "deploy ok: ${DEPLOY_PATH} (PM2 14 jehovahs-light). PORT left unchanged in host .env."
