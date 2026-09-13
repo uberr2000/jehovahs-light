@@ -1,8 +1,9 @@
 # Deploy
 
 Production on this server is untouched by this documentation change. Merge
-only after review. This repo does **not** own GitHub Actions — quality owns
-CI via `deploy-develop.yml`. Do not add `.github/workflows` here.
+only after review. GitHub Actions for **develop** live in
+`.github/workflows/` — see [ci-cd.md](ci-cd.md). There is no Production
+deploy workflow.
 
 ## Server
 

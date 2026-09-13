@@ -48,6 +48,7 @@ npm run dev
 See `.env.example`. **PORT** must be set in `.env` (Next.js / standalone
 `server.js` read it). Never add `--port` to `package.json` `start`.
 Server deploy: [docs/deploy.md](docs/deploy.md) (PM2 id 14).
+Develop CI/CD: [docs/ci-cd.md](docs/ci-cd.md).
 
 ```
 PORT=3000

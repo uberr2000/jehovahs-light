@@ -1,0 +1,53 @@
+# CI for Jehovah's Light (Next.js 16, output: 'standalone').
+# Next.js 16 requires Node >= 20.9. This job uses Node 22 (current LTS).
+name: CI
+
+on:
+  pull_request:
+    branches: [develop]
+  push:
+    branches: [develop]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Harmless placeholders so `next build` can see the same keys as .env.example.
+  # DB_* is runtime-only in src/lib/db.ts; NEXT_PUBLIC_APP_URL is unused in
+  # source today but listed in .env.example. PORT is never written into
+  # package.json — "start" stays "next start".
+  CI: true
+  PORT: "3000"
+  DB_HOST: localhost
+  DB_USER: ci
+  DB_PASSWORD: ci
+  DB_NAME: ci
+  NEXT_PUBLIC_APP_URL: https://example.invalid
+
+jobs:
+  lint-and-build:
+    name: lint and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
