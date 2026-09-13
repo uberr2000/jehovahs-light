@@ -92,6 +92,8 @@ export default function Home() {
       .find(row => row.startsWith('locale='))
       ?.split('=')[1] as Locale | undefined;
     if (savedLocale && ['en', 'zh-TW', 'zh-CN'].includes(savedLocale)) {
+      // Cookie hydrate after mount — avoids SSR/client mismatch.
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- locale cookie
       setLocale(savedLocale);
     }
   }, []);

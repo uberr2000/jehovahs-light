@@ -162,11 +162,10 @@ function createEarthTexture(): THREE.CanvasTexture {
 function Earth({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
   const earthRef = useRef<THREE.Mesh>(null);
   const atmosphereRef = useRef<THREE.Mesh>(null);
-  const [earthTexture, setEarthTexture] = useState<THREE.CanvasTexture | null>(null);
+  // Client-only (dynamic import ssr:false); build the canvas texture once.
+  const [earthTexture] = useState(() => createEarthTexture());
 
   useEffect(() => {
-    const texture = createEarthTexture();
-    setEarthTexture(texture);
     onGlobeReady?.();
   }, [onGlobeReady]);
 

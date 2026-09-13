@@ -27,6 +27,9 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
   standalone `public` + `.next/static` copy; `pm2 reload 14`
 - `docs/ci-cd.md` — CI steps, secret names, path, PM2 14, no
   `package.json` port hacks, Production untouched
+- ESLint: ignore `deploy/**` (PM2 CJS); unused `locales` import;
+  cookie-locale hydrate disable; Globe texture via `useState` init
+  so `npm run lint` is green on CI
 
 ## In Progress
 
