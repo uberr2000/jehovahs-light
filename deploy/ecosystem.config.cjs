@@ -2,8 +2,17 @@
  * PM2 ecosystem for jehovahs-light.
  *
  * Server deploy path: /var/www/html/jehovahs-light.ink.net.tw/
- * PM2 process id: 14
- * App name: jehovahs-light
+ * App name: jehovahs-light  (stable identifier — do not target by numeric id)
+ * Historical PM2 id 14 may still exist under a different name
+ * (jehovahs-light.ink.net.tw). `pm2 reload 14` does not change that
+ * process's start command. Deploy uses:
+ *   pm2 startOrReload deploy/ecosystem.config.cjs --update-env
+ * and falls back to delete-by-name then `pm2 start` this file.
+ *
+ * One-time host migration if id 14 is still the old name:
+ *   pm2 delete jehovahs-light.ink.net.tw
+ *   pm2 start deploy/ecosystem.config.cjs
+ *   pm2 save
  *
  * PORT must come from the server .env (parsed here and sourced by
  * deploy/with-env.sh). Never add --port to package.json start.
@@ -55,7 +64,8 @@ module.exports = {
   apps: [
     {
       name: 'jehovahs-light',
-      // Existing server process: pm2 id 14. Reload 14; do not start a second app.
+      // Name is the identifier. Numeric ids (historically 14) can change
+      // after delete + start from this file.
       cwd: ROOT,
       script: path.join(ROOT, 'deploy', 'with-env.sh'),
       args: 'node .next/standalone/server.js',

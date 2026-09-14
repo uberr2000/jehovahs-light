@@ -7,7 +7,9 @@
 #   DEPLOY_SSH_KEY
 #
 # Host path: /var/www/html/jehovahs-light.ink.net.tw/
-# PM2 process id 14 / name jehovahs-light
+# PM2 name: jehovahs-light (from deploy/ecosystem.config.cjs).
+# Do not assume numeric id 14 — `pm2 reload 14` does not switch an existing
+# `npm start` / `next start` process to standalone.
 # PORT must already exist in the host .env — this job never edits package.json.
 #
 # Sibling apps on the same host must not be touched:
@@ -167,19 +169,11 @@ jobs:
             rm -rf .next/standalone/.next/static
             cp -a .next/static .next/standalone/.next/static
 
-            if ! pm2 describe 14 >/dev/null 2>&1; then
-              echo "error: PM2 process id 14 is not running"
-              echo "Do not start a second jehovahs-light process from CI."
-              echo "Start id 14 once on the host (see docs/deploy.md), then re-run this workflow."
-              exit 1
-            fi
-            if ! pm2 show 14 | grep -q 'jehovahs-light'; then
-              echo "error: PM2 id 14 is not named jehovahs-light — aborting to avoid the wrong process"
-              pm2 show 14
-              exit 1
-            fi
+            # Identify by name jehovahs-light from the ecosystem file.
+            # `pm2 reload 14` is not enough to change npm start → standalone.
+            # startOrReload --update-env, with delete-by-name + start fallback.
+            # Fails if the running script is still next start (see deploy/pm2-sync.sh).
+            export DEPLOY_PATH
+            bash deploy/pm2-sync.sh
 
-            # Prefer reload of the existing id. Never pm2 start a second app.
-            pm2 reload 14
-
-            echo "deploy ok: ${DEPLOY_PATH} (PM2 14 jehovahs-light). PORT left unchanged in host .env."
+            echo "deploy ok: ${DEPLOY_PATH} (PM2 name jehovahs-light / ecosystem). PORT left unchanged in host .env."
