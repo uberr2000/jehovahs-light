@@ -44,6 +44,11 @@ exist; that is expected.
 The job **fails early** with a clear message if any secret is missing or empty.
 It does not print secret values.
 
+The SSH step does **not** pass `script_stop` to `appleboy/ssh-action` (that
+input is invalid / problematic — same lesson as ai.srdc.org.tw and
+member.rsh-care.com). The remote script starts with `set -euo pipefail` so
+a failing command still stops the deploy.
+
 ### Host steps (in order)
 
 1. `cd /var/www/html/jehovahs-light.ink.net.tw/` only. Sibling paths

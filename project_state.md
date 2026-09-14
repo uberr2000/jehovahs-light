@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-13_
+_Last updated: 2026-09-14_
 
 ## Project name & stack summary
 
@@ -24,7 +24,9 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - `.github/workflows/deploy-develop.yml` — SSH deploy on `push` to
   `develop`; secrets `DEPLOY_HOST` / `DEPLOY_USER` / `DEPLOY_SSH_KEY`;
   dirty-tree fail (no `git reset --hard`); `git pull --ff-only`;
-  standalone `public` + `.next/static` copy; `pm2 reload 14`
+  standalone `public` + `.next/static` copy; `pm2 reload 14`; no
+  `script_stop` on `appleboy/ssh-action` (`set -euo pipefail` in the
+  remote script instead)
 - `docs/ci-cd.md` — CI steps, secret names, path, PM2 14, no
   `package.json` port hacks, Production untouched
 - ESLint: ignore `deploy/**` (PM2 CJS); unused `locales` import;
@@ -65,6 +67,7 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 
 ## Recent Commits
 
+- Remove invalid `script_stop` from develop SSH deploy (`set -euo pipefail`)
 - Load PORT from `.env` via PM2 id 14 (standalone); keep `next start`
 - Add GitHub Actions CI + develop SSH deploy (no Production CD)
 - Make `npm run lint` green for CI (ignore `deploy/**`, hook/import fixes)
@@ -77,3 +80,5 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - PM2 process id 14 is documented, not created as a second process
 - CI/CD lives in this repo; only **develop** is deployed over SSH
 - Production remains untouched (no production workflow)
+- `appleboy/ssh-action` must not use `script_stop` (invalid / problematic);
+  fail-fast is `set -euo pipefail` inside the remote script
