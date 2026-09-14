@@ -5,7 +5,8 @@ there is no production deploy workflow, and this documentation does not change
 Production.
 
 PORT still comes from the **host `.env` only**. `package.json` `"start"` stays
-`next start`. Never add `--port`. See [deploy.md](deploy.md) (PM2 id **14**).
+`next start`. Never add `--port`. See [deploy.md](deploy.md) (PM2 name
+`jehovahs-light`; do not assume numeric id 14).
 
 ## CI — `.github/workflows/ci.yml`
 
@@ -64,12 +65,24 @@ a failing command still stops the deploy.
 6. Copy `public` → `.next/standalone/public` and `.next/static` →
    `.next/standalone/.next/static` (Next standalone does not include these;
    see the [output docs](https://nextjs.org/docs/app/api-reference/config/next-config-js/output)).
-7. `pm2 reload 14` (process name must be `jehovahs-light`). Does **not**
-   `pm2 start` a second process. If id 14 is missing, the job fails and asks
-   for a one-time host start (see [deploy.md](deploy.md)).
+7. Apply `deploy/ecosystem.config.cjs` by **name** `jehovahs-light` (not
+   numeric id 14). `pm2 reload 14` is **not** enough to change an existing
+   `npm start` / `next start` command. The remote script runs
+   `bash deploy/pm2-sync.sh`, which:
+   - refuses sibling paths `/var/www/html/ai.srdc.org.tw` and
+     `/var/www/html/member.rsh-care.com`
+   - aborts with one-time migration commands if a historical process named
+     `jehovahs-light.ink.net.tw` (or id 14 under another name) still has
+     cwd = this deploy path — see [deploy.md](deploy.md)
+   - runs `pm2 startOrReload deploy/ecosystem.config.cjs --update-env`
+   - if the script is still not standalone: `pm2 delete jehovahs-light`
+     then `pm2 start deploy/ecosystem.config.cjs --update-env`
+   - **fails the deploy** unless `pm2 show jehovahs-light` script mentions
+     `standalone/server.js` or `with-env.sh` (still `next start` → fail)
 
-PM2 still starts via `deploy/with-env.sh` → `node .next/standalone/server.js`.
-Reload re-reads the host `.env` through that wrapper.
+PM2 must start via `deploy/with-env.sh` → `node .next/standalone/server.js`.
+`startOrReload --update-env` re-reads the host `.env` through the ecosystem
+and the wrapper. Reload of a stale process definition does not.
 
 ## Production
 
