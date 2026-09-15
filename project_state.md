@@ -38,7 +38,7 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
   cookie-locale hydrate disable so `npm run lint` is green on CI
 - Globe3D uses a local NASA Blue Marble equirectangular satellite
   texture (`public/globe/earth-blue-marble.jpg` via drei `useTexture`);
-  procedural canvas continents removed; no clouds / day-night shader;
+  procedural canvas continents removed; unlit map (no clouds / day-night);
   light points, OrbitControls, and auto-rotation unchanged
 
 ## In Progress
@@ -87,7 +87,7 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 ## Recent Commits
 
 - Replace Globe3D procedural continents with local NASA Blue Marble
-  satellite texture (`public/globe/`), document attribution
+  satellite texture (`public/globe/`); unlit map, document attribution
 - Switch develop deploy from `pm2 reload 14` to ecosystem
   `startOrReload --update-env` (name `jehovahs-light`, fail if still
   `next start`)
@@ -108,4 +108,5 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - `appleboy/ssh-action` must not use `script_stop` (invalid / problematic);
   fail-fast is `set -euo pipefail` inside the remote script
 - Globe Earth map is a local NASA Blue Marble JPEG under `public/globe/`
-  (no runtime hotlink). No cloud layer and no day/night terminator shader.
+  (no runtime hotlink). Unlit `meshBasicMaterial` so there is no cloud
+  layer and no day/night terminator.

@@ -91,14 +91,12 @@ function Earth({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
 
   return (
     <group>
-      {/* Main Earth sphere — local NASA Blue Marble, no clouds / day-night shader */}
+      {/* Main Earth sphere — unlit local NASA Blue Marble (no day/night terminator) */}
       <Sphere ref={earthRef} args={[2, 64, 64]}>
-        <meshStandardMaterial
+        <meshBasicMaterial
           map={earthMap}
           map-colorSpace={THREE.SRGBColorSpace}
           map-anisotropy={8}
-          roughness={0.85}
-          metalness={0}
         />
       </Sphere>
 
@@ -138,11 +136,6 @@ function Earth({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
       {userMarkerPos && (
         <UserLightMarker position={userMarkerPos} />
       )}
-
-      {/* Even lighting so the satellite map stays readable (no terminator / night side) */}
-      <ambientLight intensity={0.9} />
-      <directionalLight position={[5, 3, 5]} intensity={0.45} color="#ffffff" />
-      <directionalLight position={[-5, -3, -5]} intensity={0.35} color="#ffffff" />
     </group>
   );
 }
