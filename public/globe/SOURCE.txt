@@ -1,0 +1,10 @@
+earth-blue-marble.jpg
+NASA Blue Marble (2002) — Land Surface, Shallow Water, and Shaded Topography
+2048x1024 JPEG, equirectangular, cloud-free.
+
+Source:
+https://eoimages.gsfc.nasa.gov/images/imagerecords/57000/57752/land_shallow_topo_2048.jpg
+https://visibleearth.nasa.gov/images/57752/blue-marble-land-surface-shallow-water-and-shaded-ocean
+
+Credit: NASA Goddard Space Flight Center / Reto Stöckli / Robert Simmon
+License: U.S. government work; see docs/globe-texture.md

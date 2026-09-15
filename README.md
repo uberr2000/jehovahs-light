@@ -4,7 +4,7 @@ A global beacon of faith - Light up the world with Jehovah's guiding light.
 
 ## Features
 
-- 🌍 **3D Interactive Globe** - Dark Earth with light points showing believers around the world
+- 🌍 **3D Interactive Globe** - NASA Blue Marble satellite Earth with light points showing believers around the world
 - 📍 **GPS Location Sharing** - Share your location to light up your position on the globe
 - 🌐 **Multi-language Support** - English, Traditional Chinese (繁體中文), Simplified Chinese (简体中文)
 - ✨ **Lighthouse Animation** - Beautiful entrance animation with scripture
@@ -58,6 +58,12 @@ DB_PASSWORD=your_password
 DB_NAME=jehovahs_light
 NEXT_PUBLIC_APP_URL=https://your-domain.com
 ```
+
+## Globe texture
+
+The globe map is NASA Blue Marble (2002), stored locally at
+`public/globe/earth-blue-marble.jpg`. Credit NASA GSFC. Full source, license,
+and attribution: [docs/globe-texture.md](docs/globe-texture.md).
 
 ## License
 

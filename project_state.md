@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-14_
+_Last updated: 2026-09-15_
 
 ## Project name & stack summary
 
@@ -35,8 +35,11 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - `docs/ci-cd.md` — CI steps, secret names, path, PM2 name
   `jehovahs-light`, no `package.json` port hacks, Production untouched
 - ESLint: ignore `deploy/**` (PM2 CJS); unused `locales` import;
-  cookie-locale hydrate disable; Globe texture via `useState` init
-  so `npm run lint` is green on CI
+  cookie-locale hydrate disable so `npm run lint` is green on CI
+- Globe3D uses a local NASA Blue Marble equirectangular satellite
+  texture (`public/globe/earth-blue-marble.jpg` via drei `useTexture`);
+  procedural canvas continents removed; no clouds / day-night shader;
+  light points, OrbitControls, and auto-rotation unchanged
 
 ## In Progress
 
@@ -59,6 +62,10 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - `deploy/pm2-inspect.cjs` — parse `pm2 jlist` for sync/safety checks
 - `docs/deploy.md`
 - `docs/ci-cd.md`
+- `docs/globe-texture.md` — NASA Blue Marble source, credit, license
+- `public/globe/earth-blue-marble.jpg` — local 2048×1024 satellite map
+- `public/globe/SOURCE.txt` — asset provenance next to the JPEG
+- `src/components/Globe3D.tsx` — R3F sphere + `useTexture('/globe/...')`
 - `eslint.config.mjs` — ignores `deploy/**`
 - `src/app/` — pages and API routes
 - `src/lib/db.ts`
@@ -79,6 +86,8 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 
 ## Recent Commits
 
+- Replace Globe3D procedural continents with local NASA Blue Marble
+  satellite texture (`public/globe/`), document attribution
 - Switch develop deploy from `pm2 reload 14` to ecosystem
   `startOrReload --update-env` (name `jehovahs-light`, fail if still
   `next start`)
@@ -98,3 +107,5 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - Production remains untouched (no production workflow)
 - `appleboy/ssh-action` must not use `script_stop` (invalid / problematic);
   fail-fast is `set -euo pipefail` inside the remote script
+- Globe Earth map is a local NASA Blue Marble JPEG under `public/globe/`
+  (no runtime hotlink). No cloud layer and no day/night terminator shader.
