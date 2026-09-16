@@ -7,6 +7,12 @@ import GeoLocationButton from '@/components/GeoLocationButton';
 import LanguageSelector from '@/components/LanguageSelector';
 import Stats from '@/components/Stats';
 import { type Locale } from '@/i18n/config';
+import {
+  readCachedConsent,
+  shouldSkipIntro,
+  writeCachedConsent,
+  normalizeConsent,
+} from '@/lib/consent-cache';
 
 // Dynamic import for 3D globe (no SSR)
 const Globe3D = dynamic(() => import('@/components/Globe3D'), {
@@ -74,8 +80,17 @@ const translations = {
   },
 };
 
+function GlobeLoadingSpinner() {
+  return (
+    <div className="w-full h-full flex items-center justify-center bg-black">
+      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-yellow-500" />
+    </div>
+  );
+}
+
 export default function Home() {
   const [showIntro, setShowIntro] = useState(true);
+  const [introResolved, setIntroResolved] = useState(false);
   const [locale, setLocale] = useState<Locale>('en');
   const [locations, setLocations] = useState<Location[]>([]);
   const [stats, setStats] = useState<StatsData>({ total: 0, today: 0, countries: 0 });
@@ -98,32 +113,63 @@ export default function Home() {
     }
   }, []);
 
-  // Fetch locations and user consent on mount
+  // Fetch locations and decide whether to skip the lighthouse intro.
+  // localStorage is a same-device cache; GET /api/locations.userConsent is IP-based.
   useEffect(() => {
+    let cancelled = false;
+
+    const cached = readCachedConsent();
+    const cacheSkipsIntro = shouldSkipIntro(cached);
+    if (cacheSkipsIntro && cached) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage intro gate
+      setUserConsent(cached);
+      if (cached.hasLocation && cached.latitude != null && cached.longitude != null) {
+        setUserLocation({
+          latitude: cached.latitude,
+          longitude: cached.longitude,
+        });
+      }
+      setShowIntro(false);
+      setIntroResolved(true);
+    }
+
     async function fetchData() {
       try {
         const response = await fetch('/api/locations');
         const data = await response.json();
+        if (cancelled) return;
         setLocations(data.locations || []);
         setStats(data.stats || { total: 0, today: 0, countries: 0 });
-        
-        // Check if user has already consented
+
         if (data.userConsent) {
-          setUserConsent(data.userConsent);
-          if (data.userConsent.hasLocation && data.userConsent.latitude && data.userConsent.longitude) {
-            setUserLocation({
-              latitude: data.userConsent.latitude,
-              longitude: data.userConsent.longitude,
-            });
+          const fromApi = normalizeConsent(data.userConsent);
+          if (shouldSkipIntro(fromApi)) {
+            setUserConsent(fromApi);
+            writeCachedConsent(fromApi);
+            setShowIntro(false);
+            if (fromApi.hasLocation && fromApi.latitude != null && fromApi.longitude != null) {
+              setUserLocation({
+                latitude: fromApi.latitude,
+                longitude: fromApi.longitude,
+              });
+            }
+          } else if (!cacheSkipsIntro) {
+            setUserConsent(fromApi);
           }
         }
       } catch (error) {
         console.error('Failed to fetch locations:', error);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) {
+          setIsLoading(false);
+          setIntroResolved(true);
+        }
       }
     }
     fetchData();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleLocaleChange = (newLocale: Locale) => {
@@ -132,9 +178,15 @@ export default function Home() {
   };
 
   const handleLocationReceived = (lat: number, lng: number) => {
+    const consent: UserConsent = {
+      consented: true,
+      hasLocation: true,
+      latitude: lat,
+      longitude: lng,
+    };
     setUserLocation({ latitude: lat, longitude: lng });
-    setUserConsent({ consented: true, hasLocation: true, latitude: lat, longitude: lng });
-    // Refresh locations
+    setUserConsent(consent);
+    writeCachedConsent(consent);
     fetch('/api/locations')
       .then(res => res.json())
       .then(data => {
@@ -142,6 +194,10 @@ export default function Home() {
         setStats(data.stats || { total: 0, today: 0, countries: 0 });
       });
   };
+
+  if (!introResolved) {
+    return <GlobeLoadingSpinner />;
+  }
 
   if (showIntro) {
     return <LighthouseIntro onComplete={() => setShowIntro(false)} language={locale} />;
@@ -162,12 +218,10 @@ export default function Home() {
       {/* 3D Globe Section */}
       <div className="h-[60vh] md:h-[70vh] relative">
         {isLoading ? (
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-yellow-500" />
-          </div>
+          <GlobeLoadingSpinner />
         ) : (
-          <Globe3D 
-            lightPoints={locations} 
+          <Globe3D
+            lightPoints={locations}
             userLocation={userLocation}
           />
         )}
@@ -205,7 +259,7 @@ export default function Home() {
               <h3 className="text-lg md:text-xl font-semibold text-yellow-400 mb-4">
                 {t.shareTitle}
               </h3>
-              <GeoLocationButton 
+              <GeoLocationButton
                 onLocationReceived={handleLocationReceived}
                 language={locale}
               />

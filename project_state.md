@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-15_
+_Last updated: 2026-09-16_
 
 ## Project name & stack summary
 
@@ -39,7 +39,12 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - Globe3D uses a local NASA Blue Marble equirectangular satellite
   texture (`public/globe/earth-blue-marble.jpg` via drei `useTexture`);
   procedural canvas continents removed; unlit map (no clouds / day-night);
-  light points, OrbitControls, and auto-rotation unchanged
+  OrbitControls and auto-rotation unchanged
+- Globe light points / LightGlow (and user marker glow) are ~1/4 of the
+  previous visual size (`pointsMaterial` 0.015; glow pulse 0.01–0.015)
+- Returning GPS-accepted visitors skip `LighthouseIntro`: localStorage
+  cache `jehovahs-light:user-consent` plus existing `GET /api/locations`
+  `userConsent` (IP). No new consent endpoint.
 
 ## In Progress
 
@@ -66,14 +71,17 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - `public/globe/earth-blue-marble.jpg` — local 2048×1024 satellite map
 - `public/globe/SOURCE.txt` — asset provenance next to the JPEG
 - `src/components/Globe3D.tsx` — R3F sphere + `useTexture('/globe/...')`
+- `src/lib/consent-cache.ts` — localStorage cache for intro skip
+- `docs/consent-memory.md` — IP + localStorage limitations
 - `eslint.config.mjs` — ignores `deploy/**`
 - `src/app/` — pages and API routes
 - `src/lib/db.ts`
 
 ## API Routes Summary
 
-- `GET/POST /api/locations` — lit locations
-- `GET/POST /api/consent` — GPS consent by IP
+- `GET/POST /api/locations` — lit locations; GET also returns `userConsent`
+  (IP) used to skip intro
+- `GET/POST /api/consent` — GPS consent by IP (decline path; no new routes)
 
 ## Known Issues
 
@@ -83,9 +91,14 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - Dirty host working tree aborts deploy (no `git reset --hard`)
 - If PM2 id 14 is still named `jehovahs-light.ink.net.tw`, CI aborts and
   asks for one-time `pm2 delete` + `pm2 start ecosystem` + `pm2 save`
+- GPS intro skip is IP + localStorage only: shared Wi-Fi / VPN / IP change
+  can mis-identify; new device or cleared storage falls back to IP
+  (`docs/consent-memory.md`)
 
 ## Recent Commits
 
+- Shrink Globe3D light/glow sizes to ~1/4; skip lighthouse intro when
+  GET /api/locations `userConsent` or localStorage shows GPS already accepted
 - Replace Globe3D procedural continents with local NASA Blue Marble
   satellite texture (`public/globe/`); unlit map, document attribution
 - Switch develop deploy from `pm2 reload 14` to ecosystem
@@ -110,3 +123,5 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - Globe Earth map is a local NASA Blue Marble JPEG under `public/globe/`
   (no runtime hotlink). Unlit `meshBasicMaterial` so there is no cloud
   layer and no day/night terminator.
+- Intro skip uses existing `userConsent` on `GET /api/locations` plus
+  localStorage; decline is remembered but does not skip the intro.
