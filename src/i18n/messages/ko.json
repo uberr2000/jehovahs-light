@@ -1,0 +1,49 @@
+{
+  "site": {
+    "title": "여호와의 빛",
+    "description": "여호와의 인도하는 빛으로 세상을 밝히세요"
+  },
+  "hero": {
+    "title": "여호와의 빛",
+    "subtitle": "세상을 위한 희망의 등대",
+    "description": "각각의 빛은 여호와의 사랑에 감동받은 영혼을 나타냅니다. 위치를 공유하여 이 세계적인 믿음의 등대의 일부가 되어 주세요.",
+    "shareTitle": "당신의 빛을 나누세요",
+    "alreadyShared": "당신의 빛이 세상을 비추고 있습니다",
+    "welcomeBack": "다시 오신 것을 환영합니다! 당신의 빛은 이미 빛나고 있습니다."
+  },
+  "geolocation": {
+    "title": "당신의 빛을 나누세요",
+    "request": "위치 공유를 허용하여 지구에서 당신의 위치를 밝혀 주세요",
+    "button": "내 위치 공유하기",
+    "denied": "위치 접근이 거부되었습니다. 전 세계의 빛은 계속 볼 수 있습니다.",
+    "error": "위치를 가져올 수 없습니다. 다시 시도해 주세요.",
+    "success": "당신의 빛이 세상에 더해졌습니다!",
+    "loading": "위치를 확인하는 중...",
+    "alreadyExists": "당신의 위치는 이미 밝혀져 있습니다!"
+  },
+  "globe": {
+    "title": "세계의 빛",
+    "totalLights": "빛 합계",
+    "countries": "나라",
+    "recentLights": "최근의 빛"
+  },
+  "lighthouse": {
+    "title": "여호와의 빛",
+    "subtitle": "희망의 등대",
+    "verse": "“여호와는 나의 빛, 나의 구원이시니 내가 누구를 두려워하리요”",
+    "reference": "시편 27:1",
+    "enter": "빛 속으로"
+  },
+  "stats": {
+    "totalLights": "밝혀진 빛 합계",
+    "todayLights": "오늘의 빛",
+    "countries": "도달한 나라"
+  },
+  "footer": {
+    "rights": "판권 소유",
+    "verse": "“생명의 원천이 당신께 있사오니, 우리는 당신의 빛 가운데서 빛을 보리이다” — 시편 36:9"
+  },
+  "language": {
+    "select": "언어 선택"
+  }
+}

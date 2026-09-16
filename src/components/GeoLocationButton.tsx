@@ -1,46 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { writeCachedConsent } from '@/lib/consent-cache';
 
 interface GeoLocationButtonProps {
   onLocationReceived: (lat: number, lng: number) => void;
-  language: 'en' | 'zh-TW' | 'zh-CN';
 }
-
-const translations = {
-  en: {
-    button: 'Share My Location',
-    loading: 'Locating you...',
-    denied: 'Location access denied. You can still view the lights from around the world.',
-    error: 'Unable to get your location. Please try again.',
-    success: 'Your light has been added to the world!',
-    alreadyExists: 'Your location has already been lit!',
-  },
-  'zh-TW': {
-    button: '分享我的位置',
-    loading: '正在定位您...',
-    denied: '位置存取被拒絕。您仍然可以觀看來自世界各地的光。',
-    error: '無法獲取您的位置。請重試。',
-    success: '您的光已經被添加到世界上！',
-    alreadyExists: '您的位置已經被點亮了！',
-  },
-  'zh-CN': {
-    button: '分享我的位置',
-    loading: '正在定位您...',
-    denied: '位置访问被拒绝。您仍然可以观看来自世界各地的光。',
-    error: '无法获取您的位置。请重试。',
-    success: '您的光已经被添加到世界上！',
-    alreadyExists: '您的位置已经被点亮了！',
-  },
-};
 
 type Status = 'idle' | 'loading' | 'success' | 'error' | 'denied' | 'exists';
 
-export default function GeoLocationButton({ onLocationReceived, language }: GeoLocationButtonProps) {
+export default function GeoLocationButton({ onLocationReceived }: GeoLocationButtonProps) {
+  const t = useTranslations('geolocation');
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
-  const t = translations[language];
 
   const recordDeclinedConsent = async () => {
     try {
@@ -57,7 +30,7 @@ export default function GeoLocationButton({ onLocationReceived, language }: GeoL
   const handleGetLocation = async () => {
     if (!navigator.geolocation) {
       setStatus('error');
-      setMessage(t.error);
+      setMessage(t('error'));
       return;
     }
 
@@ -66,7 +39,7 @@ export default function GeoLocationButton({ onLocationReceived, language }: GeoL
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-        
+
         try {
           const response = await fetch('/api/locations', {
             method: 'POST',
@@ -78,32 +51,31 @@ export default function GeoLocationButton({ onLocationReceived, language }: GeoL
 
           if (data.alreadyExists) {
             setStatus('exists');
-            setMessage(t.alreadyExists);
+            setMessage(t('alreadyExists'));
           } else {
             setStatus('success');
-            setMessage(t.success);
+            setMessage(t('success'));
           }
           onLocationReceived(latitude, longitude);
         } catch {
           setStatus('error');
-          setMessage(t.error);
+          setMessage(t('error'));
         }
       },
       async (error) => {
         if (error.code === error.PERMISSION_DENIED) {
           setStatus('denied');
-          setMessage(t.denied);
+          setMessage(t('denied'));
           writeCachedConsent({
             consented: false,
             hasLocation: false,
             latitude: null,
             longitude: null,
           });
-          // Record that user declined (IP). Does not skip the lighthouse intro.
           await recordDeclinedConsent();
         } else {
           setStatus('error');
-          setMessage(t.error);
+          setMessage(t('error'));
         }
       },
       {
@@ -135,23 +107,29 @@ export default function GeoLocationButton({ onLocationReceived, language }: GeoL
   return (
     <div className="flex flex-col items-center gap-4">
       <button
+        type="button"
         onClick={handleGetLocation}
         disabled={status === 'loading'}
-        className={`px-6 py-3 bg-gradient-to-r ${statusColors[status]} text-white font-semibold rounded-full 
+        className={`px-6 py-3 bg-gradient-to-r ${statusColors[status]} text-white font-semibold rounded-full
           transition-all duration-300 shadow-lg shadow-yellow-500/20
           disabled:cursor-not-allowed flex items-center gap-2`}
       >
         <span>{statusIcons[status]}</span>
-        {status === 'loading' ? t.loading : t.button}
+        {status === 'loading' ? t('loading') : t('button')}
       </button>
 
       {message && (
-        <p className={`text-sm text-center max-w-md ${
-          status === 'success' ? 'text-green-400' : 
-          status === 'error' ? 'text-red-400' : 
-          status === 'denied' ? 'text-orange-400' : 
-          'text-gray-300'
-        }`}>
+        <p
+          className={`text-sm text-center max-w-md ${
+            status === 'success'
+              ? 'text-green-400'
+              : status === 'error'
+                ? 'text-red-400'
+                : status === 'denied'
+                  ? 'text-orange-400'
+                  : 'text-gray-300'
+          }`}
+        >
           {message}
         </p>
       )}

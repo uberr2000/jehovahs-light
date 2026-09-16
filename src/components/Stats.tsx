@@ -1,37 +1,20 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
+
 interface StatsProps {
   total: number;
   today: number;
   countries: number;
-  language: 'en' | 'zh-TW' | 'zh-CN';
 }
 
-const translations = {
-  en: {
-    totalLights: 'Total Lights Lit',
-    todayLights: 'Lights Today',
-    countries: 'Countries Reached',
-  },
-  'zh-TW': {
-    totalLights: '總光芒數',
-    todayLights: '今日光芒',
-    countries: '觸及國家',
-  },
-  'zh-CN': {
-    totalLights: '总光芒数',
-    todayLights: '今日光芒',
-    countries: '触及国家',
-  },
-};
-
-export default function Stats({ total, today, countries, language }: StatsProps) {
-  const t = translations[language];
+export default function Stats({ total, today, countries }: StatsProps) {
+  const t = useTranslations('stats');
 
   const stats = [
-    { label: t.totalLights, value: total, icon: '💡' },
-    { label: t.todayLights, value: today, icon: '✨' },
-    { label: t.countries, value: countries, icon: '🌍' },
+    { label: t('totalLights'), value: total, icon: '💡' },
+    { label: t('todayLights'), value: today, icon: '✨' },
+    { label: t('countries'), value: countries, icon: '🌍' },
   ];
 
   return (

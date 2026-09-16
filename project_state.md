@@ -10,7 +10,7 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 
 ## Features Done
 
-- 3D globe, GPS consent, i18n (en / zh-TW / zh-CN), locations API
+- 3D globe, GPS consent, i18n (14 locales), locations API
 - `package.json` `start` kept as `next start` (Next reads `PORT`; no `--port`)
 - `.env.example` documents `PORT` (must be set on the server `.env`)
 - `deploy/with-env.sh` sources `.env` then execs the start command
@@ -34,17 +34,23 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
   + sibling-path safety
 - `docs/ci-cd.md` — CI steps, secret names, path, PM2 name
   `jehovahs-light`, no `package.json` port hacks, Production untouched
-- ESLint: ignore `deploy/**` (PM2 CJS); unused `locales` import;
-  cookie-locale hydrate disable so `npm run lint` is green on CI
+- ESLint: ignore `deploy/**` (PM2 CJS) so `npm run lint` is green on CI
 - Globe3D uses a local NASA Blue Marble equirectangular satellite
   texture (`public/globe/earth-blue-marble.jpg` via drei `useTexture`);
   procedural canvas continents removed; unlit map (no clouds / day-night);
-  OrbitControls and auto-rotation unchanged
+  OrbitControls zoom locked on mobile; auto-rotation unchanged
 - Globe light points / LightGlow (and user marker glow) are ~1/4 of the
   previous visual size (`pointsMaterial` 0.015; glow pulse 0.01–0.015)
 - Returning GPS-accepted visitors skip `LighthouseIntro`: localStorage
   cache `jehovahs-light:user-consent` plus existing `GET /api/locations`
   `userConsent` (IP). No new consent endpoint.
+- Mobile page zoom locked (`viewport` initial-scale=1, maximum-scale=1,
+  user-scalable=no). Globe3D pinch zoom off on coarse pointer / max-width
+  768px; camera distance stays at 5. Layout remains responsive.
+- 14 locales via next-intl messages: en, zh-TW, zh-CN, es, pt, fr, de,
+  ja, ko, ru, ar, id, th, vi. Detection: locale cookie → SSR
+  Accept-Language → navigator.language → en. Unmatched (including
+  unmatched region variants like zh-HK) → en. `html dir=rtl` only for ar.
 
 ## In Progress
 
@@ -75,7 +81,12 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - `docs/consent-memory.md` — IP + localStorage limitations
 - `eslint.config.mjs` — ignores `deploy/**`
 - `src/app/` — pages and API routes
-- `src/lib/db.ts`
+- `src/i18n/config.ts` — 14 locales + native names
+- `src/i18n/resolve-locale.ts` — cookie / Accept-Language / navigator match
+- `src/i18n/messages/*.json` — en, zh-TW, zh-CN, es, pt, fr, de, ja, ko, ru, ar, id, th, vi
+- `src/components/LocaleNavigatorFallback.tsx` — navigator fallback when SSR defaulted
+- `src/app/layout.tsx` — viewport lock, html lang/dir, locale source
+- `docs/i18n-viewport.md` — viewport lock + locale priority + list
 
 ## API Routes Summary
 
@@ -97,6 +108,8 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 
 ## Recent Commits
 
+- Lock mobile viewport/globe pinch zoom; add 14 next-intl locales with
+  cookie → Accept-Language → navigator → en (RTL for ar)
 - Shrink Globe3D light/glow sizes to ~1/4; skip lighthouse intro when
   GET /api/locations `userConsent` or localStorage shows GPS already accepted
 - Replace Globe3D procedural continents with local NASA Blue Marble
@@ -125,3 +138,10 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
   layer and no day/night terminator.
 - Intro skip uses existing `userConsent` on `GET /api/locations` plus
   localStorage; decline is remembered but does not skip the intro.
+- Mobile zoom is locked via Next.js `viewport` export (not a raw meta tag)
+  plus OrbitControls `enableZoom={false}` on coarse/narrow viewports.
+- Locale cookie is the user pick (and navigator fallback persist). SSR
+  uses Accept-Language when the cookie is missing. Unmatched region
+  variants (e.g. zh-HK) do not map to zh-TW/zh-CN. RTL only for `ar`.
+  UI strings live in next-intl `messages/*.json` (no duplicate hardcoded
+  maps, no translate API).

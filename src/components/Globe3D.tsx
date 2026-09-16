@@ -1,9 +1,36 @@
 'use client';
 
-import { Suspense, useRef, useMemo, useEffect } from 'react';
+import { Suspense, useRef, useMemo, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Sphere, Stars, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
+
+const CAMERA_DISTANCE = 5;
+const MOBILE_MAX_WIDTH = '(max-width: 768px)';
+const COARSE_POINTER = '(pointer: coarse)';
+
+function useLockGlobeZoom() {
+  const [lockZoom, setLockZoom] = useState(true);
+
+  useEffect(() => {
+    const coarse = window.matchMedia(COARSE_POINTER);
+    const narrow = window.matchMedia(MOBILE_MAX_WIDTH);
+
+    const update = () => {
+      setLockZoom(coarse.matches || narrow.matches);
+    };
+
+    update();
+    coarse.addEventListener('change', update);
+    narrow.addEventListener('change', update);
+    return () => {
+      coarse.removeEventListener('change', update);
+      narrow.removeEventListener('change', update);
+    };
+  }, []);
+
+  return lockZoom;
+}
 
 /** Local NASA Blue Marble equirectangular map. See docs/globe-texture.md. */
 const EARTH_TEXTURE_PATH = '/globe/earth-blue-marble.jpg';
@@ -202,9 +229,11 @@ function UserLightMarker({ position }: { position: THREE.Vector3 }) {
 
 // Main Globe3D component
 export default function Globe3D({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
+  const lockZoom = useLockGlobeZoom();
+
   return (
     <div className="w-full h-full">
-      <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+      <Canvas camera={{ position: [0, 0, CAMERA_DISTANCE], fov: 45 }}>
         <Stars
           radius={100}
           depth={50}
@@ -223,8 +252,9 @@ export default function Globe3D({ lightPoints, userLocation, onGlobeReady }: Glo
         </Suspense>
         <OrbitControls
           enablePan={false}
-          minDistance={3}
-          maxDistance={10}
+          enableZoom={!lockZoom}
+          minDistance={lockZoom ? CAMERA_DISTANCE : 3}
+          maxDistance={lockZoom ? CAMERA_DISTANCE : 10}
           enableDamping
           dampingFactor={0.05}
           rotateSpeed={0.5}

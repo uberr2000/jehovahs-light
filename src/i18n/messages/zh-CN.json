@@ -6,7 +6,10 @@
   "hero": {
     "title": "耶和华的光",
     "subtitle": "世界的希望灯塔",
-    "description": "每一道光都代表一个被耶和华的爱触摸的灵魂。分享您的位置，成为这个全球信仰灯塔的一部分。"
+    "description": "每一道光都代表一个被耶和华的爱触摸的灵魂。分享您的位置，成为这个全球信仰灯塔的一部分。",
+    "shareTitle": "分享您的光",
+    "alreadyShared": "您的光照耀着世界",
+    "welcomeBack": "欢迎回来！您的光已经在发光了。"
   },
   "geolocation": {
     "title": "分享您的光",
@@ -15,7 +18,8 @@
     "denied": "位置访问被拒绝。您仍然可以观看来自世界各地的光。",
     "error": "无法获取您的位置。请重试。",
     "success": "您的光已经被添加到世界上！",
-    "loading": "正在定位您..."
+    "loading": "正在定位您...",
+    "alreadyExists": "您的位置已经被点亮了！"
   },
   "globe": {
     "title": "全球光芒",
@@ -24,9 +28,11 @@
     "recentLights": "最近的光芒"
   },
   "lighthouse": {
-    "title": "黑暗中的灯塔",
+    "title": "耶和华的光",
+    "subtitle": "希望的灯塔",
     "verse": "「耶和华是我的亮光，是我的拯救，我还怕谁呢？」",
-    "reference": "诗篇 27:1"
+    "reference": "诗篇 27:1",
+    "enter": "进入光明"
   },
   "stats": {
     "totalLights": "总光芒数",

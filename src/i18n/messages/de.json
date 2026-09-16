@@ -1,0 +1,49 @@
+{
+  "site": {
+    "title": "Das Licht Jehovas",
+    "description": "Erhelle die Welt mit Jehovas leitendem Licht"
+  },
+  "hero": {
+    "title": "Das Licht Jehovas",
+    "subtitle": "Leuchtturm der Hoffnung für die Welt",
+    "description": "Jedes Licht steht für eine Seele, die von Jehovas Liebe berührt wurde. Teile deinen Standort und werde Teil dieses weltweiten Glaubensleuchtfeuers.",
+    "shareTitle": "Teile dein Licht",
+    "alreadyShared": "Dein Licht scheint über die Welt",
+    "welcomeBack": "Willkommen zurück! Dein Licht leuchtet bereits."
+  },
+  "geolocation": {
+    "title": "Teile dein Licht",
+    "request": "Erlaube die Standortfreigabe, um deine Position auf der Erde zu erleuchten",
+    "button": "Meinen Standort teilen",
+    "denied": "Standortzugriff verweigert. Du kannst die Lichter aus aller Welt trotzdem sehen.",
+    "error": "Dein Standort konnte nicht ermittelt werden. Bitte versuche es erneut.",
+    "success": "Dein Licht wurde der Welt hinzugefügt!",
+    "loading": "Standort wird ermittelt...",
+    "alreadyExists": "Dein Standort ist bereits erleuchtet!"
+  },
+  "globe": {
+    "title": "Lichter weltweit",
+    "totalLights": "Lichter insgesamt",
+    "countries": "Länder",
+    "recentLights": "Aktuelle Lichter"
+  },
+  "lighthouse": {
+    "title": "Das Licht Jehovas",
+    "subtitle": "Ein Leuchtturm der Hoffnung",
+    "verse": "„Jehova ist mein Licht und mein Heil — vor wem sollte ich mich fürchten?“",
+    "reference": "Psalm 27:1",
+    "enter": "Ins Licht eintreten"
+  },
+  "stats": {
+    "totalLights": "Entzündete Lichter",
+    "todayLights": "Lichter heute",
+    "countries": "Erreichte Länder"
+  },
+  "footer": {
+    "rights": "Alle Rechte vorbehalten",
+    "verse": "„Denn bei dir ist die Quelle des Lebens; in deinem Licht sehen wir das Licht.“ — Psalm 36:9"
+  },
+  "language": {
+    "select": "Sprache wählen"
+  }
+}

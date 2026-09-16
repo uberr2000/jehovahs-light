@@ -1,0 +1,49 @@
+{
+  "site": {
+    "title": "La Lumière de Jéhovah",
+    "description": "Illuminez le monde avec la lumière guidante de Jéhovah"
+  },
+  "hero": {
+    "title": "La Lumière de Jéhovah",
+    "subtitle": "Phare d'espoir pour le monde",
+    "description": "Chaque lumière représente une âme touchée par l'amour de Jéhovah. Partagez votre position et devenez partie de ce phare mondial de foi.",
+    "shareTitle": "Partagez votre lumière",
+    "alreadyShared": "Votre lumière brille sur le monde",
+    "welcomeBack": "Bon retour ! Votre lumière brille déjà."
+  },
+  "geolocation": {
+    "title": "Partagez votre lumière",
+    "request": "Autorisez le partage de position pour allumer votre emplacement sur la Terre",
+    "button": "Partager ma position",
+    "denied": "Accès à la position refusé. Vous pouvez toujours voir les lumières du monde entier.",
+    "error": "Impossible d'obtenir votre position. Veuillez réessayer.",
+    "success": "Votre lumière a été ajoutée au monde !",
+    "loading": "Localisation en cours...",
+    "alreadyExists": "Votre position est déjà allumée !"
+  },
+  "globe": {
+    "title": "Lumières mondiales",
+    "totalLights": "Lumières totales",
+    "countries": "Pays",
+    "recentLights": "Lumières récentes"
+  },
+  "lighthouse": {
+    "title": "La Lumière de Jéhovah",
+    "subtitle": "Un phare d'espoir",
+    "verse": "« Jéhovah est ma lumière et mon salut ; de qui aurais-je peur ? »",
+    "reference": "Psaume 27:1",
+    "enter": "Entrer dans la Lumière"
+  },
+  "stats": {
+    "totalLights": "Lumières allumées",
+    "todayLights": "Lumières aujourd'hui",
+    "countries": "Pays atteints"
+  },
+  "footer": {
+    "rights": "Tous droits réservés",
+    "verse": "« Car auprès de toi est la source de la vie ; par ta lumière nous voyons la lumière. » — Psaume 36:9"
+  },
+  "language": {
+    "select": "Choisir la langue"
+  }
+}
