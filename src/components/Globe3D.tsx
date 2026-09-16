@@ -62,7 +62,7 @@ function Earth({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
       const pos = latLngToVector3(point.latitude, point.longitude, 2.02);
       positions.push(pos.x, pos.y, pos.z);
       colors.push(1.0, 0.85, 0.3);
-      sizes.push(0.8);
+      sizes.push(0.2);
     });
 
     const geometry = new THREE.BufferGeometry();
@@ -110,11 +110,11 @@ function Earth({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
         />
       </Sphere>
 
-      {/* Light points on the globe */}
+      {/* Light points on the globe (~1/4 previous visual size) */}
       {lightPoints.length > 0 && (
         <points geometry={lightPointsGeometry}>
           <pointsMaterial
-            size={0.06}
+            size={0.015}
             vertexColors
             transparent
             opacity={0.9}
@@ -147,7 +147,7 @@ function LightGlow({ position }: { position: THREE.Vector3 }) {
   useFrame(({ clock }) => {
     if (meshRef.current) {
       const pulse = Math.sin(clock.getElapsedTime() * 2 + position.x * 10) * 0.5 + 0.5;
-      meshRef.current.scale.setScalar(0.04 + pulse * 0.02);
+      meshRef.current.scale.setScalar(0.01 + pulse * 0.005); // ~1/4 of previous 0.04–0.06
     }
   });
 
@@ -171,7 +171,7 @@ function UserLightMarker({ position }: { position: THREE.Vector3 }) {
 
   useFrame(({ clock }) => {
     if (meshRef.current) {
-      meshRef.current.scale.setScalar(0.08 + Math.sin(clock.getElapsedTime() * 4) * 0.02);
+      meshRef.current.scale.setScalar(0.02 + Math.sin(clock.getElapsedTime() * 4) * 0.005);
     }
     if (ringRef.current) {
       const scale = 1 + Math.sin(clock.getElapsedTime() * 2) * 0.3;
@@ -187,7 +187,7 @@ function UserLightMarker({ position }: { position: THREE.Vector3 }) {
         <meshBasicMaterial color="#ffffff" blending={THREE.AdditiveBlending} />
       </mesh>
       <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[0.1, 0.15, 32]} />
+        <ringGeometry args={[0.025, 0.0375, 32]} />
         <meshBasicMaterial
           color="#ffd700"
           transparent

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { writeCachedConsent } from '@/lib/consent-cache';
 
 interface GeoLocationButtonProps {
   onLocationReceived: (lat: number, lng: number) => void;
@@ -81,8 +82,8 @@ export default function GeoLocationButton({ onLocationReceived, language }: GeoL
           } else {
             setStatus('success');
             setMessage(t.success);
-            onLocationReceived(latitude, longitude);
           }
+          onLocationReceived(latitude, longitude);
         } catch {
           setStatus('error');
           setMessage(t.error);
@@ -92,7 +93,13 @@ export default function GeoLocationButton({ onLocationReceived, language }: GeoL
         if (error.code === error.PERMISSION_DENIED) {
           setStatus('denied');
           setMessage(t.denied);
-          // Record that user declined
+          writeCachedConsent({
+            consented: false,
+            hasLocation: false,
+            latitude: null,
+            longitude: null,
+          });
+          // Record that user declined (IP). Does not skip the lighthouse intro.
           await recordDeclinedConsent();
         } else {
           setStatus('error');
