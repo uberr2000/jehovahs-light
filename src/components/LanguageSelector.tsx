@@ -39,7 +39,7 @@ export default function LanguageSelector({
           hover:bg-white/20 transition-colors text-white border border-white/20"
       >
         <span className="text-lg">{localeFlags[currentLocale]}</span>
-        <span className="text-sm">{localeNames[currentLocale]}</span>
+        <span className="text-base">{localeNames[currentLocale]}</span>
         <svg
           className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
@@ -72,7 +72,7 @@ export default function LanguageSelector({
                 }`}
             >
               <span className="text-lg">{localeFlags[locale]}</span>
-              <span className="text-sm">{localeNames[locale]}</span>
+              <span className="text-base">{localeNames[locale]}</span>
               {currentLocale === locale && (
                 <svg className="w-4 h-4 ms-auto" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path

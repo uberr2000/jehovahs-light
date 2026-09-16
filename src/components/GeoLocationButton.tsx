@@ -110,7 +110,7 @@ export default function GeoLocationButton({ onLocationReceived }: GeoLocationBut
         type="button"
         onClick={handleGetLocation}
         disabled={status === 'loading'}
-        className={`px-6 py-3 bg-gradient-to-r ${statusColors[status]} text-white font-semibold rounded-full
+        className={`px-6 py-3 text-base md:text-lg bg-gradient-to-r ${statusColors[status]} text-white font-semibold rounded-full
           transition-all duration-300 shadow-lg shadow-yellow-500/20
           disabled:cursor-not-allowed flex items-center gap-2`}
       >
@@ -120,7 +120,7 @@ export default function GeoLocationButton({ onLocationReceived }: GeoLocationBut
 
       {message && (
         <p
-          className={`text-sm text-center max-w-md ${
+          className={`text-sm md:text-base text-center max-w-md ${
             status === 'success'
               ? 'text-green-400'
               : status === 'error'

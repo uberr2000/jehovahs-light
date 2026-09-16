@@ -37,7 +37,9 @@
   "stats": {
     "totalLights": "总光芒数",
     "todayLights": "今日光芒",
-    "countries": "触及国家"
+    "countries": "触及国家",
+    "loadError": "目前无法加载光芒。",
+    "retry": "再试一次"
   },
   "footer": {
     "rights": "版权所有",

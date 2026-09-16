@@ -6,9 +6,10 @@
   `width=device-width`, `initial-scale=1`, `maximum-scale=1`, `user-scalable=no`.
 - Layout stays responsive; users cannot pinch-shrink the page.
 - Globe3D OrbitControls: `enableZoom` is off when `(pointer: coarse)` or
-  `max-width: 768px`, and `minDistance`/`maxDistance` are both the default
-  camera distance (`5`) so pinch cannot change globe zoom. Desktop still
-  allows zoom between 3 and 10.
+  `max-width: 768px`. Mobile camera distance is computed from canvas
+  aspect and 45° FOV so the full sphere + atmosphere fits in the 60vh
+  canvas (about 7–8 units in portrait) and stays fixed. Desktop still
+  starts at 5 with zoom between 3 and 10.
 
 ## Locale priority
 

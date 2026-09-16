@@ -37,7 +37,9 @@
   "stats": {
     "totalLights": "灯された光の総数",
     "todayLights": "今日の光",
-    "countries": "届いた国"
+    "countries": "届いた国",
+    "loadError": "現在、光を読み込めません。",
+    "retry": "再試行"
   },
   "footer": {
     "rights": "全著作権所有",

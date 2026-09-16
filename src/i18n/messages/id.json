@@ -37,7 +37,9 @@
   "stats": {
     "totalLights": "Total terang yang dinyalakan",
     "todayLights": "Terang hari ini",
-    "countries": "Negara yang dijangkau"
+    "countries": "Negara yang dijangkau",
+    "loadError": "Tidak dapat memuat terang saat ini.",
+    "retry": "Coba lagi"
   },
   "footer": {
     "rights": "Hak cipta dilindungi",

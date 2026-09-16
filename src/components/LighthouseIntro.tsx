@@ -42,7 +42,7 @@ export default function LighthouseIntro({ onComplete }: LighthouseIntroProps) {
         </div>
 
         <h1
-          className={`text-4xl md:text-6xl font-bold text-white mb-4 transition-all duration-1000 ${
+          className={`text-5xl md:text-6xl font-bold text-white mb-4 transition-all duration-1000 ${
             phase >= 1 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
           style={{ textShadow: '0 0 40px rgba(255, 215, 0, 0.5)' }}
@@ -51,7 +51,7 @@ export default function LighthouseIntro({ onComplete }: LighthouseIntroProps) {
         </h1>
 
         <p
-          className={`text-xl md:text-2xl text-yellow-200 mb-8 transition-all duration-1000 ${
+          className={`text-2xl md:text-3xl text-yellow-200 mb-8 transition-all duration-1000 ${
             phase >= 2 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
@@ -63,14 +63,14 @@ export default function LighthouseIntro({ onComplete }: LighthouseIntroProps) {
             phase >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <p className="text-lg text-gray-300 italic mb-2">{t('verse')}</p>
-          <p className="text-sm text-yellow-400">— {t('reference')}</p>
+          <p className="text-xl text-gray-300 italic mb-2">{t('verse')}</p>
+          <p className="text-base text-yellow-400">— {t('reference')}</p>
         </div>
 
         <button
           type="button"
           onClick={onComplete}
-          className={`mt-12 px-8 py-4 bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-semibold rounded-full
+          className={`mt-12 px-8 py-4 text-lg bg-gradient-to-r from-yellow-500 to-amber-600 text-black font-semibold rounded-full
             hover:from-yellow-400 hover:to-amber-500 transition-all duration-500
             shadow-lg shadow-yellow-500/30 hover:shadow-yellow-400/50
             ${showButton ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none'}`}

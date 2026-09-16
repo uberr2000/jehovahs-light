@@ -37,7 +37,9 @@
   "stats": {
     "totalLights": "Luces encendidas",
     "todayLights": "Luces de hoy",
-    "countries": "Países alcanzados"
+    "countries": "Países alcanzados",
+    "loadError": "No se pueden cargar las luces ahora.",
+    "retry": "Reintentar"
   },
   "footer": {
     "rights": "Todos los derechos reservados",

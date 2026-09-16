@@ -1,4 +1,5 @@
 import mysql from 'mysql2/promise';
+import { toJsonNumber } from './json-safe';
 
 let pool: mysql.Pool | null = null;
 
@@ -84,7 +85,7 @@ export async function addLocation(
      VALUES (?, ?, ?, ?, ?, ?, ?)`,
     [latitude, longitude, ipAddress, userAgent || null, city || null, country || null, countryCode || null]
   );
-  return result.insertId;
+  return Number(result.insertId);
 }
 
 export async function getAllLocations(): Promise<LitLocation[]> {
@@ -113,9 +114,9 @@ export async function getStats() {
   );
   
   return {
-    total: totalResult[0].count,
-    today: todayResult[0].count,
-    countries: countriesResult[0].count,
+    total: toJsonNumber(totalResult[0].count),
+    today: toJsonNumber(todayResult[0].count),
+    countries: toJsonNumber(countriesResult[0].count),
   };
 }
 

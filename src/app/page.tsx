@@ -50,6 +50,39 @@ interface UserConsent {
   longitude: number | null;
 }
 
+type StatsStatus = 'loading' | 'ok' | 'error';
+
+async function fetchLocationsPayload(): Promise<{
+  locations: Location[];
+  stats: StatsData;
+  userConsent: UserConsent | null;
+}> {
+  const response = await fetch('/api/locations');
+  let data: {
+    error?: string;
+    locations?: Location[];
+    stats?: Partial<StatsData>;
+    userConsent?: UserConsent | null;
+  } = {};
+  try {
+    data = await response.json();
+  } catch {
+    data = {};
+  }
+  if (!response.ok) {
+    throw new Error(data.error || `Failed to fetch locations (${response.status})`);
+  }
+  return {
+    locations: Array.isArray(data.locations) ? data.locations : [],
+    stats: {
+      total: Number(data.stats?.total) || 0,
+      today: Number(data.stats?.today) || 0,
+      countries: Number(data.stats?.countries) || 0,
+    },
+    userConsent: data.userConsent ?? null,
+  };
+}
+
 function GlobeLoadingSpinner() {
   return (
     <div className="w-full h-full flex items-center justify-center bg-black">
@@ -70,6 +103,7 @@ export default function Home() {
     null
   );
   const [isLoading, setIsLoading] = useState(true);
+  const [statsStatus, setStatsStatus] = useState<StatsStatus>('loading');
 
   useEffect(() => {
     let cancelled = false;
@@ -96,11 +130,11 @@ export default function Home() {
 
     async function fetchData() {
       try {
-        const response = await fetch('/api/locations');
-        const data = await response.json();
+        const data = await fetchLocationsPayload();
         if (cancelled) return;
-        setLocations(data.locations || []);
-        setStats(data.stats || { total: 0, today: 0, countries: 0 });
+        setLocations(data.locations);
+        setStats(data.stats);
+        setStatsStatus('ok');
 
         if (data.userConsent) {
           const fromApi = normalizeConsent(data.userConsent);
@@ -120,6 +154,9 @@ export default function Home() {
         }
       } catch (error) {
         console.error('Failed to fetch locations:', error);
+        if (!cancelled) {
+          setStatsStatus('error');
+        }
       } finally {
         if (!cancelled) {
           setIsLoading(false);
@@ -149,11 +186,41 @@ export default function Home() {
     setUserLocation({ latitude: lat, longitude: lng });
     setUserConsent(consent);
     writeCachedConsent(consent);
-    fetch('/api/locations')
-      .then((res) => res.json())
+    fetchLocationsPayload()
       .then((data) => {
-        setLocations(data.locations || []);
-        setStats(data.stats || { total: 0, today: 0, countries: 0 });
+        setLocations(data.locations);
+        setStats(data.stats);
+        setStatsStatus('ok');
+      })
+      .catch((error) => {
+        console.error('Failed to refresh locations after share:', error);
+        setStatsStatus('error');
+      });
+  };
+
+  const handleRetryStats = () => {
+    fetchLocationsPayload()
+      .then((data) => {
+        setLocations(data.locations);
+        setStats(data.stats);
+        setStatsStatus('ok');
+        if (data.userConsent) {
+          const fromApi = normalizeConsent(data.userConsent);
+          if (shouldSkipIntro(fromApi)) {
+            setUserConsent(fromApi);
+            writeCachedConsent(fromApi);
+            if (fromApi.hasLocation && fromApi.latitude != null && fromApi.longitude != null) {
+              setUserLocation({
+                latitude: fromApi.latitude,
+                longitude: fromApi.longitude,
+              });
+            }
+          }
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to fetch locations:', error);
+        setStatsStatus('error');
       });
   };
 
@@ -174,7 +241,7 @@ export default function Home() {
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white overflow-hidden">
       <header className="fixed top-0 left-0 right-0 z-40 p-4 flex justify-between items-center bg-black/30 backdrop-blur-sm">
         <h1
-          className="text-xl md:text-2xl font-bold text-yellow-400"
+          className="text-2xl md:text-3xl font-bold text-yellow-400 leading-tight min-w-0 pe-3"
           style={{ textShadow: '0 0 20px rgba(255, 215, 0, 0.3)' }}
         >
           {t('hero.title')}
@@ -192,14 +259,14 @@ export default function Home() {
 
       <div className="relative z-10 px-4 py-8 bg-gradient-to-t from-black via-gray-900/90 to-transparent">
         <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-4xl font-bold mb-4 text-white">{t('hero.subtitle')}</h2>
-          <p className="text-gray-300 max-w-2xl mx-auto text-sm md:text-base">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white leading-tight">{t('hero.subtitle')}</h2>
+          <p className="text-gray-300 max-w-2xl mx-auto text-base md:text-lg leading-relaxed">
             {t('hero.description')}
           </p>
         </div>
 
         <div className="mb-8">
-          <Stats {...stats} />
+          <Stats {...stats} status={statsStatus === 'error' ? 'error' : 'ok'} onRetry={handleRetryStats} />
         </div>
 
         <div className="text-center mb-8">
@@ -207,13 +274,13 @@ export default function Home() {
             <div className="flex flex-col items-center gap-3">
               <div className="flex items-center gap-2 text-green-400">
                 <span className="text-2xl">✨</span>
-                <span className="text-lg font-semibold">{t('hero.alreadyShared')}</span>
+                <span className="text-xl font-semibold">{t('hero.alreadyShared')}</span>
               </div>
-              <p className="text-sm text-gray-400">{t('hero.welcomeBack')}</p>
+              <p className="text-base text-gray-400">{t('hero.welcomeBack')}</p>
             </div>
           ) : (
             <>
-              <h3 className="text-lg md:text-xl font-semibold text-yellow-400 mb-4">
+              <h3 className="text-xl md:text-2xl font-semibold text-yellow-400 mb-4">
                 {t('hero.shareTitle')}
               </h3>
               <GeoLocationButton onLocationReceived={handleLocationReceived} />
@@ -221,8 +288,8 @@ export default function Home() {
           )}
         </div>
 
-        <footer className="text-center text-gray-500 text-sm py-8 border-t border-white/10">
-          <p className="italic mb-2 text-gray-400">{t('footer.verse')}</p>
+        <footer className="text-center text-gray-500 text-base py-8 border-t border-white/10">
+          <p className="italic mb-2 text-gray-400 text-base md:text-base leading-relaxed">{t('footer.verse')}</p>
           <p>
             © {new Date().getFullYear()} Jehovah&apos;s Light. {t('footer.rights')}.
           </p>

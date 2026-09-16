@@ -37,7 +37,9 @@
   "stats": {
     "totalLights": "밝혀진 빛 합계",
     "todayLights": "오늘의 빛",
-    "countries": "도달한 나라"
+    "countries": "도달한 나라",
+    "loadError": "지금은 빛을 불러올 수 없습니다.",
+    "retry": "다시 시도"
   },
   "footer": {
     "rights": "판권 소유",

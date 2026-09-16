@@ -37,7 +37,9 @@
   "stats": {
     "totalLights": "Tổng số ánh sáng đã thắp",
     "todayLights": "Ánh sáng hôm nay",
-    "countries": "Quốc gia đã đến"
+    "countries": "Quốc gia đã đến",
+    "loadError": "Hiện không tải được ánh sáng.",
+    "retry": "Thử lại"
   },
   "footer": {
     "rights": "Mọi quyền được bảo lưu",

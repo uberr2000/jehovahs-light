@@ -37,7 +37,9 @@
   "stats": {
     "totalLights": "Total Lights Lit",
     "todayLights": "Lights Today",
-    "countries": "Countries Reached"
+    "countries": "Countries Reached",
+    "loadError": "Unable to load lights right now.",
+    "retry": "Try again"
   },
   "footer": {
     "rights": "All rights reserved",
