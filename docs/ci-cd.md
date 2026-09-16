@@ -18,7 +18,8 @@ Runs on `pull_request` and `push` targeting **`develop`**.
 | Install | `npm ci` |
 | Lint | `npm run lint` (`eslint` + `eslint-config-next` 16.2.4).
   `deploy/**` is ignored (PM2 CommonJS). |
-| Build | `npm run build` |
+| Build | `npm run build` (`postbuild` copies `public` + `.next/static` into standalone) |
+| Verify | `test -f .next/standalone/public/globe/earth-blue-marble.jpg` |
 
 Job env uses harmless placeholders so a build that reads `.env.example` keys
 does not fail:
@@ -61,10 +62,15 @@ a failing command still stops the deploy.
    and never edits `package.json`.
 4. `git fetch origin develop`, then `git pull --ff-only origin develop` when
    already on `develop` (otherwise checkout `develop` and pull `--ff-only`).
-5. `npm ci` and `npm run build`.
-6. Copy `public` → `.next/standalone/public` and `.next/static` →
-   `.next/standalone/.next/static` (Next standalone does not include these;
-   see the [output docs](https://nextjs.org/docs/app/api-reference/config/next-config-js/output)).
+5. `npm ci` and `npm run build`. `postbuild`
+   (`scripts/copy-standalone-assets.mjs`) copies `public` →
+   `.next/standalone/public` and `.next/static` →
+   `.next/standalone/.next/static` so the globe texture
+   (`/globe/earth-blue-marble.jpg`) is already in the standalone tree.
+6. The workflow still repeats that copy with `rm` + `cp -a` as
+   belt-and-suspenders (Next standalone does not include these by
+   default; see the [output docs](https://nextjs.org/docs/app/api-reference/config/next-config-js/output)).
+   See [deploy.md](deploy.md) (Standalone assets).
 7. Apply `deploy/ecosystem.config.cjs` by **name** `jehovahs-light` (not
    numeric id 14). `pm2 reload 14` is **not** enough to change an existing
    `npm start` / `next start` command. The remote script runs

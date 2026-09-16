@@ -101,6 +101,41 @@ delete a differently named process automatically, so sibling apps stay
 untouched. After migration, the numeric id may no longer be 14; the name
 `jehovahs-light` is the identifier.
 
+## Standalone assets (`public` + `.next/static`)
+
+Next.js `output: 'standalone'` does **not** copy `public/` or
+`.next/static` into `.next/standalone` (a CDN is assumed). Without that
+copy, `node .next/standalone/server.js` cannot serve
+`/globe/earth-blue-marble.jpg` (or other files under `public/`).
+
+**`npm run build` already copies them.** The `postbuild` script
+`scripts/copy-standalone-assets.mjs` runs after every `next build` and:
+
+- fails if `.next/standalone` is missing
+- copies `public` → `.next/standalone/public` when `public/` exists
+- copies `.next/static` → `.next/standalone/.next/static`
+
+Local and host `npm run build` therefore leave a complete standalone
+tree. You do **not** need a manual `cp` after build.
+
+The develop SSH workflow still repeats the same copy after
+`npm run build` as belt-and-suspenders (idempotent `rm` + `cp -a`).
+Either path is enough; keeping both means a forgotten host-side `cp`
+cannot drop the globe texture.
+
+If you ever copy only the `.next/standalone` folder without running
+`postbuild`, you would still need:
+
+```bash
+cp -a public .next/standalone/public
+mkdir -p .next/standalone/.next
+cp -a .next/static .next/standalone/.next/static
+```
+
+Do not type the arrow as a command (`public → .next/standalone/public`
+is documentation, not shell). Prefer `npm run build` so `postbuild`
+does this for you.
+
 ## Local / npm
 
 ```bash
@@ -111,3 +146,10 @@ npm start
 `npm start` is `next start` with no `--port`. Export or source `.env`
 first (or use `.env` / `.env.local` as Next already loads those for
 `next start`).
+
+To run the standalone server locally (same as PM2):
+
+```bash
+npm run build   # postbuild copies public + .next/static into standalone
+node .next/standalone/server.js
+```
