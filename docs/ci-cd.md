@@ -20,13 +20,17 @@ Runs on `pull_request` and `push` targeting **`develop`**.
   `deploy/**` is ignored (PM2 CommonJS). |
 | Build | `npm run build` (`postbuild` copies `public` + `.next/static` into standalone) |
 | Verify | `test -f .next/standalone/public/globe/earth-blue-marble.jpg` |
+| Drizzle check | `npm run db:check` (`drizzle-kit check`, no live DB) |
+| Migrate | `npm run db:migrate` against an ephemeral MySQL 8 service
+  (`DB_HOST=127.0.0.1`). Run twice to confirm `CREATE TABLE IF NOT EXISTS`
+  is idempotent. |
 
 Job env uses harmless placeholders so a build that reads `.env.example` keys
 does not fail:
 
 - `PORT=3000` (CI only; does **not** change `package.json`)
-- `DB_HOST` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` (`src/lib/db.ts` is
-  runtime-only today, with local defaults)
+- `DB_HOST=127.0.0.1` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` (`ci`) —
+  used by Drizzle at runtime and by `db:migrate` against the MySQL service
 - `NEXT_PUBLIC_APP_URL=https://example.invalid` (listed in `.env.example`;
   unused in source at the time of writing)
 
@@ -71,7 +75,9 @@ a failing command still stops the deploy.
    belt-and-suspenders (Next standalone does not include these by
    default; see the [output docs](https://nextjs.org/docs/app/api-reference/config/next-config-js/output)).
    See [deploy.md](deploy.md) (Standalone assets).
-7. Apply `deploy/ecosystem.config.cjs` by **name** `jehovahs-light` (not
+7. Source host `.env` and run `npm run db:migrate` (Drizzle; after pull/build,
+   before PM2). Safe if `lit_locations` / `gps_consent` already exist.
+8. Apply `deploy/ecosystem.config.cjs` by **name** `jehovahs-light` (not
    numeric id 14). `pm2 reload 14` is **not** enough to change an existing
    `npm start` / `next start` command. The remote script runs
    `bash deploy/pm2-sync.sh`, which:

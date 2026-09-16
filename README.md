@@ -14,7 +14,7 @@ A global beacon of faith - Light up the world with Jehovah's guiding light.
 
 - **Frontend**: Next.js 15, React 19, Three.js (React Three Fiber)
 - **Backend**: Next.js API Routes
-- **Database**: MySQL
+- **Database**: MySQL (Drizzle ORM + mysql2; no Prisma)
 - **Deployment**: PM2, Nginx, Let's Encrypt SSL
 - **DNS**: Cloudflare
 
@@ -41,13 +41,19 @@ cp .env.example .env.local
 
 # Run development server
 npm run dev
+
+# Apply MySQL migrations (reads DB_* from env; CREATE IF NOT EXISTS)
+npm run db:migrate
 ```
 
 ## Environment Variables
 
 See `.env.example`. **PORT** must be set in `.env` (Next.js / standalone
 `server.js` read it). Never add `--port` to `package.json` `start`.
-Server deploy: [docs/deploy.md](docs/deploy.md) (PM2 id 14).
+`DB_HOST` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` are used by Drizzle
+(`drizzle.config.ts` and `src/lib/db`; pool host defaults to `localhost`).
+Schema SQL: [docs/schema.sql](docs/schema.sql). Server deploy (including
+`db:migrate` before PM2): [docs/deploy.md](docs/deploy.md).
 Develop CI/CD: [docs/ci-cd.md](docs/ci-cd.md).
 
 ```

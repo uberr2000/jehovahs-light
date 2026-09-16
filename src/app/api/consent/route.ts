@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { recordGpsConsent } from '@/lib/db';
+import { recordGpsConsent, dbErrorHttpResponse } from '@/lib/db';
 
 // Get client IP from request headers
 function getClientIp(request: NextRequest): string {
@@ -26,9 +26,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error recording consent:', error);
-    return NextResponse.json(
-      { error: 'Failed to record consent' },
-      { status: 500 }
+    const { error: message, status } = dbErrorHttpResponse(
+      error,
+      'Failed to record consent'
     );
+    return NextResponse.json({ error: message }, { status });
   }
 }

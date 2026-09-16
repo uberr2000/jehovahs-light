@@ -1,12 +1,12 @@
 # project_state
 
-_Last updated: 2026-09-16 (standalone postbuild asset copy)_
+_Last updated: 2026-09-17 (rebase Drizzle onto develop postbuild)_
 
 ## Project name & stack summary
 
 Jehovah's Light — Next.js 16 (App Router) + React 19 + Three.js globe,
-MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
-`/var/www/html/jehovahs-light.ink.net.tw/`.
+MySQL via Drizzle ORM + `mysql2` (no Prisma), next-intl. Deployed with
+PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Features Done
 
@@ -22,16 +22,26 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - `.github/workflows/ci.yml` — `pull_request` + `push` to `develop`;
   Node 22, `npm ci`, `npm run lint`, `npm run build` (dummy `DB_*` /
   `NEXT_PUBLIC_APP_URL` / `PORT` in the job env); verifies
-  `.next/standalone/public/globe/earth-blue-marble.jpg` after postbuild
+  `.next/standalone/public/globe/earth-blue-marble.jpg` after postbuild;
+  then `npm run db:check` and `npm run db:migrate` twice against ephemeral
+  MySQL 8 (`DB_HOST=127.0.0.1`)
 - `.github/workflows/deploy-develop.yml` — SSH deploy on `push` to
   `develop`; secrets `DEPLOY_HOST` / `DEPLOY_USER` / `DEPLOY_SSH_KEY`;
   dirty-tree fail (no `git reset --hard`); `git pull --ff-only`;
   standalone `public` + `.next/static` copy (belt-and-suspenders after
-  `postbuild`); `pm2 startOrReload`
+  `postbuild`); `npm run db:migrate` after pull/build (sources host `.env`
+  for `DB_*`) before `pm2 startOrReload`
   `deploy/ecosystem.config.cjs --update-env` (delete-by-name fallback);
   verify script is standalone/`with-env.sh` (fail if still `next start`);
   no `script_stop` on `appleboy/ssh-action` (`set -euo pipefail` in the
   remote script instead)
+- Drizzle-only ORM: `drizzle-orm` + `mysql2` + `drizzle-kit`. Schema
+  tables `lit_locations` / `gps_consent` with the same column names as
+  the previous raw SQL. Scripts: `db:generate`, `db:migrate`, `db:studio`,
+  `db:check`. Migrations under `drizzle/` use `CREATE TABLE IF NOT EXISTS`.
+  Canonical SQL: `docs/schema.sql`. Runtime: `src/lib/db/` (Drizzle queries,
+  `toJsonSafe` / `toJsonNumber` kept). API logs real DB errors; connection
+  failures return 503 `Database unavailable` (no secrets in the body).
 - `deploy/pm2-sync.sh` / `deploy/pm2-inspect.cjs` — name-based PM2 apply
   + sibling-path safety
 - `docs/ci-cd.md` — CI steps, secret names, path, PM2 name
@@ -76,8 +86,16 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 
 ## File Structure (key files)
 
-- `package.json` — `"start": "next start"`; `"postbuild"` copies standalone assets
+- `package.json` — `"start": "next start"`; `"postbuild"` copies standalone
+  assets; `db:generate` / `db:migrate` / `db:studio` / `db:check`
 - `scripts/copy-standalone-assets.mjs` — `public` + `.next/static` → standalone
+- `drizzle.config.ts` — dialect mysql; `DB_HOST` / `DB_USER` / `DB_PASSWORD` /
+  `DB_NAME`
+- `src/lib/db/schema.ts` — `lit_locations`, `gps_consent`
+- `src/lib/db/index.ts` — Drizzle queries (same `@/lib/db` exports)
+- `src/lib/db/errors.ts` — connection error → 503
+- `drizzle/` — SQL migrations + meta journal
+- `docs/schema.sql` — canonical CREATE IF NOT EXISTS
 - `next.config.ts` — `output: 'standalone'`
 - `.env.example` — `PORT` + DB vars
 - `.github/workflows/ci.yml`
@@ -108,8 +126,8 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 ## API Routes Summary
 
 - `GET/POST /api/locations` — lit locations; GET also returns `userConsent`
-  (IP) used to skip intro
-- `GET/POST /api/consent` — GPS consent by IP (decline path; no new routes)
+  (IP) used to skip intro. Connection failures: 503 `Database unavailable`.
+- `POST /api/consent` — GPS consent by IP (decline path; no new routes)
 
 ## Known Issues
 
@@ -125,10 +143,14 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - Live `GET /api/locations` on jehovahs-light.ink.net.tw returns HTTP 500
   (`Failed to fetch locations`). UI now shows error + retry instead of
   silent zeros. Likely host MySQL/.env; BigInt JSON is guarded in code.
+  API now logs the real error and returns 503 when the DB is unreachable.
   See `docs/locations-api.md`. Production path untouched by this PR.
 
 ## Recent Commits
 
+- Add Drizzle ORM only (no Prisma): schema for `lit_locations` /
+  `gps_consent`, idempotent SQL migrations, `db:migrate` on develop deploy
+  and CI MySQL, clearer 503/500 API errors
 - postbuild copies `public` + `.next/static` into Next standalone output
 - Mobile type bump, fit full globe in 60vh, stats error state; JSON-safe
   locations API (BigInt) + document live 500
@@ -172,3 +194,7 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
   variants (e.g. zh-HK) do not map to zh-TW/zh-CN. RTL only for `ar`.
   UI strings live in next-intl `messages/*.json` (no duplicate hardcoded
   maps, no translate API).
+- Database access is Drizzle-only (no Prisma, no dual ORM). Table and
+  column names stay `lit_locations` / `gps_consent` with the original
+  snake_case columns so existing host tables are reused. Migrations are
+  `CREATE TABLE IF NOT EXISTS`.

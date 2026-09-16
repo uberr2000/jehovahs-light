@@ -51,7 +51,8 @@ only by numeric id 14. Sibling apps on the same host
 must not be reloaded, deleted, or started.
 
 From the deploy path, apply the ecosystem (this is what
-`.github/workflows/deploy-develop.yml` runs after build + standalone copy):
+`.github/workflows/deploy-develop.yml` runs after build + standalone copy
++ `npm run db:migrate`):
 
 ```bash
 cd /var/www/html/jehovahs-light.ink.net.tw
@@ -135,6 +136,33 @@ cp -a .next/static .next/standalone/.next/static
 Do not type the arrow as a command (`public → .next/standalone/public`
 is documentation, not shell). Prefer `npm run build` so `postbuild`
 does this for you.
+
+## Database (Drizzle)
+
+ORM is **Drizzle only** (`drizzle-orm` + `mysql2`). There is no Prisma.
+Tables and columns match the existing MySQL names:
+
+| Table | Columns |
+| --- | --- |
+| `lit_locations` | `id`, `latitude`, `longitude`, `city`, `country`, `country_code`, `ip_address`, `user_agent`, `created_at` |
+| `gps_consent` | `id`, `ip_address` (UNIQUE), `consented`, `latitude`, `longitude`, `created_at`, `updated_at` |
+
+Schema: `src/lib/db/schema.ts`. SQL: `docs/schema.sql` and `drizzle/`.
+`drizzle.config.ts` reads `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`
+(same keys as `.env.example`; pool default host is `localhost` if unset).
+
+```bash
+npm run db:generate   # drizzle-kit generate
+npm run db:migrate    # drizzle-kit migrate
+npm run db:studio     # optional GUI
+npm run db:check      # drizzle-kit check (no DB)
+```
+
+Develop deploy runs `npm run db:migrate` **after** `npm ci` / `npm run build`
+/ standalone copy and **before** `pm2 startOrReload`. The remote script
+sources host `.env` so `DB_*` are set. Migrations use
+`CREATE TABLE IF NOT EXISTS` so a host that already has these tables from
+manual SQL is unchanged aside from Drizzle's `__drizzle_migrations` log.
 
 ## Local / npm
 
