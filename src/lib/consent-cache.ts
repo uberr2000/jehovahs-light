@@ -67,3 +67,24 @@ export function writeCachedConsent(consent: CachedUserConsent): void {
     // Private mode / quota: IP-based GET /api/locations userConsent still applies.
   }
 }
+
+/** Survives locale cookie reload in the same tab so the intro does not replay. */
+export const INTRO_SESSION_KEY = 'jehovahs-light:intro-dismissed';
+
+export function readIntroDismissed(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.sessionStorage.getItem(INTRO_SESSION_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function writeIntroDismissed(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.sessionStorage.setItem(INTRO_SESSION_KEY, '1');
+  } catch {
+    // ignore
+  }
+}

@@ -24,6 +24,9 @@ map to `en`. Language-only locales still accept regional tags (`es-MX` → `es`,
 
 RTL: `html dir="rtl"` only for `ar`.
 
+Choosing a language writes the `locale` cookie and reloads so SSR matches.
+The lighthouse intro is not replayed in the same tab (`sessionStorage`).
+
 ## Supported locales
 
 `en`, `zh-TW`, `zh-CN`, `es`, `pt`, `fr`, `de`, `ja`, `ko`, `ru`, `ar`, `id`,

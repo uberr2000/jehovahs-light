@@ -51,6 +51,8 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
   ja, ko, ru, ar, id, th, vi. Detection: locale cookie → SSR
   Accept-Language → navigator.language → en. Unmatched (including
   unmatched region variants like zh-HK) → en. `html dir=rtl` only for ar.
+- Language cookie reload keeps the main page in the same tab (sessionStorage
+  intro-dismissed); first visit still shows the lighthouse intro.
 
 ## In Progress
 

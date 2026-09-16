@@ -14,6 +14,8 @@ import {
   shouldSkipIntro,
   writeCachedConsent,
   normalizeConsent,
+  readIntroDismissed,
+  writeIntroDismissed,
 } from '@/lib/consent-cache';
 
 const Globe3D = dynamic(() => import('@/components/Globe3D'), {
@@ -74,17 +76,22 @@ export default function Home() {
 
     const cached = readCachedConsent();
     const cacheSkipsIntro = shouldSkipIntro(cached);
-    if (cacheSkipsIntro && cached) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage intro gate
-      setUserConsent(cached);
-      if (cached.hasLocation && cached.latitude != null && cached.longitude != null) {
-        setUserLocation({
-          latitude: cached.latitude,
-          longitude: cached.longitude,
-        });
+    const dismissedThisSession = readIntroDismissed();
+    if ((cacheSkipsIntro && cached) || dismissedThisSession) {
+      if (cacheSkipsIntro && cached) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage/session intro gate
+        setUserConsent(cached);
+        if (cached.hasLocation && cached.latitude != null && cached.longitude != null) {
+          setUserLocation({
+            latitude: cached.latitude,
+            longitude: cached.longitude,
+          });
+        }
       }
       setShowIntro(false);
-      setIntroResolved(true);
+      if (cacheSkipsIntro && cached) {
+        setIntroResolved(true);
+      }
     }
 
     async function fetchData() {
@@ -155,7 +162,10 @@ export default function Home() {
   }
 
   if (showIntro) {
-    return <LighthouseIntro onComplete={() => setShowIntro(false)} />;
+    return <LighthouseIntro onComplete={() => {
+      writeIntroDismissed();
+      setShowIntro(false);
+    }} />;
   }
 
   const hasSharedLocation = userConsent?.hasLocation;
