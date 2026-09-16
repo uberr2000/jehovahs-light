@@ -1,0 +1,51 @@
+{
+  "site": {
+    "title": "Ánh sáng của Đức Giê-hô-va",
+    "description": "Soi sáng thế giới bằng ánh sáng dẫn dắt của Đức Giê-hô-va"
+  },
+  "hero": {
+    "title": "Ánh sáng của Đức Giê-hô-va",
+    "subtitle": "Ngọn hải đăng hy vọng cho thế giới",
+    "description": "Mỗi ánh sáng đại diện cho một linh hồn được tình yêu thương của Đức Giê-hô-va chạm đến. Hãy chia sẻ vị trí của bạn và trở thành một phần của ngọn hải đăng đức tin toàn cầu này.",
+    "shareTitle": "Chia sẻ ánh sáng của bạn",
+    "alreadyShared": "Ánh sáng của bạn đang chiếu rọi thế giới",
+    "welcomeBack": "Chào mừng trở lại! Ánh sáng của bạn đã đang tỏa sáng."
+  },
+  "geolocation": {
+    "title": "Chia sẻ ánh sáng của bạn",
+    "request": "Cho phép chia sẻ vị trí để thắp sáng vị trí của bạn trên Trái Đất",
+    "button": "Chia sẻ vị trí của tôi",
+    "denied": "Quyền truy cập vị trí bị từ chối. Bạn vẫn có thể xem ánh sáng từ khắp nơi trên thế giới.",
+    "error": "Không thể lấy vị trí của bạn. Vui lòng thử lại.",
+    "success": "Ánh sáng của bạn đã được thêm vào thế giới!",
+    "loading": "Đang xác định vị trí của bạn...",
+    "alreadyExists": "Vị trí của bạn đã được thắp sáng!"
+  },
+  "globe": {
+    "title": "Ánh sáng toàn cầu",
+    "totalLights": "Tổng số ánh sáng",
+    "countries": "Quốc gia",
+    "recentLights": "Ánh sáng gần đây"
+  },
+  "lighthouse": {
+    "title": "Ánh sáng của Đức Giê-hô-va",
+    "subtitle": "Ngọn hải đăng hy vọng",
+    "verse": "“Đức Giê-hô-va là ánh sáng và sự cứu rỗi của tôi—tôi còn sợ ai?”",
+    "reference": "Thi thiên 27:1",
+    "enter": "Bước vào Ánh sáng"
+  },
+  "stats": {
+    "totalLights": "Tổng số ánh sáng đã thắp",
+    "todayLights": "Ánh sáng hôm nay",
+    "countries": "Quốc gia đã đến",
+    "loadError": "Hiện không tải được ánh sáng.",
+    "retry": "Thử lại"
+  },
+  "footer": {
+    "rights": "Mọi quyền được bảo lưu",
+    "verse": "“Vì nơi Ngài có nguồn sự sống; trong ánh sáng Ngài, chúng tôi thấy sự sáng.” — Thi thiên 36:9"
+  },
+  "language": {
+    "select": "Chọn ngôn ngữ"
+  }
+}

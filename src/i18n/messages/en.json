@@ -6,7 +6,10 @@
   "hero": {
     "title": "Jehovah's Light",
     "subtitle": "Beacon of Hope for the World",
-    "description": "Each light represents a soul touched by Jehovah's love. Share your location and become part of this global beacon of faith."
+    "description": "Each light represents a soul touched by Jehovah's love. Share your location and become part of this global beacon of faith.",
+    "shareTitle": "Share Your Light",
+    "alreadyShared": "Your light shines on the world",
+    "welcomeBack": "Welcome back! Your light is already shining."
   },
   "geolocation": {
     "title": "Share Your Light",
@@ -15,7 +18,8 @@
     "denied": "Location access denied. You can still view the lights from around the world.",
     "error": "Unable to get your location. Please try again.",
     "success": "Your light has been added to the world!",
-    "loading": "Locating you..."
+    "loading": "Locating you...",
+    "alreadyExists": "Your location has already been lit!"
   },
   "globe": {
     "title": "Global Lights",
@@ -24,14 +28,18 @@
     "recentLights": "Recent Lights"
   },
   "lighthouse": {
-    "title": "A Lighthouse in the Darkness",
+    "title": "Jehovah's Light",
+    "subtitle": "A Beacon of Hope",
     "verse": "\"The LORD is my light and my salvation— whom shall I fear?\"",
-    "reference": "Psalm 27:1"
+    "reference": "Psalm 27:1",
+    "enter": "Enter the Light"
   },
   "stats": {
     "totalLights": "Total Lights Lit",
     "todayLights": "Lights Today",
-    "countries": "Countries Reached"
+    "countries": "Countries Reached",
+    "loadError": "Unable to load lights right now.",
+    "retry": "Try again"
   },
   "footer": {
     "rights": "All rights reserved",

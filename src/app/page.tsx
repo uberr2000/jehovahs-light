@@ -2,19 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { useLocale, useTranslations } from 'next-intl';
 import LighthouseIntro from '@/components/LighthouseIntro';
 import GeoLocationButton from '@/components/GeoLocationButton';
 import LanguageSelector from '@/components/LanguageSelector';
 import Stats from '@/components/Stats';
 import { type Locale } from '@/i18n/config';
+import { isLocale, localeCookieString } from '@/i18n/resolve-locale';
 import {
   readCachedConsent,
   shouldSkipIntro,
   writeCachedConsent,
   normalizeConsent,
+  readIntroDismissed,
+  writeIntroDismissed,
 } from '@/lib/consent-cache';
 
-// Dynamic import for 3D globe (no SSR)
 const Globe3D = dynamic(() => import('@/components/Globe3D'), {
   ssr: false,
   loading: () => (
@@ -47,38 +50,38 @@ interface UserConsent {
   longitude: number | null;
 }
 
-const translations = {
-  en: {
-    title: "Jehovah's Light",
-    subtitle: 'Beacon of Hope for the World',
-    description: 'Each light represents a soul touched by Jehovah\'s love. Share your location and become part of this global beacon of faith.',
-    shareTitle: 'Share Your Light',
-    alreadyShared: 'Your light shines on the world',
-    footerVerse: '"For with you is the fountain of life; in your light we see light." — Psalm 36:9',
-    rights: 'All rights reserved',
-    welcomeBack: 'Welcome back! Your light is already shining.',
-  },
-  'zh-TW': {
-    title: '耶和華的光',
-    subtitle: '世界的希望燈塔',
-    description: '每一道光都代表一個被耶和華的愛觸摸的靈魂。分享您的位置，成為這個全球信仰燈塔的一部分。',
-    shareTitle: '分享您的光',
-    alreadyShared: '您的光照耀著世界',
-    footerVerse: '「因為，在你那裡有生命的源頭；在你的光中，我們必得見光。」— 詩篇 36:9',
-    rights: '版權所有',
-    welcomeBack: '歡迎回來！您的光已經在發光了。',
-  },
-  'zh-CN': {
-    title: '耶和华的光',
-    subtitle: '世界的希望灯塔',
-    description: '每一道光都代表一个被耶和华的爱触摸的灵魂。分享您的位置，成为这个全球信仰灯塔的一部分。',
-    shareTitle: '分享您的光',
-    alreadyShared: '您的光照耀着世界',
-    footerVerse: '「因为，在你那里有生命的源头；在你的光中，我们必得见光。」— 诗篇 36:9',
-    rights: '版权所有',
-    welcomeBack: '欢迎回来！您的光已经在发光了。',
-  },
-};
+type StatsStatus = 'loading' | 'ok' | 'error';
+
+async function fetchLocationsPayload(): Promise<{
+  locations: Location[];
+  stats: StatsData;
+  userConsent: UserConsent | null;
+}> {
+  const response = await fetch('/api/locations');
+  let data: {
+    error?: string;
+    locations?: Location[];
+    stats?: Partial<StatsData>;
+    userConsent?: UserConsent | null;
+  } = {};
+  try {
+    data = await response.json();
+  } catch {
+    data = {};
+  }
+  if (!response.ok) {
+    throw new Error(data.error || `Failed to fetch locations (${response.status})`);
+  }
+  return {
+    locations: Array.isArray(data.locations) ? data.locations : [],
+    stats: {
+      total: Number(data.stats?.total) || 0,
+      today: Number(data.stats?.today) || 0,
+      countries: Number(data.stats?.countries) || 0,
+    },
+    userConsent: data.userConsent ?? null,
+  };
+}
 
 function GlobeLoadingSpinner() {
   return (
@@ -89,57 +92,49 @@ function GlobeLoadingSpinner() {
 }
 
 export default function Home() {
+  const t = useTranslations();
+  const locale = useLocale() as Locale;
   const [showIntro, setShowIntro] = useState(true);
   const [introResolved, setIntroResolved] = useState(false);
-  const [locale, setLocale] = useState<Locale>('en');
   const [locations, setLocations] = useState<Location[]>([]);
   const [stats, setStats] = useState<StatsData>({ total: 0, today: 0, countries: 0 });
   const [userConsent, setUserConsent] = useState<UserConsent | null>(null);
-  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
+  const [statsStatus, setStatsStatus] = useState<StatsStatus>('loading');
 
-  const t = translations[locale];
-
-  // Load locale from cookie
-  useEffect(() => {
-    const savedLocale = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('locale='))
-      ?.split('=')[1] as Locale | undefined;
-    if (savedLocale && ['en', 'zh-TW', 'zh-CN'].includes(savedLocale)) {
-      // Cookie hydrate after mount — avoids SSR/client mismatch.
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- locale cookie
-      setLocale(savedLocale);
-    }
-  }, []);
-
-  // Fetch locations and decide whether to skip the lighthouse intro.
-  // localStorage is a same-device cache; GET /api/locations.userConsent is IP-based.
   useEffect(() => {
     let cancelled = false;
 
     const cached = readCachedConsent();
     const cacheSkipsIntro = shouldSkipIntro(cached);
-    if (cacheSkipsIntro && cached) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage intro gate
-      setUserConsent(cached);
-      if (cached.hasLocation && cached.latitude != null && cached.longitude != null) {
-        setUserLocation({
-          latitude: cached.latitude,
-          longitude: cached.longitude,
-        });
+    const dismissedThisSession = readIntroDismissed();
+    if ((cacheSkipsIntro && cached) || dismissedThisSession) {
+      if (cacheSkipsIntro && cached) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage/session intro gate
+        setUserConsent(cached);
+        if (cached.hasLocation && cached.latitude != null && cached.longitude != null) {
+          setUserLocation({
+            latitude: cached.latitude,
+            longitude: cached.longitude,
+          });
+        }
       }
       setShowIntro(false);
-      setIntroResolved(true);
+      if (cacheSkipsIntro && cached) {
+        setIntroResolved(true);
+      }
     }
 
     async function fetchData() {
       try {
-        const response = await fetch('/api/locations');
-        const data = await response.json();
+        const data = await fetchLocationsPayload();
         if (cancelled) return;
-        setLocations(data.locations || []);
-        setStats(data.stats || { total: 0, today: 0, countries: 0 });
+        setLocations(data.locations);
+        setStats(data.stats);
+        setStatsStatus('ok');
 
         if (data.userConsent) {
           const fromApi = normalizeConsent(data.userConsent);
@@ -159,6 +154,9 @@ export default function Home() {
         }
       } catch (error) {
         console.error('Failed to fetch locations:', error);
+        if (!cancelled) {
+          setStatsStatus('error');
+        }
       } finally {
         if (!cancelled) {
           setIsLoading(false);
@@ -173,8 +171,9 @@ export default function Home() {
   }, []);
 
   const handleLocaleChange = (newLocale: Locale) => {
-    setLocale(newLocale);
-    document.cookie = `locale=${newLocale}; path=/; max-age=31536000`;
+    if (!isLocale(newLocale) || newLocale === locale) return;
+    document.cookie = localeCookieString(newLocale);
+    window.location.reload();
   };
 
   const handleLocationReceived = (lat: number, lng: number) => {
@@ -187,11 +186,41 @@ export default function Home() {
     setUserLocation({ latitude: lat, longitude: lng });
     setUserConsent(consent);
     writeCachedConsent(consent);
-    fetch('/api/locations')
-      .then(res => res.json())
-      .then(data => {
-        setLocations(data.locations || []);
-        setStats(data.stats || { total: 0, today: 0, countries: 0 });
+    fetchLocationsPayload()
+      .then((data) => {
+        setLocations(data.locations);
+        setStats(data.stats);
+        setStatsStatus('ok');
+      })
+      .catch((error) => {
+        console.error('Failed to refresh locations after share:', error);
+        setStatsStatus('error');
+      });
+  };
+
+  const handleRetryStats = () => {
+    fetchLocationsPayload()
+      .then((data) => {
+        setLocations(data.locations);
+        setStats(data.stats);
+        setStatsStatus('ok');
+        if (data.userConsent) {
+          const fromApi = normalizeConsent(data.userConsent);
+          if (shouldSkipIntro(fromApi)) {
+            setUserConsent(fromApi);
+            writeCachedConsent(fromApi);
+            if (fromApi.hasLocation && fromApi.latitude != null && fromApi.longitude != null) {
+              setUserLocation({
+                latitude: fromApi.latitude,
+                longitude: fromApi.longitude,
+              });
+            }
+          }
+        }
+      })
+      .catch((error) => {
+        console.error('Failed to fetch locations:', error);
+        setStatsStatus('error');
       });
   };
 
@@ -200,77 +229,70 @@ export default function Home() {
   }
 
   if (showIntro) {
-    return <LighthouseIntro onComplete={() => setShowIntro(false)} language={locale} />;
+    return <LighthouseIntro onComplete={() => {
+      writeIntroDismissed();
+      setShowIntro(false);
+    }} />;
   }
 
   const hasSharedLocation = userConsent?.hasLocation;
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white overflow-hidden">
-      {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-40 p-4 flex justify-between items-center bg-black/30 backdrop-blur-sm">
-        <h1 className="text-xl md:text-2xl font-bold text-yellow-400" style={{ textShadow: '0 0 20px rgba(255, 215, 0, 0.3)' }}>
-          {t.title}
+        <h1
+          className="text-2xl md:text-3xl font-bold text-yellow-400 leading-tight min-w-0 pe-3"
+          style={{ textShadow: '0 0 20px rgba(255, 215, 0, 0.3)' }}
+        >
+          {t('hero.title')}
         </h1>
         <LanguageSelector currentLocale={locale} onLocaleChange={handleLocaleChange} />
       </header>
 
-      {/* 3D Globe Section */}
       <div className="h-[60vh] md:h-[70vh] relative">
         {isLoading ? (
           <GlobeLoadingSpinner />
         ) : (
-          <Globe3D
-            lightPoints={locations}
-            userLocation={userLocation}
-          />
+          <Globe3D lightPoints={locations} userLocation={userLocation} />
         )}
       </div>
 
-      {/* Content Section */}
       <div className="relative z-10 px-4 py-8 bg-gradient-to-t from-black via-gray-900/90 to-transparent">
-        {/* Title & Description */}
         <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-4xl font-bold mb-4 text-white">
-            {t.subtitle}
-          </h2>
-          <p className="text-gray-300 max-w-2xl mx-auto text-sm md:text-base">
-            {t.description}
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white leading-tight">{t('hero.subtitle')}</h2>
+          <p className="text-gray-300 max-w-2xl mx-auto text-base md:text-lg leading-relaxed">
+            {t('hero.description')}
           </p>
         </div>
 
-        {/* Stats */}
         <div className="mb-8">
-          <Stats {...stats} language={locale} />
+          <Stats {...stats} status={statsStatus === 'error' ? 'error' : 'ok'} onRetry={handleRetryStats} />
         </div>
 
-        {/* GPS Button or Welcome Back message */}
         <div className="text-center mb-8">
           {hasSharedLocation ? (
             <div className="flex flex-col items-center gap-3">
               <div className="flex items-center gap-2 text-green-400">
                 <span className="text-2xl">✨</span>
-                <span className="text-lg font-semibold">{t.alreadyShared}</span>
+                <span className="text-xl font-semibold">{t('hero.alreadyShared')}</span>
               </div>
-              <p className="text-sm text-gray-400">{t.welcomeBack}</p>
+              <p className="text-base text-gray-400">{t('hero.welcomeBack')}</p>
             </div>
           ) : (
             <>
-              <h3 className="text-lg md:text-xl font-semibold text-yellow-400 mb-4">
-                {t.shareTitle}
+              <h3 className="text-xl md:text-2xl font-semibold text-yellow-400 mb-4">
+                {t('hero.shareTitle')}
               </h3>
-              <GeoLocationButton
-                onLocationReceived={handleLocationReceived}
-                language={locale}
-              />
+              <GeoLocationButton onLocationReceived={handleLocationReceived} />
             </>
           )}
         </div>
 
-        {/* Footer */}
-        <footer className="text-center text-gray-500 text-sm py-8 border-t border-white/10">
-          <p className="italic mb-2 text-gray-400">{t.footerVerse}</p>
-          <p>© {new Date().getFullYear()} Jehovah&apos;s Light. {t.rights}.</p>
+        <footer className="text-center text-gray-500 text-base py-8 border-t border-white/10">
+          <p className="italic mb-2 text-gray-400 text-base md:text-base leading-relaxed">{t('footer.verse')}</p>
+          <p>
+            © {new Date().getFullYear()} Jehovah&apos;s Light. {t('footer.rights')}.
+          </p>
         </footer>
       </div>
     </main>

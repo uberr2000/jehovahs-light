@@ -1,9 +1,82 @@
 'use client';
 
-import { Suspense, useRef, useMemo, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Suspense, useRef, useMemo, useEffect, useState, useLayoutEffect } from 'react';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Sphere, Stars, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
+
+const DESKTOP_CAMERA_DISTANCE = 5;
+const CAMERA_FOV = 45;
+const EARTH_RADIUS = 2;
+const ATMOSPHERE_RADIUS = 2.08;
+const FIT_MARGIN = 1.22;
+const MOBILE_MAX_WIDTH = '(max-width: 768px)';
+const COARSE_POINTER = '(pointer: coarse)';
+
+/** Distance so a sphere of `radius` fits in the canvas with margin (portrait uses the narrower FOV). */
+export function fitCameraDistance(
+  radius: number,
+  fovDeg: number,
+  aspect: number,
+  margin = FIT_MARGIN
+): number {
+  const vFov = (fovDeg * Math.PI) / 180;
+  const safeAspect = Number.isFinite(aspect) && aspect > 0 ? aspect : 1;
+  const hFov = 2 * Math.atan(Math.tan(vFov / 2) * safeAspect);
+  const limiting = Math.min(vFov, hFov);
+  return (radius / Math.tan(limiting / 2)) * margin;
+}
+
+function useLockGlobeZoom() {
+  const [lockZoom, setLockZoom] = useState(true);
+
+  useEffect(() => {
+    const coarse = window.matchMedia(COARSE_POINTER);
+    const narrow = window.matchMedia(MOBILE_MAX_WIDTH);
+
+    const update = () => {
+      setLockZoom(coarse.matches || narrow.matches);
+    };
+
+    update();
+    coarse.addEventListener('change', update);
+    narrow.addEventListener('change', update);
+    return () => {
+      coarse.removeEventListener('change', update);
+      narrow.removeEventListener('change', update);
+    };
+  }, []);
+
+  return lockZoom;
+}
+
+function GlobeOrbitControls({ lockZoom }: { lockZoom: boolean }) {
+  const { camera, size } = useThree();
+  const aspect = size.width / Math.max(size.height, 1);
+  const fitDistance = useMemo(
+    () => fitCameraDistance(ATMOSPHERE_RADIUS, CAMERA_FOV, aspect),
+    [aspect]
+  );
+  const distance = lockZoom ? fitDistance : DESKTOP_CAMERA_DISTANCE;
+
+  useLayoutEffect(() => {
+    if (!lockZoom) return;
+    camera.position.set(0, 0, distance);
+    camera.updateProjectionMatrix();
+  }, [camera, distance, lockZoom]);
+
+  return (
+    <OrbitControls
+      enablePan={false}
+      enableZoom={!lockZoom}
+      minDistance={lockZoom ? distance : 3}
+      maxDistance={lockZoom ? distance : 10}
+      enableDamping
+      dampingFactor={0.05}
+      rotateSpeed={0.5}
+    />
+  );
+}
 
 /** Local NASA Blue Marble equirectangular map. See docs/globe-texture.md. */
 const EARTH_TEXTURE_PATH = '/globe/earth-blue-marble.jpg';
@@ -36,7 +109,7 @@ function latLngToVector3(lat: number, lng: number, radius: number): THREE.Vector
 
 function EarthFallback() {
   return (
-    <Sphere args={[2, 32, 32]}>
+    <Sphere args={[EARTH_RADIUS, 32, 32]}>
       <meshBasicMaterial color="#0a1628" />
     </Sphere>
   );
@@ -92,7 +165,7 @@ function Earth({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
   return (
     <group>
       {/* Main Earth sphere — unlit local NASA Blue Marble (no day/night terminator) */}
-      <Sphere ref={earthRef} args={[2, 64, 64]}>
+      <Sphere ref={earthRef} args={[EARTH_RADIUS, 64, 64]}>
         <meshBasicMaterial
           map={earthMap}
           map-colorSpace={THREE.SRGBColorSpace}
@@ -101,7 +174,7 @@ function Earth({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
       </Sphere>
 
       {/* Subtle atmospheric rim (not a cloud layer) */}
-      <Sphere ref={atmosphereRef} args={[2.08, 64, 64]}>
+      <Sphere ref={atmosphereRef} args={[ATMOSPHERE_RADIUS, 64, 64]}>
         <meshBasicMaterial
           color="#4a90d9"
           transparent
@@ -202,9 +275,11 @@ function UserLightMarker({ position }: { position: THREE.Vector3 }) {
 
 // Main Globe3D component
 export default function Globe3D({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
+  const lockZoom = useLockGlobeZoom();
+
   return (
     <div className="w-full h-full">
-      <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+      <Canvas camera={{ position: [0, 0, lockZoom ? 8 : DESKTOP_CAMERA_DISTANCE], fov: CAMERA_FOV }}>
         <Stars
           radius={100}
           depth={50}
@@ -221,14 +296,7 @@ export default function Globe3D({ lightPoints, userLocation, onGlobeReady }: Glo
             onGlobeReady={onGlobeReady}
           />
         </Suspense>
-        <OrbitControls
-          enablePan={false}
-          minDistance={3}
-          maxDistance={10}
-          enableDamping
-          dampingFactor={0.05}
-          rotateSpeed={0.5}
-        />
+        <GlobeOrbitControls lockZoom={lockZoom} />
       </Canvas>
     </div>
   );

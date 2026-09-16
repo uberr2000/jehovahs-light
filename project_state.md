@@ -10,7 +10,7 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 
 ## Features Done
 
-- 3D globe, GPS consent, i18n (en / zh-TW / zh-CN), locations API
+- 3D globe, GPS consent, i18n (14 locales), locations API
 - `package.json` `start` kept as `next start` (Next reads `PORT`; no `--port`)
 - `.env.example` documents `PORT` (must be set on the server `.env`)
 - `deploy/with-env.sh` sources `.env` then execs the start command
@@ -34,17 +34,31 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
   + sibling-path safety
 - `docs/ci-cd.md` — CI steps, secret names, path, PM2 name
   `jehovahs-light`, no `package.json` port hacks, Production untouched
-- ESLint: ignore `deploy/**` (PM2 CJS); unused `locales` import;
-  cookie-locale hydrate disable so `npm run lint` is green on CI
+- ESLint: ignore `deploy/**` (PM2 CJS) so `npm run lint` is green on CI
 - Globe3D uses a local NASA Blue Marble equirectangular satellite
   texture (`public/globe/earth-blue-marble.jpg` via drei `useTexture`);
   procedural canvas continents removed; unlit map (no clouds / day-night);
-  OrbitControls and auto-rotation unchanged
+  OrbitControls zoom locked on mobile; auto-rotation unchanged
 - Globe light points / LightGlow (and user marker glow) are ~1/4 of the
   previous visual size (`pointsMaterial` 0.015; glow pulse 0.01–0.015)
 - Returning GPS-accepted visitors skip `LighthouseIntro`: localStorage
   cache `jehovahs-light:user-consent` plus existing `GET /api/locations`
   `userConsent` (IP). No new consent endpoint.
+- Mobile page zoom locked (`viewport` initial-scale=1, maximum-scale=1,
+  user-scalable=no). Globe3D pinch zoom off on coarse pointer / max-width
+  768px; mobile camera pulls back so the full globe fits in 60vh (distance
+  from FOV/aspect, pinch still locked). Layout remains responsive.
+- Stats no longer treat a failed `GET /api/locations` as zeros; error + retry.
+  Live `/api/locations` 500 is documented in `docs/locations-api.md`
+  (likely host MySQL/.env; BigInt JSON serialize is also guarded in code).
+- Mobile typography bumped (header, hero, stats values/labels, footer,
+  intro, language selector) so Chinese/English stay readable.
+- 14 locales via next-intl messages: en, zh-TW, zh-CN, es, pt, fr, de,
+  ja, ko, ru, ar, id, th, vi. Detection: locale cookie → SSR
+  Accept-Language → navigator.language → en. Unmatched (including
+  unmatched region variants like zh-HK) → en. `html dir=rtl` only for ar.
+- Language cookie reload keeps the main page in the same tab (sessionStorage
+  intro-dismissed); first visit still shows the lighthouse intro.
 
 ## In Progress
 
@@ -75,7 +89,14 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - `docs/consent-memory.md` — IP + localStorage limitations
 - `eslint.config.mjs` — ignores `deploy/**`
 - `src/app/` — pages and API routes
-- `src/lib/db.ts`
+- `src/i18n/config.ts` — 14 locales + native names
+- `src/i18n/resolve-locale.ts` — cookie / Accept-Language / navigator match
+- `src/i18n/messages/*.json` — en, zh-TW, zh-CN, es, pt, fr, de, ja, ko, ru, ar, id, th, vi
+- `src/components/LocaleNavigatorFallback.tsx` — navigator fallback when SSR defaulted
+- `src/app/layout.tsx` — viewport lock, html lang/dir, locale source
+- `docs/i18n-viewport.md` — viewport lock + locale priority + list
+- `src/lib/json-safe.ts` — BigInt-safe JSON for mysql2 COUNT / insertId
+- `docs/locations-api.md` — GET /api/locations 500 diagnosis
 
 ## API Routes Summary
 
@@ -94,9 +115,17 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - GPS intro skip is IP + localStorage only: shared Wi-Fi / VPN / IP change
   can mis-identify; new device or cleared storage falls back to IP
   (`docs/consent-memory.md`)
+- Live `GET /api/locations` on jehovahs-light.ink.net.tw returns HTTP 500
+  (`Failed to fetch locations`). UI now shows error + retry instead of
+  silent zeros. Likely host MySQL/.env; BigInt JSON is guarded in code.
+  See `docs/locations-api.md`. Production path untouched by this PR.
 
 ## Recent Commits
 
+- Mobile type bump, fit full globe in 60vh, stats error state; JSON-safe
+  locations API (BigInt) + document live 500
+- Lock mobile viewport/globe pinch zoom; add 14 next-intl locales with
+  cookie → Accept-Language → navigator → en (RTL for ar)
 - Shrink Globe3D light/glow sizes to ~1/4; skip lighthouse intro when
   GET /api/locations `userConsent` or localStorage shows GPS already accepted
 - Replace Globe3D procedural continents with local NASA Blue Marble
@@ -125,3 +154,10 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
   layer and no day/night terminator.
 - Intro skip uses existing `userConsent` on `GET /api/locations` plus
   localStorage; decline is remembered but does not skip the intro.
+- Mobile zoom is locked via Next.js `viewport` export (not a raw meta tag)
+  plus OrbitControls `enableZoom={false}` on coarse/narrow viewports.
+- Locale cookie is the user pick (and navigator fallback persist). SSR
+  uses Accept-Language when the cookie is missing. Unmatched region
+  variants (e.g. zh-HK) do not map to zh-TW/zh-CN. RTL only for `ar`.
+  UI strings live in next-intl `messages/*.json` (no duplicate hardcoded
+  maps, no translate API).

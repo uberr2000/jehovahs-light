@@ -1,0 +1,51 @@
+{
+  "site": {
+    "title": "La Luz de Jehová",
+    "description": "Ilumina el mundo con la luz guía de Jehová"
+  },
+  "hero": {
+    "title": "La Luz de Jehová",
+    "subtitle": "Faro de esperanza para el mundo",
+    "description": "Cada luz representa un alma tocada por el amor de Jehová. Comparte tu ubicación y forma parte de este faro mundial de fe.",
+    "shareTitle": "Comparte tu luz",
+    "alreadyShared": "Tu luz brilla sobre el mundo",
+    "welcomeBack": "¡Bienvenido de nuevo! Tu luz ya está brillando."
+  },
+  "geolocation": {
+    "title": "Comparte tu luz",
+    "request": "Permite compartir tu ubicación para encender tu posición en la Tierra",
+    "button": "Compartir mi ubicación",
+    "denied": "Acceso a la ubicación denegado. Aún puedes ver las luces de todo el mundo.",
+    "error": "No se pudo obtener tu ubicación. Inténtalo de nuevo.",
+    "success": "¡Tu luz ha sido añadida al mundo!",
+    "loading": "Localizándote...",
+    "alreadyExists": "¡Tu ubicación ya está encendida!"
+  },
+  "globe": {
+    "title": "Luces mundiales",
+    "totalLights": "Luces totales",
+    "countries": "Países",
+    "recentLights": "Luces recientes"
+  },
+  "lighthouse": {
+    "title": "La Luz de Jehová",
+    "subtitle": "Un faro de esperanza",
+    "verse": "«Jehová es mi luz y mi salvación; ¿de quién temeré?»",
+    "reference": "Salmo 27:1",
+    "enter": "Entrar en la Luz"
+  },
+  "stats": {
+    "totalLights": "Luces encendidas",
+    "todayLights": "Luces de hoy",
+    "countries": "Países alcanzados",
+    "loadError": "No se pueden cargar las luces ahora.",
+    "retry": "Reintentar"
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados",
+    "verse": "«Porque en ti está el manantial de la vida; en tu luz veremos la luz.» — Salmo 36:9"
+  },
+  "language": {
+    "select": "Seleccionar idioma"
+  }
+}

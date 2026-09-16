@@ -1,0 +1,51 @@
+{
+  "site": {
+    "title": "Terang Yehuwa",
+    "description": "Terangi dunia dengan terang Yehuwa yang menuntun"
+  },
+  "hero": {
+    "title": "Terang Yehuwa",
+    "subtitle": "Mercusuar pengharapan bagi dunia",
+    "description": "Setiap terang mewakili jiwa yang tersentuh kasih Yehuwa. Bagikan lokasi Anda dan jadilah bagian dari mercusuar iman sedunia ini.",
+    "shareTitle": "Bagikan terang Anda",
+    "alreadyShared": "Terang Anda bersinar di dunia",
+    "welcomeBack": "Selamat datang kembali! Terang Anda sudah bersinar."
+  },
+  "geolocation": {
+    "title": "Bagikan terang Anda",
+    "request": "Izinkan berbagi lokasi untuk menyalakan posisi Anda di Bumi",
+    "button": "Bagikan lokasi saya",
+    "denied": "Akses lokasi ditolak. Anda masih dapat melihat terang dari seluruh dunia.",
+    "error": "Tidak dapat memperoleh lokasi Anda. Silakan coba lagi.",
+    "success": "Terang Anda telah ditambahkan ke dunia!",
+    "loading": "Menentukan lokasi Anda...",
+    "alreadyExists": "Lokasi Anda sudah dinyalakan!"
+  },
+  "globe": {
+    "title": "Terang global",
+    "totalLights": "Total terang",
+    "countries": "Negara",
+    "recentLights": "Terang terbaru"
+  },
+  "lighthouse": {
+    "title": "Terang Yehuwa",
+    "subtitle": "Mercusuar pengharapan",
+    "verse": "\"Yehuwa adalah terangku dan keselamatanku—siapa yang akan kutakuti?\"",
+    "reference": "Mazmur 27:1",
+    "enter": "Masuk ke dalam Terang"
+  },
+  "stats": {
+    "totalLights": "Total terang yang dinyalakan",
+    "todayLights": "Terang hari ini",
+    "countries": "Negara yang dijangkau",
+    "loadError": "Tidak dapat memuat terang saat ini.",
+    "retry": "Coba lagi"
+  },
+  "footer": {
+    "rights": "Hak cipta dilindungi",
+    "verse": "\"Sebab pada-Mu ada sumber kehidupan; dalam terang-Mu kami melihat terang.\" — Mazmur 36:9"
+  },
+  "language": {
+    "select": "Pilih bahasa"
+  }
+}

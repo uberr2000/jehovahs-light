@@ -7,6 +7,7 @@ import {
   getGpsConsentByIp,
   recordGpsConsent
 } from '@/lib/db';
+import { toJsonSafe } from '@/lib/json-safe';
 
 // Get client IP from request headers (Cloudflare sends CF-Connecting-IP)
 function getClientIp(request: NextRequest): string {
@@ -27,7 +28,7 @@ export async function GET(request: NextRequest) {
       getGpsConsentByIp(clientIp),
     ]);
 
-    return NextResponse.json({
+    return NextResponse.json(toJsonSafe({
       locations,
       stats,
       userConsent: consent ? {
@@ -36,7 +37,7 @@ export async function GET(request: NextRequest) {
         latitude: consent.latitude,
         longitude: consent.longitude,
       } : null,
-    });
+    }));
   } catch (error) {
     console.error('Error fetching locations:', error);
     return NextResponse.json(
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
       geoData.country_code
     );
 
-    return NextResponse.json({
+    return NextResponse.json(toJsonSafe({
       success: true,
       id,
       location: {
@@ -130,7 +131,7 @@ export async function POST(request: NextRequest) {
         longitude,
         ...geoData,
       },
-    });
+    }));
   } catch (error) {
     console.error('Error adding location:', error);
     return NextResponse.json(

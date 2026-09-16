@@ -6,7 +6,7 @@ A global beacon of faith - Light up the world with Jehovah's guiding light.
 
 - 🌍 **3D Interactive Globe** - NASA Blue Marble satellite Earth with light points showing believers around the world
 - 📍 **GPS Location Sharing** - Share your location to light up your position on the globe
-- 🌐 **Multi-language Support** - English, Traditional Chinese (繁體中文), Simplified Chinese (简体中文)
+- 🌐 **Multi-language Support** - 14 locales (cookie → Accept-Language → navigator → en). See [docs/i18n-viewport.md](docs/i18n-viewport.md).
 - ✨ **Lighthouse Animation** - Beautiful entrance animation with scripture
 - 💡 **Real-time Stats** - Total lights, today's lights, countries reached
 

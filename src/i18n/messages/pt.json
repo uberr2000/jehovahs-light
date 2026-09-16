@@ -1,0 +1,51 @@
+{
+  "site": {
+    "title": "A Luz de Jeová",
+    "description": "Ilumine o mundo com a luz orientadora de Jeová"
+  },
+  "hero": {
+    "title": "A Luz de Jeová",
+    "subtitle": "Farol de esperança para o mundo",
+    "description": "Cada luz representa uma alma tocada pelo amor de Jeová. Compartilhe sua localização e faça parte deste farol mundial de fé.",
+    "shareTitle": "Compartilhe sua luz",
+    "alreadyShared": "Sua luz brilha sobre o mundo",
+    "welcomeBack": "Bem-vindo de volta! Sua luz já está brilhando."
+  },
+  "geolocation": {
+    "title": "Compartilhe sua luz",
+    "request": "Permita o compartilhamento de localização para acender sua posição na Terra",
+    "button": "Compartilhar minha localização",
+    "denied": "Acesso à localização negado. Você ainda pode ver as luzes de todo o mundo.",
+    "error": "Não foi possível obter sua localização. Tente novamente.",
+    "success": "Sua luz foi adicionada ao mundo!",
+    "loading": "Localizando você...",
+    "alreadyExists": "Sua localização já está acesa!"
+  },
+  "globe": {
+    "title": "Luzes globais",
+    "totalLights": "Total de luzes",
+    "countries": "Países",
+    "recentLights": "Luzes recentes"
+  },
+  "lighthouse": {
+    "title": "A Luz de Jeová",
+    "subtitle": "Um farol de esperança",
+    "verse": "«Jeová é a minha luz e a minha salvação; a quem temerei?»",
+    "reference": "Salmo 27:1",
+    "enter": "Entrar na Luz"
+  },
+  "stats": {
+    "totalLights": "Total de luzes acesas",
+    "todayLights": "Luzes hoje",
+    "countries": "Países alcançados",
+    "loadError": "Não foi possível carregar as luzes agora.",
+    "retry": "Tentar novamente"
+  },
+  "footer": {
+    "rights": "Todos os direitos reservados",
+    "verse": "«Pois em ti está a fonte da vida; na tua luz veremos a luz.» — Salmo 36:9"
+  },
+  "language": {
+    "select": "Selecionar idioma"
+  }
+}
