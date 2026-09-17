@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-16_
+_Last updated: 2026-09-16 (standalone postbuild asset copy)_
 
 ## Project name & stack summary
 
@@ -21,11 +21,13 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
   one-time migration if old name `jehovahs-light.ink.net.tw`
 - `.github/workflows/ci.yml` — `pull_request` + `push` to `develop`;
   Node 22, `npm ci`, `npm run lint`, `npm run build` (dummy `DB_*` /
-  `NEXT_PUBLIC_APP_URL` / `PORT` in the job env)
+  `NEXT_PUBLIC_APP_URL` / `PORT` in the job env); verifies
+  `.next/standalone/public/globe/earth-blue-marble.jpg` after postbuild
 - `.github/workflows/deploy-develop.yml` — SSH deploy on `push` to
   `develop`; secrets `DEPLOY_HOST` / `DEPLOY_USER` / `DEPLOY_SSH_KEY`;
   dirty-tree fail (no `git reset --hard`); `git pull --ff-only`;
-  standalone `public` + `.next/static` copy; `pm2 startOrReload`
+  standalone `public` + `.next/static` copy (belt-and-suspenders after
+  `postbuild`); `pm2 startOrReload`
   `deploy/ecosystem.config.cjs --update-env` (delete-by-name fallback);
   verify script is standalone/`with-env.sh` (fail if still `next start`);
   no `script_stop` on `appleboy/ssh-action` (`set -euo pipefail` in the
@@ -59,6 +61,10 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
   unmatched region variants like zh-HK) → en. `html dir=rtl` only for ar.
 - Language cookie reload keeps the main page in the same tab (sessionStorage
   intro-dismissed); first visit still shows the lighthouse intro.
+- `npm run build` `postbuild` copies `public` + `.next/static` into
+  `.next/standalone` so `/globe/earth-blue-marble.jpg` works under
+  `node .next/standalone/server.js` without a manual `cp`. Deploy
+  workflow keeps an explicit `cp -a` as belt-and-suspenders.
 
 ## In Progress
 
@@ -70,7 +76,8 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 
 ## File Structure (key files)
 
-- `package.json` — `"start": "next start"`
+- `package.json` — `"start": "next start"`; `"postbuild"` copies standalone assets
+- `scripts/copy-standalone-assets.mjs` — `public` + `.next/static` → standalone
 - `next.config.ts` — `output: 'standalone'`
 - `.env.example` — `PORT` + DB vars
 - `.github/workflows/ci.yml`
@@ -122,6 +129,7 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 
 ## Recent Commits
 
+- postbuild copies `public` + `.next/static` into Next standalone output
 - Mobile type bump, fit full globe in 60vh, stats error state; JSON-safe
   locations API (BigInt) + document live 500
 - Lock mobile viewport/globe pinch zoom; add 14 next-intl locales with
@@ -152,6 +160,9 @@ MySQL (`mysql2`), next-intl. Deployed with PM2 + Nginx. Production path
 - Globe Earth map is a local NASA Blue Marble JPEG under `public/globe/`
   (no runtime hotlink). Unlit `meshBasicMaterial` so there is no cloud
   layer and no day/night terminator.
+- Standalone `public` / `.next/static` copy lives in `npm run build`
+  (`postbuild`) so local and host builds always produce a complete tree;
+  the SSH workflow copy is kept as belt-and-suspenders.
 - Intro skip uses existing `userConsent` on `GET /api/locations` plus
   localStorage; decline is remembered but does not skip the intro.
 - Mobile zoom is locked via Next.js `viewport` export (not a raw meta tag)

@@ -51,3 +51,7 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # postbuild copies public + .next/static into the standalone tree.
+      - name: Verify standalone public assets
+        run: test -f .next/standalone/public/globe/earth-blue-marble.jpg

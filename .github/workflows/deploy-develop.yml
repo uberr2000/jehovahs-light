@@ -155,7 +155,9 @@ jobs:
               echo "error: .next/standalone missing after build (next.config.ts output: 'standalone')"
               exit 1
             fi
-            # Next standalone does not copy public / .next/static (CDN assumed).
+            # Belt-and-suspenders: npm postbuild already copies these into
+            # standalone. Repeat here so a missed/mistyped host-side cp cannot
+            # drop /globe/earth-blue-marble.jpg. Idempotent rm + cp -a.
             # https://nextjs.org/docs/app/api-reference/config/next-config-js/output
             if [ -d public ]; then
               rm -rf .next/standalone/public

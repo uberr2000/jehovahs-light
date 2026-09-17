@@ -3,6 +3,8 @@
 The 3D globe in `src/components/Globe3D.tsx` uses a **local** equirectangular
 satellite map. Runtime loading is `/globe/earth-blue-marble.jpg` from this
 repo’s `public/` folder — NASA (or any other host) is **not** hotlinked.
+`npm run build` copies it into `.next/standalone/public` so standalone
+`server.js` can serve the same path. See [deploy.md](deploy.md).
 
 ## Asset
 
