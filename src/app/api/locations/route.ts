@@ -5,7 +5,8 @@ import {
   addLocation, 
   checkLocationExists,
   getGpsConsentByIp,
-  recordGpsConsent
+  recordGpsConsent,
+  dbErrorHttpResponse,
 } from '@/lib/db';
 import { toJsonSafe } from '@/lib/json-safe';
 
@@ -40,10 +41,11 @@ export async function GET(request: NextRequest) {
     }));
   } catch (error) {
     console.error('Error fetching locations:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch locations' },
-      { status: 500 }
+    const { error: message, status } = dbErrorHttpResponse(
+      error,
+      'Failed to fetch locations'
     );
+    return NextResponse.json({ error: message }, { status });
   }
 }
 
@@ -134,9 +136,10 @@ export async function POST(request: NextRequest) {
     }));
   } catch (error) {
     console.error('Error adding location:', error);
-    return NextResponse.json(
-      { error: 'Failed to add location' },
-      { status: 500 }
+    const { error: message, status } = dbErrorHttpResponse(
+      error,
+      'Failed to add location'
     );
+    return NextResponse.json({ error: message }, { status });
   }
 }

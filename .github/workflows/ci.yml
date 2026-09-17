@@ -17,12 +17,12 @@ permissions:
 
 env:
   # Harmless placeholders so `next build` can see the same keys as .env.example.
-  # DB_* is runtime-only in src/lib/db.ts; NEXT_PUBLIC_APP_URL is unused in
-  # source today but listed in .env.example. PORT is never written into
-  # package.json — "start" stays "next start".
+  # DB_* is used at runtime by Drizzle (src/lib/db) and by `npm run db:migrate`.
+  # NEXT_PUBLIC_APP_URL is unused in source today but listed in .env.example.
+  # PORT is never written into package.json — "start" stays "next start".
   CI: true
   PORT: "3000"
-  DB_HOST: localhost
+  DB_HOST: 127.0.0.1
   DB_USER: ci
   DB_PASSWORD: ci
   DB_NAME: ci
@@ -30,9 +30,24 @@ env:
 
 jobs:
   lint-and-build:
-    name: lint and build
+    name: lint, build, and migrate
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ci
+          MYSQL_DATABASE: ci
+          MYSQL_USER: ci
+          MYSQL_PASSWORD: ci
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pci --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=12
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,3 +70,12 @@ jobs:
       # postbuild copies public + .next/static into the standalone tree.
       - name: Verify standalone public assets
         run: test -f .next/standalone/public/globe/earth-blue-marble.jpg
+
+      - name: Drizzle kit check
+        run: npm run db:check
+
+      - name: Migrate against ephemeral MySQL
+        run: npm run db:migrate
+
+      - name: Re-run migrate (idempotent IF NOT EXISTS)
+        run: npm run db:migrate
