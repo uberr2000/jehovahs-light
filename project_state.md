@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-20 (v10 mobile type, globe zoom, brighter stars)
+_Last updated: 2026-09-20 (×2 header/CTA/count/hint type; chrome footprint unchanged)
 
 ## Project name & stack summary
 
@@ -76,6 +76,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   unlit panel is a large CTA (“Let your light shine”) + prominent
   LAMPS LIT count (no packed tiny-text card); lit title/body/count
   are larger. 14-locale detection unchanged.
+- Header title/tagline, bottom CTA, lamp count / LAMPS LIT, and hint
+  copy are 2× the previous develop sizes on both mobile and desktop.
+  Header/panel padding, gaps, and globe `flex-1` share are unchanged
+  (no 3/4 chrome shrink).
 - Stats no longer treat a failed `GET /api/locations` as zeros; error + retry.
   Live `/api/locations` 500 is documented in `docs/locations-api.md`
   (likely host MySQL/.env; BigInt JSON serialize is also guarded in code).
@@ -131,11 +135,14 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `LAND_LUMINANCE_FACTOR` (0.5 vs v0/develop land lift; sea unchanged)
 - `src/components/globe/Beacons.tsx` / `OwnBeacon.tsx` / `lat-lng.ts`
 - `src/components/WelcomePanel.tsx` / `LightLampButton.tsx` / `LampCounter.tsx`
-  — v10-scale CTA + lamp count (unlit), larger lit type
+  — v10-scale CTA + lamp count (unlit), larger lit type; CTA / count /
+  hint copy 2× develop sizes (padding/gaps unchanged)
 - `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales
 - `src/lib/consent-cache.ts` — localStorage cache for intro skip
 - `docs/consent-memory.md` — IP + localStorage limitations
 - `eslint.config.mjs` — ignores `deploy/**`
+- `src/app/page.tsx` — header brand/tagline 2× develop type; globe pane
+  still `flex-1` (no chrome shrink)
 - `src/app/` — pages and API routes
 - `src/i18n/config.ts` — 14 locales + native names
 - `src/i18n/resolve-locale.ts` — cookie / Accept-Language / navigator match
@@ -172,6 +179,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Double header title/tagline, bottom CTA, lamp count / LAMPS LIT, and
+  hint font sizes (mobile + desktop). Keep globe share and chrome
+  padding/gaps as on develop; no 3/4 shrink.
 - Match v10 mobile type scale (larger header, CTA “Let your light shine”,
   prominent LAMPS LIT); enable globe OrbitControls zoom while the page
   viewport stays locked; denser/brighter starfield; hint “Drag or zoom…”
@@ -234,6 +244,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   column names stay `lit_locations` / `gps_consent` with the original
   snake_case columns so existing host tables are reused. Migrations are
   `CREATE TABLE IF NOT EXISTS`.
+- Top/bottom copy (header title/tagline, CTA, lamp count label, hint)
+  is sized 2× relative to the post-v10 develop type on both breakpoints.
+  Chrome footprint (padding, gaps, globe flex share) is not shrunk.
 - Home chrome follows the v0 dark full-bleed + glass panel. Lighting a
   lamp still uses existing locations/consent APIs (not the zip’s
   `/api/lamps` or Postgres). v0 `zh-Hant` strings map to `zh-TW`; all 14

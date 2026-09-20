@@ -89,7 +89,7 @@ export default function LightLampButton({ onLocationReceived }: LightLampButtonP
         type="button"
         onClick={handleClick}
         disabled={busy}
-        className="group relative inline-flex min-h-14 items-center justify-center gap-3 overflow-hidden rounded-full bg-gradient-to-b from-amber-300 to-amber-500 px-8 py-4 text-lg font-semibold text-neutral-900 shadow-[0_0_36px_-4px_rgba(245,180,90,0.75)] transition-all hover:shadow-[0_0_48px_-2px_rgba(245,180,90,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-80"
+        className="group relative inline-flex min-h-14 items-center justify-center gap-3 overflow-hidden rounded-full bg-gradient-to-b from-amber-300 to-amber-500 px-8 py-4 text-[2.25rem] font-semibold text-neutral-900 shadow-[0_0_36px_-4px_rgba(245,180,90,0.75)] transition-all hover:shadow-[0_0_48px_-2px_rgba(245,180,90,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-80"
       >
         <LampGlyph busy={busy} />
         <span>{status === 'saving' ? t('saving') : busy ? t('locating') : t('lightButton')}</span>
