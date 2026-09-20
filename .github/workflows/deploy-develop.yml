@@ -171,6 +171,16 @@ jobs:
             rm -rf .next/standalone/.next/static
             cp -a .next/static .next/standalone/.next/static
 
+            # Apply Drizzle migrations before PM2 reload. CREATE TABLE IF NOT
+            # EXISTS is safe when gps_consent / lit_locations already exist.
+            # Source host .env so drizzle-kit sees DB_HOST / DB_USER /
+            # DB_PASSWORD / DB_NAME (never printed).
+            set -a
+            # shellcheck disable=SC1091
+            . ./.env
+            set +a
+            npm run db:migrate
+
             # Identify by name jehovahs-light from the ecosystem file.
             # `pm2 reload 14` is not enough to change npm start → standalone.
             # startOrReload --update-env, with delete-by-name + start fallback.
