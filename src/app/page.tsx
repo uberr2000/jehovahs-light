@@ -210,12 +210,12 @@ export default function Home() {
 
   return (
     <main className="relative flex h-[100dvh] w-full flex-col overflow-hidden bg-[#04060e]">
-      <header className="z-10 flex shrink-0 items-start justify-between gap-4 p-4 sm:p-6">
+      <header className="z-10 flex shrink-0 items-start justify-between gap-3 p-3 md:gap-4 md:p-6">
         <div className="flex min-w-0 flex-col gap-0.5">
-          <span className="text-base font-semibold tracking-wide text-amber-50 sm:text-lg">
+          <span className="text-xs font-semibold tracking-wide text-amber-50 md:text-lg">
             {t('brand')}
           </span>
-          <span className="text-xs text-amber-100/55 sm:text-sm">{t('tagline')}</span>
+          <span className="text-[0.5625rem] text-amber-100/55 md:text-sm">{t('tagline')}</span>
         </div>
         <LanguageSelector currentLocale={locale} onLocaleChange={handleLocaleChange} />
       </header>
@@ -225,7 +225,7 @@ export default function Home() {
           <Globe3D lightPoints={locations} userLocation={userLocation} />
         </div>
 
-        <div className="flex shrink-0 justify-center p-4 pt-0 sm:p-6 sm:pt-0 lg:w-[26rem] lg:items-center lg:p-8">
+        <div className="flex shrink-0 justify-center p-3 pt-0 md:p-6 md:pt-0 lg:w-[26rem] lg:items-center lg:p-8">
           <WelcomePanel
             count={stats.total}
             hasLit={hasLit}

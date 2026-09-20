@@ -84,18 +84,18 @@ export default function LightLampButton({ onLocationReceived }: LightLampButtonP
   };
 
   return (
-    <div className="flex flex-col items-stretch gap-2">
+    <div className="flex flex-col items-stretch gap-1.5 md:gap-2">
       <button
         type="button"
         onClick={handleClick}
         disabled={busy}
-        className="group relative inline-flex min-h-14 items-center justify-center gap-3 overflow-hidden rounded-full bg-gradient-to-b from-amber-300 to-amber-500 px-8 py-4 text-lg font-semibold text-neutral-900 shadow-[0_0_36px_-4px_rgba(245,180,90,0.75)] transition-all hover:shadow-[0_0_48px_-2px_rgba(245,180,90,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-80"
+        className="group relative inline-flex min-h-[2.625rem] items-center justify-center gap-[0.5625rem] overflow-hidden rounded-full bg-gradient-to-b from-amber-300 to-amber-500 px-6 py-3 text-[0.84375rem] font-semibold text-neutral-900 shadow-[0_0_36px_-4px_rgba(245,180,90,0.75)] transition-all hover:shadow-[0_0_48px_-2px_rgba(245,180,90,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-80 md:min-h-14 md:gap-3 md:px-8 md:py-4 md:text-lg"
       >
         <LampGlyph busy={busy} />
         <span>{status === 'saving' ? t('saving') : busy ? t('locating') : t('lightButton')}</span>
       </button>
       {error ? (
-        <p role="alert" className="px-1 text-center text-sm text-amber-200/80">
+        <p role="alert" className="px-1 text-center text-[0.65625rem] text-amber-200/80 md:text-sm">
           {error}
         </p>
       ) : null}
@@ -107,10 +107,10 @@ function LampGlyph({ busy }: { busy: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className={`relative flex h-5 w-5 items-center justify-center ${busy ? 'animate-pulse' : ''}`}
+      className={`relative flex h-[0.9375rem] w-[0.9375rem] items-center justify-center md:h-5 md:w-5 ${busy ? 'animate-pulse' : ''}`}
     >
-      <span className="absolute h-5 w-5 rounded-full bg-amber-100 blur-[3px]" />
-      <span className="relative h-3 w-3 rounded-full bg-neutral-900/80" />
+      <span className="absolute h-[0.9375rem] w-[0.9375rem] rounded-full bg-amber-100 blur-[3px] md:h-5 md:w-5" />
+      <span className="relative h-[0.5625rem] w-[0.5625rem] rounded-full bg-neutral-900/80 md:h-3 md:w-3" />
     </span>
   );
 }

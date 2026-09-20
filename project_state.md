@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-20 (v10 mobile type, globe zoom, brighter stars)
+_Last updated: 2026-09-20 (mobile chrome ~75% so globe gets more viewport)
 
 ## Project name & stack summary
 
@@ -72,10 +72,13 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `touch-action: none`); compact camera still frames the full globe in
   the remaining pane, then the user can zoom. Hint is “Drag or zoom…”.
   Layout is column on mobile (globe above panel) and row on desktop.
-- Home chrome matches v10 type scale: larger header title/tagline,
-  unlit panel is a large CTA (“Let your light shine”) + prominent
-  LAMPS LIT count (no packed tiny-text card); lit title/body/count
-  are larger. 14-locale detection unchanged.
+- Home chrome matches v10 type scale on **md+**: larger header
+  title/tagline, unlit panel CTA (“Let your light shine”) + prominent
+  LAMPS LIT count; lit title/body/count stay large. Below `md`, top
+  and bottom chrome (header title/tagline/lang pill, CTA, lamp count,
+  hint, card padding/gaps) is ~75% of that mobile type so the globe
+  gets more viewport. Globe zoom, stars, land luminance, APIs,
+  consent, and i18n copy are unchanged.
 - Stats no longer treat a failed `GET /api/locations` as zeros; error + retry.
   Live `/api/locations` 500 is documented in `docs/locations-api.md`
   (likely host MySQL/.env; BigInt JSON serialize is also guarded in code).
@@ -130,9 +133,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `src/components/globe/Earth.tsx` — Blue Marble + land/sea contrast shader;
   `LAND_LUMINANCE_FACTOR` (0.5 vs v0/develop land lift; sea unchanged)
 - `src/components/globe/Beacons.tsx` / `OwnBeacon.tsx` / `lat-lng.ts`
+- `src/app/page.tsx` — mobile header/panel padding ~75%; md+ unchanged
 - `src/components/WelcomePanel.tsx` / `LightLampButton.tsx` / `LampCounter.tsx`
-  — v10-scale CTA + lamp count (unlit), larger lit type
-- `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales
+  — v10-scale CTA + lamp count on md+; ~75% type/padding below md
+- `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales;
+  trigger ~75% below md (dropdown overlay unchanged)
 - `src/lib/consent-cache.ts` — localStorage cache for intro skip
 - `docs/consent-memory.md` — IP + localStorage limitations
 - `eslint.config.mjs` — ignores `deploy/**`
@@ -172,6 +177,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Shrink mobile-only top/bottom chrome to ~75% of current type and
+  vertical padding (header, CTA, lamp count, hint card) so the globe
+  gets more viewport; md+ layout and globe/API/i18n unchanged
 - Match v10 mobile type scale (larger header, CTA “Let your light shine”,
   prominent LAMPS LIT); enable globe OrbitControls zoom while the page
   viewport stays locked; denser/brighter starfield; hint “Drag or zoom…”
@@ -241,3 +249,6 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   a land-brighter-than-sea contrast boost (no hotlink). Land luminance
   after that lift is `LAND_LUMINANCE_FACTOR` (`0.5` vs v0; set `1` to
   restore). Sea mix is not scaled.
+- Mobile (`max-width: 767px`) chrome is ~3/4 of the v10 mobile type
+  and vertical padding so the globe pane grows; `md+` keeps the v10
+  sizes. This is targeted typography/padding, not a global `scale()`.

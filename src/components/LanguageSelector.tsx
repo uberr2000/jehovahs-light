@@ -36,7 +36,7 @@ export default function LanguageSelector({
           onClick={() => setIsOpen(!isOpen)}
           aria-label={t('select')}
           aria-expanded={isOpen}
-          className="flex items-center gap-1.5 rounded-full bg-amber-300/90 px-3.5 py-1.5 text-sm font-medium text-neutral-900 transition-colors"
+          className="flex items-center gap-[0.28125rem] rounded-full bg-amber-300/90 px-[0.65625rem] py-[0.28125rem] text-[0.65625rem] font-medium text-neutral-900 transition-colors md:gap-1.5 md:px-3.5 md:py-1.5 md:text-sm"
         >
           <span aria-hidden="true">{localeFlags[currentLocale]}</span>
           <span>{localeNames[currentLocale]}</span>
