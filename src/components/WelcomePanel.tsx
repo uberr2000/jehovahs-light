@@ -33,14 +33,14 @@ export default function WelcomePanel({
           </div>
           <LampCounter count={count} />
           <StatsError status={statsStatus} onRetry={onRetry} />
-          <p className="text-sm text-amber-100/50 sm:text-base">{t('rotateHint')}</p>
+          <p className="text-[1.75rem] text-amber-100/50 sm:text-[2rem]">{t('rotateHint')}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-6">
           <LightLampButton onLocationReceived={onLocationReceived} />
           <LampCounter count={count} />
           <StatsError status={statsStatus} onRetry={onRetry} />
-          <p className="text-sm text-amber-100/50 sm:text-base">{t('rotateHint')}</p>
+          <p className="text-[1.75rem] text-amber-100/50 sm:text-[2rem]">{t('rotateHint')}</p>
         </div>
       )}
     </div>
