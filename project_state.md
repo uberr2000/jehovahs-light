@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-20 (v0 Light of the Nations UI port)_
+_Last updated: 2026-09-20 (halve Earth land luminance vs v0)_
 
 ## Project name & stack summary
 
@@ -52,10 +52,14 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `docs/ci-cd.md` — CI steps, secret names, path, PM2 name
   `jehovahs-light`, no `package.json` port hacks, Production untouched
 - ESLint: ignore `deploy/**` (PM2 CJS) so `npm run lint` is green on CI
+- Earth land luminance is half the v0/develop contrast-lifted look
+  (`LAND_LUMINANCE_FACTOR = 0.5` in `Earth.tsx`); ocean, beacons,
+  camera, and mobile zoom lock are unchanged
 - Globe3D uses a local NASA Blue Marble equirectangular satellite
   texture (`public/globe/earth-blue-marble.jpg` via drei `useTexture`);
   procedural canvas continents removed; unlit map (no clouds / day-night)
-  with a land/sea contrast boost so land reads brighter than ocean;
+  with a land/sea contrast boost so land reads brighter than ocean,
+  then land RGB scaled by `LAND_LUMINANCE_FACTOR` (`0.5` vs the v0 lift);
   OrbitControls zoom locked on mobile; auto-rotation via OrbitControls
 - Globe light points / LightGlow (and user marker glow) are ~1/4 of the
   previous visual size (`pointsMaterial` 0.015; glow pulse 0.01–0.015)
@@ -118,7 +122,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `public/globe/SOURCE.txt` — asset provenance next to the JPEG
 - `src/components/Globe3D.tsx` — R3F scene: Earth + beacons + own beacon,
   mobile zoom lock, OrbitControls auto-rotate
-- `src/components/globe/Earth.tsx` — Blue Marble + land/sea contrast shader
+- `src/components/globe/Earth.tsx` — Blue Marble + land/sea contrast shader;
+  `LAND_LUMINANCE_FACTOR` (0.5 vs v0/develop land lift; sea unchanged)
 - `src/components/globe/Beacons.tsx` / `OwnBeacon.tsx` / `lat-lng.ts`
 - `src/components/WelcomePanel.tsx` / `LightLampButton.tsx` / `LampCounter.tsx`
 - `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales
@@ -161,6 +166,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Halve Earth land luminance vs the v0/develop contrast lift via
+  reversible `LAND_LUMINANCE_FACTOR = 0.5` (sea / beacons / camera
+  / mobile zoom lock unchanged)
 - Port v0 “Light of the Nations” home UI onto develop: glass panel,
   globe beacons, lamp counter, 14-locale chrome; wire to `/api/locations`
 - Add Drizzle ORM only (no Prisma): schema for `lit_locations` /
@@ -217,4 +225,6 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   lamp still uses existing locations/consent APIs (not the zip’s
   `/api/lamps` or Postgres). v0 `zh-Hant` strings map to `zh-TW`; all 14
   locales stay in `src/i18n/messages`. Earth stays local Blue Marble with
-  a land-brighter-than-sea contrast boost (no hotlink).
+  a land-brighter-than-sea contrast boost (no hotlink). Land luminance
+  after that lift is `LAND_LUMINANCE_FACTOR` (`0.5` vs v0; set `1` to
+  restore). Sea mix is not scaled.
