@@ -24,7 +24,7 @@ export default function WelcomePanel({
       {hasLit ? (
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-2.5">
-            <h2 className="text-balance text-[1.65rem] font-semibold leading-tight tracking-tight text-amber-50 sm:text-3xl">
+            <h2 className="text-balance text-[3.3rem] font-semibold leading-tight tracking-tight text-amber-50 sm:text-3xl">
               {t('litTitle')}
             </h2>
             <p className="text-pretty text-base leading-relaxed text-amber-100/75 sm:text-lg">
@@ -33,14 +33,14 @@ export default function WelcomePanel({
           </div>
           <LampCounter count={count} />
           <StatsError status={statsStatus} onRetry={onRetry} />
-          <p className="text-sm text-amber-100/50 sm:text-base">{t('rotateHint')}</p>
+          <p className="text-[1.75rem] text-amber-100/50 sm:text-base">{t('rotateHint')}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-6">
           <LightLampButton onLocationReceived={onLocationReceived} />
           <LampCounter count={count} />
           <StatsError status={statsStatus} onRetry={onRetry} />
-          <p className="text-sm text-amber-100/50 sm:text-base">{t('rotateHint')}</p>
+          <p className="text-[1.75rem] text-amber-100/50 sm:text-base">{t('rotateHint')}</p>
         </div>
       )}
     </div>

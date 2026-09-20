@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-20 (v10 mobile type, globe zoom, brighter stars)
+_Last updated: 2026-09-20 (mobile title/CTA/count/hint type ×2)
 
 ## Project name & stack summary
 
@@ -72,10 +72,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `touch-action: none`); compact camera still frames the full globe in
   the remaining pane, then the user can zoom. Hint is “Drag or zoom…”.
   Layout is column on mobile (globe above panel) and row on desktop.
-- Home chrome matches v10 type scale: larger header title/tagline,
-  unlit panel is a large CTA (“Let your light shine”) + prominent
-  LAMPS LIT count (no packed tiny-text card); lit title/body/count
-  are larger. 14-locale detection unchanged.
+- Home chrome matches v10 type scale on sm+: header title/tagline,
+  unlit CTA + LAMPS LIT count, larger lit type. Below `sm`, title /
+  CTA / lamp count / hint are ×2 those mobile sizes (layout padding
+  unchanged). Globe, APIs, consent, i18n copy unchanged.
 - Stats no longer treat a failed `GET /api/locations` as zeros; error + retry.
   Live `/api/locations` 500 is documented in `docs/locations-api.md`
   (likely host MySQL/.env; BigInt JSON serialize is also guarded in code).
@@ -130,8 +130,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `src/components/globe/Earth.tsx` — Blue Marble + land/sea contrast shader;
   `LAND_LUMINANCE_FACTOR` (0.5 vs v0/develop land lift; sea unchanged)
 - `src/components/globe/Beacons.tsx` / `OwnBeacon.tsx` / `lat-lng.ts`
+- `src/app/page.tsx` — mobile header title ×2 (`text-[2rem]`); sm+ unchanged
 - `src/components/WelcomePanel.tsx` / `LightLampButton.tsx` / `LampCounter.tsx`
-  — v10-scale CTA + lamp count (unlit), larger lit type
+  — v10-scale on sm+; mobile CTA / count / hint / lit title ×2 type only
 - `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales
 - `src/lib/consent-cache.ts` — localStorage cache for intro skip
 - `docs/consent-memory.md` — IP + localStorage limitations
@@ -172,6 +173,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Double mobile font size for header title, CTA, lamp count, and hint
+  (×2 of current develop); keep padding/gaps and sm+ / desktop as-is
 - Match v10 mobile type scale (larger header, CTA “Let your light shine”,
   prominent LAMPS LIT); enable globe OrbitControls zoom while the page
   viewport stays locked; denser/brighter starfield; hint “Drag or zoom…”
@@ -241,3 +244,5 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   a land-brighter-than-sea contrast boost (no hotlink). Land luminance
   after that lift is `LAND_LUMINANCE_FACTOR` (`0.5` vs v0; set `1` to
   restore). Sea mix is not scaled.
+- Live chrome-to-globe proportions stay; do not shrink the v10 mobile
+  footprint. Mobile-only type ×2 applies to title / CTA / count / hint.
