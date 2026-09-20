@@ -41,16 +41,16 @@ export default function LampCounter({ count }: { count: number }) {
   const display = useAnimatedCount(count);
 
   return (
-    <div className="flex items-center gap-3">
-      <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
+    <div className="flex items-center gap-3.5">
+      <span className="relative flex h-3.5 w-3.5 shrink-0" aria-hidden="true">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-300/60" />
-        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_12px_2px_rgba(245,180,90,0.8)]" />
+        <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-amber-300 shadow-[0_0_16px_3px_rgba(245,180,90,0.85)]" />
       </span>
       <div className="flex flex-col leading-tight">
-        <span className="font-mono text-2xl font-semibold tabular-nums tracking-tight text-amber-50">
+        <span className="font-mono text-4xl font-semibold tabular-nums tracking-tight text-amber-50 sm:text-5xl">
           {display.toLocaleString()}
         </span>
-        <span className="text-[0.7rem] uppercase tracking-[0.18em] text-amber-100/50">
+        <span className="text-xs uppercase tracking-[0.22em] text-amber-100/55 sm:text-sm">
           {t('counterLabel')}
         </span>
       </div>

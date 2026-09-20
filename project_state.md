@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-20 (halve Earth land luminance vs v0)_
+_Last updated: 2026-09-20 (v10 mobile type, globe zoom, brighter stars)
 
 ## Project name & stack summary
 
@@ -54,23 +54,28 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - ESLint: ignore `deploy/**` (PM2 CJS) so `npm run lint` is green on CI
 - Earth land luminance is half the v0/develop contrast-lifted look
   (`LAND_LUMINANCE_FACTOR = 0.5` in `Earth.tsx`); ocean, beacons,
-  camera, and mobile zoom lock are unchanged
+  and camera framing are unchanged
 - Globe3D uses a local NASA Blue Marble equirectangular satellite
   texture (`public/globe/earth-blue-marble.jpg` via drei `useTexture`);
   procedural canvas continents removed; unlit map (no clouds / day-night)
   with a land/sea contrast boost so land reads brighter than ocean,
   then land RGB scaled by `LAND_LUMINANCE_FACTOR` (`0.5` vs the v0 lift);
-  OrbitControls zoom locked on mobile; auto-rotation via OrbitControls
+  OrbitControls drag-rotate + zoom; auto-rotation via OrbitControls;
+  starfield denser/brighter (count 8000, factor 7, closer radius)
 - Globe light points / LightGlow (and user marker glow) are ~1/4 of the
   previous visual size (`pointsMaterial` 0.015; glow pulse 0.01–0.015)
 - Returning GPS-accepted visitors open the glass panel in the lit state:
   localStorage cache `jehovahs-light:user-consent` plus existing
   `GET /api/locations` `userConsent` (IP). No new consent endpoint.
-- Mobile page zoom locked (`viewport` initial-scale=1, maximum-scale=1,
-  user-scalable=no). Globe3D pinch zoom off on coarse pointer / max-width
-  768px; mobile camera pulls back so the full globe fits in the remaining
-  viewport pane (distance from FOV/aspect, pinch still locked). Layout is
-  column on mobile (globe above panel) and row on desktop.
+- Mobile **page** zoom locked (`viewport` initial-scale=1, maximum-scale=1,
+  user-scalable=no). Globe pinch/scroll zoom is on (`enableZoom`, canvas
+  `touch-action: none`); compact camera still frames the full globe in
+  the remaining pane, then the user can zoom. Hint is “Drag or zoom…”.
+  Layout is column on mobile (globe above panel) and row on desktop.
+- Home chrome matches v10 type scale: larger header title/tagline,
+  unlit panel is a large CTA (“Let your light shine”) + prominent
+  LAMPS LIT count (no packed tiny-text card); lit title/body/count
+  are larger. 14-locale detection unchanged.
 - Stats no longer treat a failed `GET /api/locations` as zeros; error + retry.
   Live `/api/locations` 500 is documented in `docs/locations-api.md`
   (likely host MySQL/.env; BigInt JSON serialize is also guarded in code).
@@ -121,11 +126,12 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `public/globe/earth-blue-marble.jpg` — local 2048×1024 satellite map
 - `public/globe/SOURCE.txt` — asset provenance next to the JPEG
 - `src/components/Globe3D.tsx` — R3F scene: Earth + beacons + own beacon,
-  mobile zoom lock, OrbitControls auto-rotate
+  OrbitControls rotate + zoom, compact fit-then-zoom, brighter Stars
 - `src/components/globe/Earth.tsx` — Blue Marble + land/sea contrast shader;
   `LAND_LUMINANCE_FACTOR` (0.5 vs v0/develop land lift; sea unchanged)
 - `src/components/globe/Beacons.tsx` / `OwnBeacon.tsx` / `lat-lng.ts`
 - `src/components/WelcomePanel.tsx` / `LightLampButton.tsx` / `LampCounter.tsx`
+  — v10-scale CTA + lamp count (unlit), larger lit type
 - `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales
 - `src/lib/consent-cache.ts` — localStorage cache for intro skip
 - `docs/consent-memory.md` — IP + localStorage limitations
@@ -136,7 +142,7 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `src/i18n/messages/*.json` — en, zh-TW, zh-CN, es, pt, fr, de, ja, ko, ru, ar, id, th, vi
 - `src/components/LocaleNavigatorFallback.tsx` — navigator fallback when SSR defaulted
 - `src/app/layout.tsx` — viewport lock, html lang/dir, locale source
-- `docs/i18n-viewport.md` — viewport lock + locale priority + list
+- `docs/i18n-viewport.md` — page viewport lock + globe zoom + locale list
 - `src/lib/json-safe.ts` — BigInt-safe JSON for mysql2 COUNT / insertId
 - `docs/locations-api.md` — GET /api/locations 500 diagnosis
 
@@ -157,7 +163,7 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - GPS intro skip is IP + localStorage only: shared Wi-Fi / VPN / IP change
   can mis-identify; new device or cleared storage falls back to IP
   (`docs/consent-memory.md`). Home no longer shows the lighthouse splash;
-  first visit is the v0 glass “light a lamp” panel.
+  first visit is the v0 glass panel with CTA “Let your light shine”.
 - Live `GET /api/locations` on jehovahs-light.ink.net.tw returns HTTP 500
   (`Failed to fetch locations`). UI now shows error + retry instead of
   silent zeros. Likely host MySQL/.env; BigInt JSON is guarded in code.
@@ -166,6 +172,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Match v10 mobile type scale (larger header, CTA “Let your light shine”,
+  prominent LAMPS LIT); enable globe OrbitControls zoom while the page
+  viewport stays locked; denser/brighter starfield; hint “Drag or zoom…”
+  in all 14 locales. `/api/locations`, consent, locale detection, and
+  land luminance unchanged.
 - Halve Earth land luminance vs the v0/develop contrast lift via
   reversible `LAND_LUMINANCE_FACTOR = 0.5` (sea / beacons / camera
   / mobile zoom lock unchanged)
@@ -210,8 +221,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   the SSH workflow copy is kept as belt-and-suspenders.
 - Intro skip uses existing `userConsent` on `GET /api/locations` plus
   localStorage; decline is remembered but does not skip the intro.
-- Mobile zoom is locked via Next.js `viewport` export (not a raw meta tag)
-  plus OrbitControls `enableZoom={false}` on coarse/narrow viewports.
+- Mobile **page** zoom is locked via Next.js `viewport` export (not a raw
+  meta tag). Globe OrbitControls `enableZoom` is on; pinch/wheel zoom the
+  camera only (`touch-none` on the canvas). Compact viewports still frame
+  the full globe first. Hint copy is `home.rotateHint` in all 14 locales.
 - Locale cookie is the user pick (and navigator fallback persist). SSR
   uses Accept-Language when the cookie is missing. Unmatched region
   variants (e.g. zh-HK) do not map to zh-TW/zh-CN. RTL only for `ar`.

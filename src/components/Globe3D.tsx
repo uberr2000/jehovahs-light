@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useMemo, useLayoutEffect, useEffect, useState } from 'react';
+import { Suspense, useMemo, useLayoutEffect, useEffect, useRef, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 
@@ -13,6 +13,8 @@ const CAMERA_FOV = 45;
 const EARTH_RADIUS = 2;
 const ATMOSPHERE_RADIUS = EARTH_RADIUS * 1.12;
 const FIT_MARGIN = 1.22;
+const MIN_ZOOM_DISTANCE = 3.2;
+const DESKTOP_MAX_ZOOM_DISTANCE = 9;
 const MOBILE_MAX_WIDTH = '(max-width: 768px)';
 const COARSE_POINTER = '(pointer: coarse)';
 
@@ -30,15 +32,15 @@ export function fitCameraDistance(
   return (radius / Math.tan(limiting / 2)) * margin;
 }
 
-function useLockGlobeZoom() {
-  const [lockZoom, setLockZoom] = useState(true);
+function useCompactGlobeView() {
+  const [compact, setCompact] = useState(true);
 
   useEffect(() => {
     const coarse = window.matchMedia(COARSE_POINTER);
     const narrow = window.matchMedia(MOBILE_MAX_WIDTH);
 
     const update = () => {
-      setLockZoom(coarse.matches || narrow.matches);
+      setCompact(coarse.matches || narrow.matches);
     };
 
     update();
@@ -50,34 +52,45 @@ function useLockGlobeZoom() {
     };
   }, []);
 
-  return lockZoom;
+  return compact;
 }
 
-function GlobeOrbitControls({ lockZoom }: { lockZoom: boolean }) {
+function GlobeOrbitControls({ compact }: { compact: boolean }) {
   const { camera, size } = useThree();
   const aspect = size.width / Math.max(size.height, 1);
   const fitDistance = useMemo(
     () => fitCameraDistance(ATMOSPHERE_RADIUS, CAMERA_FOV, aspect),
     [aspect]
   );
-  const distance = lockZoom ? fitDistance : DESKTOP_CAMERA_DISTANCE;
+  const maxDistance = compact
+    ? Math.max(fitDistance, DESKTOP_MAX_ZOOM_DISTANCE)
+    : DESKTOP_MAX_ZOOM_DISTANCE;
+  const framedRef = useRef(false);
+  const lastAspectRef = useRef(aspect);
 
   useLayoutEffect(() => {
-    if (!lockZoom) return;
-    camera.position.set(0, 0, distance);
+    if (!compact) {
+      framedRef.current = false;
+      return;
+    }
+    const aspectJump = Math.abs(lastAspectRef.current - aspect) > 0.25;
+    lastAspectRef.current = aspect;
+    if (framedRef.current && !aspectJump) return;
+    camera.position.setLength(fitDistance);
     camera.updateProjectionMatrix();
-  }, [camera, distance, lockZoom]);
+    framedRef.current = true;
+  }, [aspect, camera, compact, fitDistance]);
 
   return (
     <OrbitControls
       enablePan={false}
-      enableZoom={!lockZoom}
-      minDistance={lockZoom ? distance : 3.2}
-      maxDistance={lockZoom ? distance : 9}
+      enableZoom
+      minDistance={MIN_ZOOM_DISTANCE}
+      maxDistance={maxDistance}
       enableDamping
       dampingFactor={0.05}
       rotateSpeed={0.5}
-      zoomSpeed={0.6}
+      zoomSpeed={0.7}
       autoRotate
       autoRotateSpeed={0.35}
     />
@@ -124,21 +137,28 @@ function GlobeContent({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
 }
 
 export default function Globe3D({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
-  const lockZoom = useLockGlobeZoom();
+  const compact = useCompactGlobeView();
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full touch-none">
       <Canvas
         camera={{
-          position: [0, lockZoom ? 0 : 0.45, lockZoom ? 8 : DESKTOP_CAMERA_DISTANCE],
+          position: [0, compact ? 0 : 0.45, compact ? 8 : DESKTOP_CAMERA_DISTANCE],
           fov: CAMERA_FOV,
         }}
         dpr={[1, 2]}
         gl={{ antialias: true }}
       >
         <color attach="background" args={['#04060e']} />
-        <fog attach="fog" args={['#04060e', 7, 14]} />
-        <Stars radius={120} depth={60} count={2200} factor={4} saturation={0} fade speed={0.6} />
+        <Stars
+          radius={55}
+          depth={35}
+          count={8000}
+          factor={7}
+          saturation={0}
+          fade
+          speed={0.4}
+        />
         <Suspense fallback={<EarthFallback />}>
           <GlobeContent
             lightPoints={lightPoints}
@@ -146,7 +166,7 @@ export default function Globe3D({ lightPoints, userLocation, onGlobeReady }: Glo
             onGlobeReady={onGlobeReady}
           />
         </Suspense>
-        <GlobeOrbitControls lockZoom={lockZoom} />
+        <GlobeOrbitControls compact={compact} />
       </Canvas>
     </div>
   );

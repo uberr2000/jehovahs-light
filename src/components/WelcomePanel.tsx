@@ -20,30 +20,27 @@ export default function WelcomePanel({
   const t = useTranslations('home');
 
   return (
-    <div className="pointer-events-auto w-full max-w-md rounded-3xl border border-amber-200/12 bg-neutral-950/55 p-6 shadow-[0_8px_60px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:p-7">
+    <div className="pointer-events-auto w-full max-w-md rounded-[1.75rem] border border-amber-200/12 bg-neutral-950/45 px-6 py-7 shadow-[0_8px_60px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:px-8 sm:py-8">
       {hasLit ? (
-        <div className="flex flex-col gap-5">
-          <div className="flex flex-col gap-1.5">
-            <h2 className="text-balance text-xl font-semibold text-amber-50">{t('litTitle')}</h2>
-            <p className="text-pretty text-sm leading-relaxed text-amber-100/70">{t('litMessage')}</p>
+        <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-2.5">
+            <h2 className="text-balance text-[1.65rem] font-semibold leading-tight tracking-tight text-amber-50 sm:text-3xl">
+              {t('litTitle')}
+            </h2>
+            <p className="text-pretty text-base leading-relaxed text-amber-100/75 sm:text-lg">
+              {t('litMessage')}
+            </p>
           </div>
-          <div className="h-px bg-gradient-to-r from-transparent via-amber-200/20 to-transparent" />
           <LampCounter count={count} />
           <StatsError status={statsStatus} onRetry={onRetry} />
-          <p className="text-xs text-amber-100/45">{t('rotateHint')}</p>
+          <p className="text-sm text-amber-100/50 sm:text-base">{t('rotateHint')}</p>
         </div>
       ) : (
-        <div className="flex flex-col gap-5">
-          <div className="flex flex-col gap-2">
-            <h1 className="text-balance text-2xl font-semibold tracking-tight text-amber-50 sm:text-3xl">
-              {t('heroTitle')}
-            </h1>
-            <p className="text-pretty text-sm leading-relaxed text-amber-100/70">{t('heroSubtitle')}</p>
-          </div>
+        <div className="flex flex-col gap-6">
           <LightLampButton onLocationReceived={onLocationReceived} />
-          <div className="h-px bg-gradient-to-r from-transparent via-amber-200/15 to-transparent" />
           <LampCounter count={count} />
           <StatsError status={statsStatus} onRetry={onRetry} />
+          <p className="text-sm text-amber-100/50 sm:text-base">{t('rotateHint')}</p>
         </div>
       )}
     </div>
@@ -62,11 +59,11 @@ function StatsError({
 
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-xs text-amber-200/80">{t('loadError')}</p>
+      <p className="text-sm text-amber-200/80">{t('loadError')}</p>
       <button
         type="button"
         onClick={onRetry}
-        className="self-start rounded-full border border-amber-200/20 bg-white/5 px-3 py-1.5 text-xs text-amber-50 hover:bg-white/10"
+        className="self-start rounded-full border border-amber-200/20 bg-white/5 px-4 py-2 text-sm text-amber-50 hover:bg-white/10"
       >
         {t('retry')}
       </button>

@@ -36,7 +36,7 @@ export default function LanguageSelector({
           onClick={() => setIsOpen(!isOpen)}
           aria-label={t('select')}
           aria-expanded={isOpen}
-          className="flex items-center gap-1.5 rounded-full bg-amber-300/90 px-3 py-1 text-xs font-medium text-neutral-900 transition-colors"
+          className="flex items-center gap-1.5 rounded-full bg-amber-300/90 px-3.5 py-1.5 text-sm font-medium text-neutral-900 transition-colors"
         >
           <span aria-hidden="true">{localeFlags[currentLocale]}</span>
           <span>{localeNames[currentLocale]}</span>
@@ -65,7 +65,7 @@ export default function LanguageSelector({
                   setIsOpen(false);
                 }}
                 aria-pressed={active}
-                className={`flex w-full items-center gap-3 rounded-full px-3 py-2 text-start text-xs font-medium transition-colors ${
+                className={`flex w-full items-center gap-3 rounded-full px-3 py-2.5 text-start text-sm font-medium transition-colors ${
                   active
                     ? 'bg-amber-300/90 text-neutral-900'
                     : 'text-amber-50/70 hover:bg-white/5 hover:text-amber-50'

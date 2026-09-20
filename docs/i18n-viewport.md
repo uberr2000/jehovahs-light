@@ -4,12 +4,15 @@
 
 - Root layout exports a Next.js `viewport` object:
   `width=device-width`, `initial-scale=1`, `maximum-scale=1`, `user-scalable=no`.
-- Layout stays responsive; users cannot pinch-shrink the page.
-- Globe3D OrbitControls: `enableZoom` is off when `(pointer: coarse)` or
-  `max-width: 768px`. Mobile camera distance is computed from canvas
-  aspect and 45° FOV so the full sphere + atmosphere fits in the remaining
-  viewport (the globe pane beside/above the glass welcome panel) and stays
-  fixed. Desktop still starts around distance 6 with zoom between 3.2 and 9.
+  That locks **page** pinch/scale; the layout stays responsive.
+- Globe3D OrbitControls: `enableZoom` is on for every viewport (drag rotate
+  stays). The globe canvas uses `touch-action: none` so pinch/wheel zoom the
+  camera, not the page. Compact viewports (`pointer: coarse` or
+  `max-width: 768px`) still **frame** the full sphere + atmosphere in the
+  remaining pane (distance from FOV/aspect) as the starting camera; zoom
+  range is `3.2` … `max(fitDistance, 9)`. Desktop still starts around
+  distance 6 with zoom between 3.2 and 9. Hint copy is `home.rotateHint`
+  (“Drag or zoom…”) in all 14 locale files.
 
 ## Locale priority
 

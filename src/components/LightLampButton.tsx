@@ -89,13 +89,13 @@ export default function LightLampButton({ onLocationReceived }: LightLampButtonP
         type="button"
         onClick={handleClick}
         disabled={busy}
-        className="group relative inline-flex items-center justify-center gap-2.5 overflow-hidden rounded-full bg-gradient-to-b from-amber-300 to-amber-500 px-7 py-3.5 text-base font-semibold text-neutral-900 shadow-[0_0_30px_-4px_rgba(245,180,90,0.7)] transition-all hover:shadow-[0_0_40px_-2px_rgba(245,180,90,0.9)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-80"
+        className="group relative inline-flex min-h-14 items-center justify-center gap-3 overflow-hidden rounded-full bg-gradient-to-b from-amber-300 to-amber-500 px-8 py-4 text-lg font-semibold text-neutral-900 shadow-[0_0_36px_-4px_rgba(245,180,90,0.75)] transition-all hover:shadow-[0_0_48px_-2px_rgba(245,180,90,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-80"
       >
         <LampGlyph busy={busy} />
         <span>{status === 'saving' ? t('saving') : busy ? t('locating') : t('lightButton')}</span>
       </button>
       {error ? (
-        <p role="alert" className="px-1 text-center text-xs text-amber-200/80">
+        <p role="alert" className="px-1 text-center text-sm text-amber-200/80">
           {error}
         </p>
       ) : null}
@@ -107,10 +107,10 @@ function LampGlyph({ busy }: { busy: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className={`relative flex h-4 w-4 items-center justify-center ${busy ? 'animate-pulse' : ''}`}
+      className={`relative flex h-5 w-5 items-center justify-center ${busy ? 'animate-pulse' : ''}`}
     >
-      <span className="absolute h-4 w-4 rounded-full bg-amber-100 blur-[3px]" />
-      <span className="relative h-2.5 w-2.5 rounded-full bg-neutral-900/80" />
+      <span className="absolute h-5 w-5 rounded-full bg-amber-100 blur-[3px]" />
+      <span className="relative h-3 w-3 rounded-full bg-neutral-900/80" />
     </span>
   );
 }
