@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-20 (narrow chrome overlays globe; ×2 type kept)
+_Last updated: 2026-09-20 (narrow full-viewport globe + short translucent bottom bar)
 
 ## Project name & stack summary
 
@@ -85,6 +85,12 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   padding/gaps are tighter; the rotate hint sits on the globe’s bottom
   edge. Desktop (`lg` row) stays in-flow. Zoom, stars, land brightness,
   APIs, consent, and i18n strings are unchanged.
+- Narrow home is a true `100dvh` canvas (`absolute inset-0` of `main`,
+  not a flex-column child). Bottom CTA / lamp count / hint is a **short
+  translucent overlay** (no solid glass card, low-opacity gradient,
+  tight padding). Overlay type is slightly reduced so the bar stays
+  short; desktop (`lg`) keeps the glass card and ×2 sizes. Zoom, stars,
+  land, APIs, and consent are unchanged.
 - Stats no longer treat a failed `GET /api/locations` as zeros; error + retry.
   Live `/api/locations` 500 is documented in `docs/locations-api.md`
   (likely host MySQL/.env; BigInt JSON serialize is also guarded in code).
@@ -141,15 +147,17 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `src/components/globe/Beacons.tsx` / `OwnBeacon.tsx` / `lat-lng.ts`
 - `src/components/WelcomePanel.tsx` / `LightLampButton.tsx` / `LampCounter.tsx`
   — v10-scale CTA + lamp count (unlit), larger lit type; CTA / count /
-  hint copy 2× develop sizes; mobile overlay tightens card padding/gaps
-  and parks the hint on the globe bottom edge (`lg` card stays in-flow)
+  hint copy 2× develop sizes on `lg`; below `lg` the bottom chrome is a
+  short translucent overlay (no solid card; slightly smaller type,
+  wrapping, tight padding) so the globe stays ≥60% of the viewport
 - `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales
 - `src/lib/consent-cache.ts` — localStorage cache for intro skip
 - `docs/consent-memory.md` — IP + localStorage limitations
 - `eslint.config.mjs` — ignores `deploy/**`
-- `src/app/page.tsx` — header brand/tagline 2× develop type; below `lg`
-  header + panel overlay the full-height globe (`absolute`); `lg` stays
-  header + row sidebar in-flow
+- `src/app/page.tsx` — header brand/tagline 2× develop type; `main` is
+  `h-[100dvh]` with the globe `absolute inset-0` (full viewport) below
+  `lg`; header + short bottom bar overlay; `lg` stays header + row
+  sidebar in-flow with the glass card
 - `src/app/` — pages and API routes
 - `src/i18n/config.ts` — 14 locales + native names
 - `src/i18n/resolve-locale.ts` — cookie / Accept-Language / navigator match
@@ -184,11 +192,17 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   API now logs the real error and returns 503 when the DB is unreachable.
   See `docs/locations-api.md`. Production path untouched by this PR.
 - Narrow/mobile leftover globe strip after ×2 in-flow type is addressed
-  by overlaying header + bottom chrome on the canvas below `lg`. Desktop
-  (`lg` row) globe share was already large and stays in-flow.
+  by a full-viewport canvas plus a short translucent bottom overlay
+  (PR #16’s overlay still left a half-screen solid card). Desktop
+  (`lg` row) globe share was already large and stays an in-flow card.
 
 ## Recent Commits
 
+- Narrow screens: full-viewport globe canvas + short translucent bottom
+  bar (CTA / count / hint). Drop the solid half-screen flex card that
+  still covered the globe after #16. Slightly reduce overlay type;
+  desktop glass card unchanged. No API / consent / land / zoom / stars
+  changes.
 - Overlay header and bottom CTA/count/hint on the globe below `lg` so
   ×2 type no longer crushes the canvas into a thin band. Tighten overlay
   padding/gaps; sit the hint on the globe bottom edge. Desktop layout,
@@ -259,9 +273,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   snake_case columns so existing host tables are reused. Migrations are
   `CREATE TABLE IF NOT EXISTS`.
 - Top/bottom copy (header title/tagline, CTA, lamp count label, hint)
-  is sized 2× relative to the post-v10 develop type on both breakpoints.
-  Below `lg`, that chrome overlays the globe instead of consuming flex
-  height; overlay padding/gaps are tighter. Desktop chrome stays in-flow.
+  is sized 2× relative to the post-v10 develop type on desktop. Below
+  `lg`, chrome overlays a full-viewport canvas; the bottom bar is a
+  short translucent strip (not a solid card) and may use slightly
+  smaller type so the globe stays ≥60% of visible height. Desktop
+  chrome stays an in-flow glass card.
 - Home chrome follows the v0 dark full-bleed + glass panel. Lighting a
   lamp still uses existing locations/consent APIs (not the zip’s
   `/api/lamps` or Postgres). v0 `zh-Hant` strings map to `zh-TW`; all 14

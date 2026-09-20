@@ -41,16 +41,16 @@ export default function LampCounter({ count }: { count: number }) {
   const display = useAnimatedCount(count);
 
   return (
-    <div className="flex items-center gap-3.5">
-      <span className="relative flex h-3.5 w-3.5 shrink-0" aria-hidden="true">
+    <div className="flex items-center gap-2.5 lg:gap-3.5">
+      <span className="relative flex h-2.5 w-2.5 shrink-0 lg:h-3.5 lg:w-3.5" aria-hidden="true">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-300/60" />
-        <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-amber-300 shadow-[0_0_16px_3px_rgba(245,180,90,0.85)]" />
+        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_16px_3px_rgba(245,180,90,0.85)] lg:h-3.5 lg:w-3.5" />
       </span>
-      <div className="flex flex-col leading-tight">
-        <span className="font-mono text-[4.5rem] font-semibold tabular-nums tracking-tight text-amber-50 sm:text-[6rem]">
+      <div className="flex flex-row flex-wrap items-baseline gap-x-2 gap-y-0 leading-none lg:flex-col lg:leading-tight">
+        <span className="font-mono text-[2.75rem] font-semibold tabular-nums tracking-tight text-amber-50 lg:text-[6rem]">
           {display.toLocaleString()}
         </span>
-        <span className="text-[1.5rem] uppercase tracking-[0.22em] text-amber-100/55 sm:text-[1.75rem]">
+        <span className="text-sm uppercase tracking-[0.18em] text-amber-100/55 lg:text-[1.75rem] lg:tracking-[0.22em]">
           {t('counterLabel')}
         </span>
       </div>

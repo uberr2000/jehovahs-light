@@ -209,8 +209,8 @@ export default function Home() {
   const hasLit = Boolean(userConsent?.hasLocation || userLocation);
 
   return (
-    <main className="relative flex h-[100dvh] w-full flex-col overflow-hidden bg-[#04060e]">
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-2 bg-gradient-to-b from-[#04060e]/80 to-transparent px-3 pt-3 pb-2 sm:gap-3 sm:px-4 sm:pt-4 lg:pointer-events-auto lg:static lg:shrink-0 lg:gap-4 lg:bg-none lg:p-6">
+    <main className="relative h-[100dvh] w-full overflow-hidden bg-[#04060e] lg:flex lg:flex-col">
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-2 bg-gradient-to-b from-[#04060e]/50 to-transparent px-3 pt-3 pb-2 sm:gap-3 sm:px-4 sm:pt-4 lg:pointer-events-auto lg:static lg:shrink-0 lg:gap-4 lg:bg-none lg:p-6">
         <div className="flex min-w-0 flex-col gap-0.5">
           <span className="text-[2rem] font-semibold tracking-wide text-amber-50 sm:text-[2.25rem]">
             {t('brand')}
@@ -222,12 +222,18 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="relative min-h-0 flex-1 lg:flex lg:flex-row">
-        <div className="absolute inset-0 lg:relative lg:min-h-0 lg:flex-1">
+      <div className="absolute inset-0 lg:relative lg:flex lg:min-h-0 lg:flex-1">
+        <div
+          data-testid="home-globe"
+          className="absolute inset-0 lg:relative lg:min-h-0 lg:flex-1"
+        >
           <Globe3D lightPoints={locations} userLocation={userLocation} />
         </div>
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/70 to-transparent px-3 pb-2 pt-0 sm:px-4 lg:pointer-events-auto lg:static lg:w-[26rem] lg:shrink-0 lg:items-center lg:bg-none lg:p-8">
+        <div
+          data-testid="home-bottom-chrome"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/40 via-[#04060e]/12 to-transparent px-2 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-5 lg:pointer-events-auto lg:static lg:w-[26rem] lg:shrink-0 lg:items-center lg:bg-none lg:p-8"
+        >
           <WelcomePanel
             count={stats.total}
             hasLit={hasLit}

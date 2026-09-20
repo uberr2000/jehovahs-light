@@ -24,15 +24,15 @@ export default function WelcomePanel({
   );
 
   return (
-    <div className="flex w-full max-w-md flex-col gap-1.5 lg:gap-0">
-      <div className="pointer-events-auto w-full rounded-[1.75rem] border border-amber-200/12 bg-neutral-950/45 px-4 py-3 shadow-[0_8px_60px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:px-5 sm:py-4 lg:px-8 lg:py-8">
+    <div className="flex w-full max-w-lg flex-col gap-1 lg:max-w-md lg:gap-0">
+      <div className="pointer-events-auto w-full rounded-none border-0 bg-transparent px-1 py-0 shadow-none backdrop-blur-none lg:rounded-[1.75rem] lg:border lg:border-amber-200/12 lg:bg-neutral-950/45 lg:px-8 lg:py-8 lg:shadow-[0_8px_60px_-12px_rgba(0,0,0,0.8)] lg:backdrop-blur-xl">
         {hasLit ? (
-          <div className="flex flex-col gap-3 lg:gap-6">
-            <div className="flex flex-col gap-2 lg:gap-2.5">
-              <h2 className="text-balance text-[1.65rem] font-semibold leading-tight tracking-tight text-amber-50 sm:text-3xl">
+          <div className="flex flex-col gap-1.5 lg:gap-6">
+            <div className="flex flex-col gap-0.5 lg:gap-2.5">
+              <h2 className="text-balance text-xl font-semibold leading-tight tracking-tight text-amber-50 lg:text-3xl">
                 {t('litTitle')}
               </h2>
-              <p className="text-pretty text-base leading-relaxed text-amber-100/75 sm:text-lg">
+              <p className="text-pretty text-sm leading-snug text-amber-100/75 lg:text-lg lg:leading-relaxed">
                 {t('litMessage')}
               </p>
             </div>
@@ -41,7 +41,7 @@ export default function WelcomePanel({
             <div className="hidden lg:block">{hint}</div>
           </div>
         ) : (
-          <div className="flex flex-col gap-3 lg:gap-6">
+          <div className="flex flex-col gap-1.5 lg:gap-6">
             <LightLampButton onLocationReceived={onLocationReceived} />
             <LampCounter count={count} />
             <StatsError status={statsStatus} onRetry={onRetry} />
@@ -49,7 +49,7 @@ export default function WelcomePanel({
           </div>
         )}
       </div>
-      <p className="px-1 text-center text-[1.75rem] leading-tight text-amber-100/50 lg:hidden sm:text-[2rem]">
+      <p className="px-1 text-center text-base leading-snug text-amber-100/50 lg:hidden">
         {t('rotateHint')}
       </p>
     </div>
@@ -67,12 +67,12 @@ function StatsError({
   if (status !== 'error') return null;
 
   return (
-    <div className="flex flex-col gap-2">
-      <p className="text-sm text-amber-200/80">{t('loadError')}</p>
+    <div className="flex flex-row flex-wrap items-center gap-x-2 gap-y-1 lg:flex-col lg:items-start lg:gap-2">
+      <p className="text-xs text-amber-200/80 lg:text-sm">{t('loadError')}</p>
       <button
         type="button"
         onClick={onRetry}
-        className="self-start rounded-full border border-amber-200/20 bg-white/5 px-4 py-2 text-sm text-amber-50 hover:bg-white/10"
+        className="self-start rounded-full border border-amber-200/20 bg-white/5 px-3 py-1 text-xs text-amber-50 hover:bg-white/10 lg:px-4 lg:py-2 lg:text-sm"
       >
         {t('retry')}
       </button>
