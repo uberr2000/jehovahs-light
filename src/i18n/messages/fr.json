@@ -47,5 +47,24 @@
   },
   "language": {
     "select": "Choisir la langue"
+  },
+  "home": {
+    "brand": "Lumière des Nations",
+    "tagline": "Une âme, une lampe, éclairant toute la terre",
+    "heroTitle": "Allumer une lampe",
+    "heroSubtitle": "Si tu mets ta foi en Jéhovah, allume une lampe. Un point de lumière s’élèvera là où tu es, rejoignant une mer d’étoiles avec des frères et sœurs du monde entier.",
+    "lightButton": "Allumer une lampe",
+    "locating": "Recherche de ta position…",
+    "saving": "Allumage de ta lampe…",
+    "litTitle": "Ta lampe brille",
+    "litMessage": "Qu’elle brille avec les lumières partout dans le monde, et ne s’éteigne jamais.",
+    "counterLabel": "Lampes allumées",
+    "rotateHint": "Fais glisser le globe pour voir les lumières du monde",
+    "alreadyLit": "Tu as déjà allumé une lampe",
+    "errorDenied": "L’accès à la position est nécessaire pour allumer ta lampe sur la carte.",
+    "errorGeneric": "Impossible de trouver ta position. Merci de réessayer.",
+    "errorUnsupported": "Ton appareil ne prend pas en charge la géolocalisation.",
+    "loadError": "Impossible de charger les lumières pour le moment.",
+    "retry": "Réessayer"
   }
 }

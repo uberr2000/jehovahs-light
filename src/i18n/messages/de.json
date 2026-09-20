@@ -47,5 +47,24 @@
   },
   "language": {
     "select": "Sprache wählen"
+  },
+  "home": {
+    "brand": "Licht der Nationen",
+    "tagline": "Eine Seele, eine Lampe, die die ganze Erde erhellt",
+    "heroTitle": "Eine Lampe entzünden",
+    "heroSubtitle": "Wenn du dein Vertrauen auf Jehova setzt, entzünde eine Lampe. Ein Lichtpunkt erhebt sich an deinem Ort und verbindet sich mit einem Meer von Sternen von Brüdern und Schwestern weltweit.",
+    "lightButton": "Eine Lampe entzünden",
+    "locating": "Standort wird gesucht…",
+    "saving": "Deine Lampe wird entzündet…",
+    "litTitle": "Deine Lampe leuchtet",
+    "litMessage": "Möge sie zusammen mit den Lichtern überall strahlen und nie verlöschen.",
+    "counterLabel": "Entzündete Lampen",
+    "rotateHint": "Ziehe den Globus, um Lichter rund um die Welt zu sehen",
+    "alreadyLit": "Du hast bereits eine Lampe entzündet",
+    "errorDenied": "Standortzugriff ist nötig, um deine Lampe auf der Karte zu entzünden.",
+    "errorGeneric": "Dein Standort konnte nicht ermittelt werden. Bitte versuche es erneut.",
+    "errorUnsupported": "Dein Gerät unterstützt keine Standortdienste.",
+    "loadError": "Lichter können gerade nicht geladen werden.",
+    "retry": "Erneut versuchen"
   }
 }

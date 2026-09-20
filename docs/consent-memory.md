@@ -1,8 +1,9 @@
 # GPS consent memory and intro skip
 
-Returning visitors who have **already accepted** GPS sharing skip
-`LighthouseIntro` and go straight to the globe. Decline is recorded (IP +
-optional local cache) but does **not** skip the intro.
+Returning visitors who have **already accepted** GPS sharing open the home
+globe with the glass welcome panel already in the **lit** state (own beacon
+on the globe). Decline is recorded (IP + optional local cache) but does
+**not** mark the lamp as lit.
 
 There is **no new consent API**. The frontend reuses:
 
@@ -17,15 +18,16 @@ Plus a **same-device localStorage cache**.
 On load:
 
 1. Read `localStorage` key `jehovahs-light:user-consent`. If `consented` or
-   `hasLocation` is true, skip the intro immediately (and still fetch
-   locations in the background).
+   `hasLocation` is true, show the lit welcome panel immediately (and still
+   fetch locations in the background).
 2. Call existing `GET /api/locations`. If `userConsent` indicates the current
-   IP already accepted (or already has a stored lat/lng), skip the intro and
-   refresh the localStorage cache.
+   IP already accepted (or already has a stored lat/lng), show the lit panel
+   and refresh the localStorage cache.
 
-A first-time visitor with no cache and no IP match still sees the lighthouse
-intro. After they share location, the client writes the cache so the next
-visit on that device skips even if the public IP changes briefly.
+A first-time visitor with no cache and no IP match sees the “light a lamp”
+panel. After they share location, the client writes the cache so the next
+visit on that device opens in the lit state even if the public IP changes
+briefly.
 
 ## Limitations (IP and cache)
 
@@ -44,4 +46,4 @@ Consent on the server is **keyed by client IP** (`CF-Connecting-IP` /
   remains.
 
 Do not treat this as an identity or security boundary. It only avoids
-repeating the lighthouse splash and GPS prompt for likely-returning visitors.
+repeating the GPS “light a lamp” prompt for likely-returning visitors.

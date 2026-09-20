@@ -3,10 +3,8 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
-import LighthouseIntro from '@/components/LighthouseIntro';
-import GeoLocationButton from '@/components/GeoLocationButton';
 import LanguageSelector from '@/components/LanguageSelector';
-import Stats from '@/components/Stats';
+import WelcomePanel from '@/components/WelcomePanel';
 import { type Locale } from '@/i18n/config';
 import { isLocale, localeCookieString } from '@/i18n/resolve-locale';
 import {
@@ -14,17 +12,11 @@ import {
   shouldSkipIntro,
   writeCachedConsent,
   normalizeConsent,
-  readIntroDismissed,
-  writeIntroDismissed,
 } from '@/lib/consent-cache';
 
 const Globe3D = dynamic(() => import('@/components/Globe3D'), {
   ssr: false,
-  loading: () => (
-    <div className="w-full h-full flex items-center justify-center">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-yellow-500" />
-    </div>
-  ),
+  loading: () => <GlobeLoadingSpinner />,
 });
 
 interface Location {
@@ -85,24 +77,21 @@ async function fetchLocationsPayload(): Promise<{
 
 function GlobeLoadingSpinner() {
   return (
-    <div className="w-full h-full flex items-center justify-center bg-black">
-      <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-yellow-500" />
+    <div className="flex h-full w-full items-center justify-center bg-[#04060e]">
+      <div className="h-12 w-12 animate-spin rounded-full border-2 border-amber-300/20 border-t-amber-300" />
     </div>
   );
 }
 
 export default function Home() {
-  const t = useTranslations();
+  const t = useTranslations('home');
   const locale = useLocale() as Locale;
-  const [showIntro, setShowIntro] = useState(true);
-  const [introResolved, setIntroResolved] = useState(false);
   const [locations, setLocations] = useState<Location[]>([]);
   const [stats, setStats] = useState<StatsData>({ total: 0, today: 0, countries: 0 });
   const [userConsent, setUserConsent] = useState<UserConsent | null>(null);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(
     null
   );
-  const [isLoading, setIsLoading] = useState(true);
   const [statsStatus, setStatsStatus] = useState<StatsStatus>('loading');
 
   useEffect(() => {
@@ -110,25 +99,18 @@ export default function Home() {
 
     const cached = readCachedConsent();
     const cacheSkipsIntro = shouldSkipIntro(cached);
-    const dismissedThisSession = readIntroDismissed();
-    if ((cacheSkipsIntro && cached) || dismissedThisSession) {
-      if (cacheSkipsIntro && cached) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage/session intro gate
-        setUserConsent(cached);
-        if (cached.hasLocation && cached.latitude != null && cached.longitude != null) {
-          setUserLocation({
-            latitude: cached.latitude,
-            longitude: cached.longitude,
-          });
-        }
-      }
-      setShowIntro(false);
-      if (cacheSkipsIntro && cached) {
-        setIntroResolved(true);
+    if (cacheSkipsIntro && cached) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage consent hydrate
+      setUserConsent(cached);
+      if (cached.hasLocation && cached.latitude != null && cached.longitude != null) {
+        setUserLocation({
+          latitude: cached.latitude,
+          longitude: cached.longitude,
+        });
       }
     }
 
-    async function fetchData() {
+    async function fetchData(isPoll = false) {
       try {
         const data = await fetchLocationsPayload();
         if (cancelled) return;
@@ -141,7 +123,6 @@ export default function Home() {
           if (shouldSkipIntro(fromApi)) {
             setUserConsent(fromApi);
             writeCachedConsent(fromApi);
-            setShowIntro(false);
             if (fromApi.hasLocation && fromApi.latitude != null && fromApi.longitude != null) {
               setUserLocation({
                 latitude: fromApi.latitude,
@@ -154,19 +135,20 @@ export default function Home() {
         }
       } catch (error) {
         console.error('Failed to fetch locations:', error);
-        if (!cancelled) {
+        if (!cancelled && !isPoll) {
           setStatsStatus('error');
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-          setIntroResolved(true);
         }
       }
     }
+
     fetchData();
+    const interval = window.setInterval(() => {
+      fetchData(true);
+    }, 8000);
+
     return () => {
       cancelled = true;
+      window.clearInterval(interval);
     };
   }, []);
 
@@ -194,7 +176,7 @@ export default function Home() {
       })
       .catch((error) => {
         console.error('Failed to refresh locations after share:', error);
-        setStatsStatus('error');
+        setStatsStatus((current) => (current === 'ok' ? current : 'error'));
       });
   };
 
@@ -224,76 +206,32 @@ export default function Home() {
       });
   };
 
-  if (!introResolved) {
-    return <GlobeLoadingSpinner />;
-  }
-
-  if (showIntro) {
-    return <LighthouseIntro onComplete={() => {
-      writeIntroDismissed();
-      setShowIntro(false);
-    }} />;
-  }
-
-  const hasSharedLocation = userConsent?.hasLocation;
+  const hasLit = Boolean(userConsent?.hasLocation || userLocation);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white overflow-hidden">
-      <header className="fixed top-0 left-0 right-0 z-40 p-4 flex justify-between items-center bg-black/30 backdrop-blur-sm">
-        <h1
-          className="text-2xl md:text-3xl font-bold text-yellow-400 leading-tight min-w-0 pe-3"
-          style={{ textShadow: '0 0 20px rgba(255, 215, 0, 0.3)' }}
-        >
-          {t('hero.title')}
-        </h1>
+    <main className="relative flex h-[100dvh] w-full flex-col overflow-hidden bg-[#04060e]">
+      <header className="z-10 flex shrink-0 items-start justify-between gap-4 p-4 sm:p-6">
+        <div className="flex min-w-0 flex-col">
+          <span className="text-sm font-semibold tracking-wide text-amber-50">{t('brand')}</span>
+          <span className="text-[0.7rem] text-amber-100/50">{t('tagline')}</span>
+        </div>
         <LanguageSelector currentLocale={locale} onLocaleChange={handleLocaleChange} />
       </header>
 
-      <div className="h-[60vh] md:h-[70vh] relative">
-        {isLoading ? (
-          <GlobeLoadingSpinner />
-        ) : (
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+        <div className="relative min-h-0 flex-1">
           <Globe3D lightPoints={locations} userLocation={userLocation} />
-        )}
-      </div>
-
-      <div className="relative z-10 px-4 py-8 bg-gradient-to-t from-black via-gray-900/90 to-transparent">
-        <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white leading-tight">{t('hero.subtitle')}</h2>
-          <p className="text-gray-300 max-w-2xl mx-auto text-base md:text-lg leading-relaxed">
-            {t('hero.description')}
-          </p>
         </div>
 
-        <div className="mb-8">
-          <Stats {...stats} status={statsStatus === 'error' ? 'error' : 'ok'} onRetry={handleRetryStats} />
+        <div className="flex shrink-0 justify-center p-4 pt-0 sm:p-6 sm:pt-0 lg:w-[26rem] lg:items-center lg:p-8">
+          <WelcomePanel
+            count={stats.total}
+            hasLit={hasLit}
+            statsStatus={statsStatus}
+            onRetry={handleRetryStats}
+            onLocationReceived={handleLocationReceived}
+          />
         </div>
-
-        <div className="text-center mb-8">
-          {hasSharedLocation ? (
-            <div className="flex flex-col items-center gap-3">
-              <div className="flex items-center gap-2 text-green-400">
-                <span className="text-2xl">✨</span>
-                <span className="text-xl font-semibold">{t('hero.alreadyShared')}</span>
-              </div>
-              <p className="text-base text-gray-400">{t('hero.welcomeBack')}</p>
-            </div>
-          ) : (
-            <>
-              <h3 className="text-xl md:text-2xl font-semibold text-yellow-400 mb-4">
-                {t('hero.shareTitle')}
-              </h3>
-              <GeoLocationButton onLocationReceived={handleLocationReceived} />
-            </>
-          )}
-        </div>
-
-        <footer className="text-center text-gray-500 text-base py-8 border-t border-white/10">
-          <p className="italic mb-2 text-gray-400 text-base md:text-base leading-relaxed">{t('footer.verse')}</p>
-          <p>
-            © {new Date().getFullYear()} Jehovah&apos;s Light. {t('footer.rights')}.
-          </p>
-        </footer>
       </div>
     </main>
   );

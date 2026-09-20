@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-17 (rebase Drizzle onto develop postbuild)_
+_Last updated: 2026-09-20 (v0 Light of the Nations UI port)_
 
 ## Project name & stack summary
 
@@ -11,6 +11,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 ## Features Done
 
 - 3D globe, GPS consent, i18n (14 locales), locations API
+- Home UI ported from v0 “Light of the Nations / 萬國之光”: full-viewport
+  dark layout (`#04060e`), glass welcome panel (light / lit states),
+  instanced amber beacons + own beacon, animated lamp counter, pill
+  language switcher chrome. Still `GET/POST /api/locations` + `/api/consent`
+  (no `/api/lamps`, no zip Postgres). v0 `zh-Hant` copy is `zh-TW`.
 - `package.json` `start` kept as `next start` (Next reads `PORT`; no `--port`)
 - `.env.example` documents `PORT` (must be set on the server `.env`)
 - `deploy/with-env.sh` sources `.env` then execs the start command
@@ -49,17 +54,19 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - ESLint: ignore `deploy/**` (PM2 CJS) so `npm run lint` is green on CI
 - Globe3D uses a local NASA Blue Marble equirectangular satellite
   texture (`public/globe/earth-blue-marble.jpg` via drei `useTexture`);
-  procedural canvas continents removed; unlit map (no clouds / day-night);
-  OrbitControls zoom locked on mobile; auto-rotation unchanged
+  procedural canvas continents removed; unlit map (no clouds / day-night)
+  with a land/sea contrast boost so land reads brighter than ocean;
+  OrbitControls zoom locked on mobile; auto-rotation via OrbitControls
 - Globe light points / LightGlow (and user marker glow) are ~1/4 of the
   previous visual size (`pointsMaterial` 0.015; glow pulse 0.01–0.015)
-- Returning GPS-accepted visitors skip `LighthouseIntro`: localStorage
-  cache `jehovahs-light:user-consent` plus existing `GET /api/locations`
-  `userConsent` (IP). No new consent endpoint.
+- Returning GPS-accepted visitors open the glass panel in the lit state:
+  localStorage cache `jehovahs-light:user-consent` plus existing
+  `GET /api/locations` `userConsent` (IP). No new consent endpoint.
 - Mobile page zoom locked (`viewport` initial-scale=1, maximum-scale=1,
   user-scalable=no). Globe3D pinch zoom off on coarse pointer / max-width
-  768px; mobile camera pulls back so the full globe fits in 60vh (distance
-  from FOV/aspect, pinch still locked). Layout remains responsive.
+  768px; mobile camera pulls back so the full globe fits in the remaining
+  viewport pane (distance from FOV/aspect, pinch still locked). Layout is
+  column on mobile (globe above panel) and row on desktop.
 - Stats no longer treat a failed `GET /api/locations` as zeros; error + retry.
   Live `/api/locations` 500 is documented in `docs/locations-api.md`
   (likely host MySQL/.env; BigInt JSON serialize is also guarded in code).
@@ -109,7 +116,12 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `docs/globe-texture.md` — NASA Blue Marble source, credit, license
 - `public/globe/earth-blue-marble.jpg` — local 2048×1024 satellite map
 - `public/globe/SOURCE.txt` — asset provenance next to the JPEG
-- `src/components/Globe3D.tsx` — R3F sphere + `useTexture('/globe/...')`
+- `src/components/Globe3D.tsx` — R3F scene: Earth + beacons + own beacon,
+  mobile zoom lock, OrbitControls auto-rotate
+- `src/components/globe/Earth.tsx` — Blue Marble + land/sea contrast shader
+- `src/components/globe/Beacons.tsx` / `OwnBeacon.tsx` / `lat-lng.ts`
+- `src/components/WelcomePanel.tsx` / `LightLampButton.tsx` / `LampCounter.tsx`
+- `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales
 - `src/lib/consent-cache.ts` — localStorage cache for intro skip
 - `docs/consent-memory.md` — IP + localStorage limitations
 - `eslint.config.mjs` — ignores `deploy/**`
@@ -139,7 +151,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   asks for one-time `pm2 delete` + `pm2 start ecosystem` + `pm2 save`
 - GPS intro skip is IP + localStorage only: shared Wi-Fi / VPN / IP change
   can mis-identify; new device or cleared storage falls back to IP
-  (`docs/consent-memory.md`)
+  (`docs/consent-memory.md`). Home no longer shows the lighthouse splash;
+  first visit is the v0 glass “light a lamp” panel.
 - Live `GET /api/locations` on jehovahs-light.ink.net.tw returns HTTP 500
   (`Failed to fetch locations`). UI now shows error + retry instead of
   silent zeros. Likely host MySQL/.env; BigInt JSON is guarded in code.
@@ -148,6 +161,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Port v0 “Light of the Nations” home UI onto develop: glass panel,
+  globe beacons, lamp counter, 14-locale chrome; wire to `/api/locations`
 - Add Drizzle ORM only (no Prisma): schema for `lit_locations` /
   `gps_consent`, idempotent SQL migrations, `db:migrate` on develop deploy
   and CI MySQL, clearer 503/500 API errors
@@ -198,3 +213,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   column names stay `lit_locations` / `gps_consent` with the original
   snake_case columns so existing host tables are reused. Migrations are
   `CREATE TABLE IF NOT EXISTS`.
+- Home chrome follows the v0 dark full-bleed + glass panel. Lighting a
+  lamp still uses existing locations/consent APIs (not the zip’s
+  `/api/lamps` or Postgres). v0 `zh-Hant` strings map to `zh-TW`; all 14
+  locales stay in `src/i18n/messages`. Earth stays local Blue Marble with
+  a land-brighter-than-sea contrast boost (no hotlink).
