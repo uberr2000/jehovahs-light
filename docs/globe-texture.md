@@ -22,8 +22,10 @@ a day/night terminator shader.
 
 The unlit `meshBasicMaterial` injects a small land/sea contrast boost: vegetated
 and desert land (and bright ice) are lifted, while blue water is darkened, so
-continents read clearly brighter than the ocean. The JPEG itself is unchanged
-and still loaded only from `/globe/earth-blue-marble.jpg`.
+continents read clearly brighter than the ocean. After that v0 lift, land RGB is
+scaled by `LAND_LUMINANCE_FACTOR` in `src/components/globe/Earth.tsx` (`0.5` =
+half the develop/v0 land look; `1` restores it). The sea mix is unchanged. The
+JPEG itself is unchanged and still loaded only from `/globe/earth-blue-marble.jpg`.
 
 ## Source
 

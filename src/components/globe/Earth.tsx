@@ -8,8 +8,15 @@ import * as THREE from 'three';
 export const EARTH_TEXTURE_PATH = '/globe/earth-blue-marble.jpg';
 
 /**
+ * Land RGB scale vs the v0-tuned contrast lift on develop (PR #10).
+ * `1` keeps that look; `0.5` halves land luminance. Sea mix is unchanged.
+ */
+export const LAND_LUMINANCE_FACTOR = 0.5;
+
+/**
  * After drei/three samples the map, lift vegetated/desert land and ice, and
  * darken blue water so continents read clearly brighter than the ocean.
+ * Land is then scaled by {@link LAND_LUMINANCE_FACTOR} (reversible).
  */
 const LAND_SEA_MAP_FRAGMENT = /* glsl */ `
 #include <map_fragment>
@@ -18,6 +25,7 @@ float blueExcess = diffuseColor.b - max(diffuseColor.r, diffuseColor.g);
 float water = smoothstep(-0.05, 0.06, blueExcess);
 water *= 1.0 - smoothstep(0.58, 0.78, luma);
 vec3 land = min(diffuseColor.rgb * vec3(1.55, 1.38, 1.10) + vec3(0.10, 0.08, 0.03), vec3(1.0));
+land *= ${LAND_LUMINANCE_FACTOR.toFixed(2)};
 vec3 sea = diffuseColor.rgb * vec3(0.16, 0.28, 0.50);
 diffuseColor.rgb = mix(land, sea, water);
 `;
@@ -42,7 +50,8 @@ export function Earth({
         LAND_SEA_MAP_FRAGMENT
       );
     };
-    mat.customProgramCacheKey = () => 'earth-land-sea-contrast-v1';
+    mat.customProgramCacheKey = () =>
+      `earth-land-sea-contrast-v2-land-${LAND_LUMINANCE_FACTOR}`;
     return mat;
   }, [earthMap]);
 
