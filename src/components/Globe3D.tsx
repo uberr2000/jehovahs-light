@@ -15,6 +15,9 @@ const ATMOSPHERE_RADIUS = EARTH_RADIUS * 1.12;
 const FIT_MARGIN = 1.22;
 const MIN_ZOOM_DISTANCE = 3.2;
 const DESKTOP_MAX_ZOOM_DISTANCE = 9;
+/** Compact default: Earth disk as a fraction of canvas height. Must stay ≥ 0.6. */
+const COMPACT_EARTH_HEIGHT_FILL = 0.72;
+const MIN_EARTH_HEIGHT_FILL = 0.6;
 const MOBILE_MAX_WIDTH = '(max-width: 768px)';
 const COARSE_POINTER = '(pointer: coarse)';
 
@@ -31,6 +34,42 @@ export function fitCameraDistance(
   const limiting = Math.min(vFov, hFov);
   return (radius / Math.tan(limiting / 2)) * margin;
 }
+
+/**
+ * Camera distance so a sphere of `radius` fills `fill` of the vertical FOV
+ * (canvas / viewport height). Portrait width is allowed to crop.
+ */
+export function fillHeightCameraDistance(
+  radius: number,
+  fovDeg: number,
+  fill: number
+): number {
+  const vFov = (fovDeg * Math.PI) / 180;
+  const safeFill = Number.isFinite(fill) && fill > 0 ? fill : COMPACT_EARTH_HEIGHT_FILL;
+  return radius / (safeFill * Math.tan(vFov / 2));
+}
+
+/** Projected Earth-disk diameter ÷ canvas height at `distance`. */
+export function earthDiskHeightFill(
+  distance: number,
+  fovDeg: number,
+  radius = EARTH_RADIUS
+): number {
+  const vFov = (fovDeg * Math.PI) / 180;
+  const safeDistance = Number.isFinite(distance) && distance > 0 ? distance : 1;
+  return radius / (safeDistance * Math.tan(vFov / 2));
+}
+
+const COMPACT_CAMERA_DISTANCE = fillHeightCameraDistance(
+  EARTH_RADIUS,
+  CAMERA_FOV,
+  COMPACT_EARTH_HEIGHT_FILL
+);
+const COMPACT_MAX_GATE_DISTANCE = fillHeightCameraDistance(
+  EARTH_RADIUS,
+  CAMERA_FOV,
+  MIN_EARTH_HEIGHT_FILL
+);
 
 function useCompactGlobeView() {
   const [compact, setCompact] = useState(true);
@@ -58,28 +97,34 @@ function useCompactGlobeView() {
 function GlobeOrbitControls({ compact }: { compact: boolean }) {
   const { camera, size } = useThree();
   const aspect = size.width / Math.max(size.height, 1);
-  const fitDistance = useMemo(
+  const fullFitDistance = useMemo(
     () => fitCameraDistance(ATMOSPHERE_RADIUS, CAMERA_FOV, aspect),
     [aspect]
   );
+  // Portrait width-fit pulls the camera too far (Earth disk ~width/height, well
+  // below the 60% height gate). Frame compact views by vertical fill instead.
+  const compactFrameDistance = Math.min(COMPACT_CAMERA_DISTANCE, COMPACT_MAX_GATE_DISTANCE);
   const maxDistance = compact
-    ? Math.max(fitDistance, DESKTOP_MAX_ZOOM_DISTANCE)
+    ? Math.max(fullFitDistance, DESKTOP_MAX_ZOOM_DISTANCE, compactFrameDistance)
     : DESKTOP_MAX_ZOOM_DISTANCE;
   const framedRef = useRef(false);
-  const lastAspectRef = useRef(aspect);
 
   useLayoutEffect(() => {
     if (!compact) {
-      framedRef.current = false;
+      if (framedRef.current) {
+        camera.position.set(0, 0.45, DESKTOP_CAMERA_DISTANCE);
+        camera.lookAt(0, 0, 0);
+        camera.updateProjectionMatrix();
+        framedRef.current = false;
+      }
       return;
     }
-    const aspectJump = Math.abs(lastAspectRef.current - aspect) > 0.25;
-    lastAspectRef.current = aspect;
-    if (framedRef.current && !aspectJump) return;
-    camera.position.setLength(fitDistance);
+    if (framedRef.current) return;
+    camera.position.set(0, 0, compactFrameDistance);
+    camera.lookAt(0, 0, 0);
     camera.updateProjectionMatrix();
     framedRef.current = true;
-  }, [aspect, camera, compact, fitDistance]);
+  }, [camera, compact, compactFrameDistance]);
 
   return (
     <OrbitControls
@@ -143,7 +188,7 @@ export default function Globe3D({ lightPoints, userLocation, onGlobeReady }: Glo
     <div className="h-full w-full touch-none">
       <Canvas
         camera={{
-          position: [0, compact ? 0 : 0.45, compact ? 8 : DESKTOP_CAMERA_DISTANCE],
+          position: [0, compact ? 0 : 0.45, compact ? COMPACT_CAMERA_DISTANCE : DESKTOP_CAMERA_DISTANCE],
           fov: CAMERA_FOV,
         }}
         dpr={[1, 2]}

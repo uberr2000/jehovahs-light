@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-20 (narrow full-viewport globe + short translucent bottom bar)
+_Last updated: 2026-09-20 (narrow Earth camera pull-in so disk ≥60% viewport height)
 
 ## Project name & stack summary
 
@@ -69,8 +69,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `GET /api/locations` `userConsent` (IP). No new consent endpoint.
 - Mobile **page** zoom locked (`viewport` initial-scale=1, maximum-scale=1,
   user-scalable=no). Globe pinch/scroll zoom is on (`enableZoom`, canvas
-  `touch-action: none`); compact camera still frames the full globe in
-  the remaining pane, then the user can zoom. Hint is “Drag or zoom…”.
+  `touch-action: none`); compact camera frames the Earth disk at ~72% of
+  canvas height (camera `z` / vertical FOV, not width-limited fit), then
+  the user can zoom. Hint is “Drag or zoom…”.
   Layout is column on mobile (globe above panel) and row on desktop.
 - Home chrome matches v10 type scale: larger header title/tagline,
   unlit panel is a large CTA (“Let your light shine”) + prominent
@@ -91,6 +92,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   tight padding). Overlay type is slightly reduced so the bar stays
   short; desktop (`lg`) keeps the glass card and ×2 sizes. Zoom, stars,
   land, APIs, and consent are unchanged.
+- Compact globe camera no longer width-fits atmosphere + margin (that
+  left a ~34% / tinier disk on 390×844). Default `position.z` uses
+  vertical FOV so the Earth disk is ~72% of canvas height (≥60% gate).
+  Zoom-out still reaches the full-sphere fit; desktop stays at distance 6.
 - Stats no longer treat a failed `GET /api/locations` as zeros; error + retry.
   Live `/api/locations` 500 is documented in `docs/locations-api.md`
   (likely host MySQL/.env; BigInt JSON serialize is also guarded in code).
@@ -141,7 +146,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `public/globe/earth-blue-marble.jpg` — local 2048×1024 satellite map
 - `public/globe/SOURCE.txt` — asset provenance next to the JPEG
 - `src/components/Globe3D.tsx` — R3F scene: Earth + beacons + own beacon,
-  OrbitControls rotate + zoom, compact fit-then-zoom, brighter Stars
+  OrbitControls rotate + zoom, compact height-fill framing (Earth disk
+  ≥60% of viewport height) then zoom, brighter Stars
 - `src/components/globe/Earth.tsx` — Blue Marble + land/sea contrast shader;
   `LAND_LUMINANCE_FACTOR` (0.5 vs v0/develop land lift; sea unchanged)
 - `src/components/globe/Beacons.tsx` / `OwnBeacon.tsx` / `lat-lng.ts`
@@ -195,9 +201,18 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   by a full-viewport canvas plus a short translucent bottom overlay
   (PR #16’s overlay still left a half-screen solid card). Desktop
   (`lg` row) globe share was already large and stays an in-flow card.
+- After #17 the canvas was full-viewport but compact OrbitControls still
+  width-fit the atmosphere (camera ~14 on 390×844), so the Earth disk
+  was a small circle in a sea of black. Compact default now uses
+  vertical FOV height-fill (~72%, `z` ≈ 6.7) so the disk is ≥60% of
+  viewport height. Zoom-out can still reach the full-sphere fit.
 
 ## Recent Commits
 
+- Narrow screens: pull the compact globe camera closer (vertical FOV
+  height-fill ~72%, `z` ≈ 6.7) so the rendered Earth disk is ≥60% of
+  viewport height. Keep short translucent bottom bar, zoom, stars,
+  land, APIs. Desktop framing unchanged.
 - Narrow screens: full-viewport globe canvas + short translucent bottom
   bar (CTA / count / hint). Drop the solid half-screen flex card that
   still covered the globe after #16. Slightly reduce overlay type;
@@ -276,8 +291,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   is sized 2× relative to the post-v10 develop type on desktop. Below
   `lg`, chrome overlays a full-viewport canvas; the bottom bar is a
   short translucent strip (not a solid card) and may use slightly
-  smaller type so the globe stays ≥60% of visible height. Desktop
-  chrome stays an in-flow glass card.
+  smaller type. Compact camera frames the Earth disk at ~72% of canvas
+  height (vertical FOV / `position.z`, not CSS scale) so the sphere
+  itself is ≥60% of viewport height on ~390×844. Desktop chrome stays
+  an in-flow glass card with the existing distance-6 framing.
 - Home chrome follows the v0 dark full-bleed + glass panel. Lighting a
   lamp still uses existing locations/consent APIs (not the zip’s
   `/api/lamps` or Postgres). v0 `zh-Hant` strings map to `zh-TW`; all 14
