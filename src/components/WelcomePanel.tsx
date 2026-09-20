@@ -19,30 +19,39 @@ export default function WelcomePanel({
 }) {
   const t = useTranslations('home');
 
+  const hint = (
+    <p className="text-[1.75rem] text-amber-100/50 sm:text-[2rem]">{t('rotateHint')}</p>
+  );
+
   return (
-    <div className="pointer-events-auto w-full max-w-md rounded-[1.75rem] border border-amber-200/12 bg-neutral-950/45 px-6 py-7 shadow-[0_8px_60px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:px-8 sm:py-8">
-      {hasLit ? (
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2.5">
-            <h2 className="text-balance text-[1.65rem] font-semibold leading-tight tracking-tight text-amber-50 sm:text-3xl">
-              {t('litTitle')}
-            </h2>
-            <p className="text-pretty text-base leading-relaxed text-amber-100/75 sm:text-lg">
-              {t('litMessage')}
-            </p>
+    <div className="flex w-full max-w-md flex-col gap-1.5 lg:gap-0">
+      <div className="pointer-events-auto w-full rounded-[1.75rem] border border-amber-200/12 bg-neutral-950/45 px-4 py-3 shadow-[0_8px_60px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl sm:px-5 sm:py-4 lg:px-8 lg:py-8">
+        {hasLit ? (
+          <div className="flex flex-col gap-3 lg:gap-6">
+            <div className="flex flex-col gap-2 lg:gap-2.5">
+              <h2 className="text-balance text-[1.65rem] font-semibold leading-tight tracking-tight text-amber-50 sm:text-3xl">
+                {t('litTitle')}
+              </h2>
+              <p className="text-pretty text-base leading-relaxed text-amber-100/75 sm:text-lg">
+                {t('litMessage')}
+              </p>
+            </div>
+            <LampCounter count={count} />
+            <StatsError status={statsStatus} onRetry={onRetry} />
+            <div className="hidden lg:block">{hint}</div>
           </div>
-          <LampCounter count={count} />
-          <StatsError status={statsStatus} onRetry={onRetry} />
-          <p className="text-[1.75rem] text-amber-100/50 sm:text-[2rem]">{t('rotateHint')}</p>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-6">
-          <LightLampButton onLocationReceived={onLocationReceived} />
-          <LampCounter count={count} />
-          <StatsError status={statsStatus} onRetry={onRetry} />
-          <p className="text-[1.75rem] text-amber-100/50 sm:text-[2rem]">{t('rotateHint')}</p>
-        </div>
-      )}
+        ) : (
+          <div className="flex flex-col gap-3 lg:gap-6">
+            <LightLampButton onLocationReceived={onLocationReceived} />
+            <LampCounter count={count} />
+            <StatsError status={statsStatus} onRetry={onRetry} />
+            <div className="hidden lg:block">{hint}</div>
+          </div>
+        )}
+      </div>
+      <p className="px-1 text-center text-[1.75rem] leading-tight text-amber-100/50 lg:hidden sm:text-[2rem]">
+        {t('rotateHint')}
+      </p>
     </div>
   );
 }

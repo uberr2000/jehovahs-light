@@ -210,22 +210,24 @@ export default function Home() {
 
   return (
     <main className="relative flex h-[100dvh] w-full flex-col overflow-hidden bg-[#04060e]">
-      <header className="z-10 flex shrink-0 items-start justify-between gap-4 p-4 sm:p-6">
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-2 bg-gradient-to-b from-[#04060e]/80 to-transparent px-3 pt-3 pb-2 sm:gap-3 sm:px-4 sm:pt-4 lg:pointer-events-auto lg:static lg:shrink-0 lg:gap-4 lg:bg-none lg:p-6">
         <div className="flex min-w-0 flex-col gap-0.5">
           <span className="text-[2rem] font-semibold tracking-wide text-amber-50 sm:text-[2.25rem]">
             {t('brand')}
           </span>
           <span className="text-[1.5rem] text-amber-100/55 sm:text-[1.75rem]">{t('tagline')}</span>
         </div>
-        <LanguageSelector currentLocale={locale} onLocaleChange={handleLocaleChange} />
+        <div className="pointer-events-auto shrink-0">
+          <LanguageSelector currentLocale={locale} onLocaleChange={handleLocaleChange} />
+        </div>
       </header>
 
-      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        <div className="relative min-h-0 flex-1">
+      <div className="relative min-h-0 flex-1 lg:flex lg:flex-row">
+        <div className="absolute inset-0 lg:relative lg:min-h-0 lg:flex-1">
           <Globe3D lightPoints={locations} userLocation={userLocation} />
         </div>
 
-        <div className="flex shrink-0 justify-center p-4 pt-0 sm:p-6 sm:pt-0 lg:w-[26rem] lg:items-center lg:p-8">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/70 to-transparent px-3 pb-2 pt-0 sm:px-4 lg:pointer-events-auto lg:static lg:w-[26rem] lg:shrink-0 lg:items-center lg:bg-none lg:p-8">
           <WelcomePanel
             count={stats.total}
             hasLit={hasLit}

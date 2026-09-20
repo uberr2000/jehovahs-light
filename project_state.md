@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-20 (×2 header/CTA/count/hint type; chrome padding unchanged)
+_Last updated: 2026-09-20 (narrow chrome overlays globe; ×2 type kept)
 
 ## Project name & stack summary
 
@@ -80,6 +80,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   copy are 2× the previous develop sizes on both mobile and desktop.
   Header/panel padding, gaps, and globe `flex-1` share are unchanged
   (no 3/4 chrome shrink).
+- Below `lg`, header and bottom CTA/count/hint overlay the globe canvas
+  (`absolute`) so ×2 type no longer consumes flex height. Overlay
+  padding/gaps are tighter; the rotate hint sits on the globe’s bottom
+  edge. Desktop (`lg` row) stays in-flow. Zoom, stars, land brightness,
+  APIs, consent, and i18n strings are unchanged.
 - Stats no longer treat a failed `GET /api/locations` as zeros; error + retry.
   Live `/api/locations` 500 is documented in `docs/locations-api.md`
   (likely host MySQL/.env; BigInt JSON serialize is also guarded in code).
@@ -136,13 +141,15 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `src/components/globe/Beacons.tsx` / `OwnBeacon.tsx` / `lat-lng.ts`
 - `src/components/WelcomePanel.tsx` / `LightLampButton.tsx` / `LampCounter.tsx`
   — v10-scale CTA + lamp count (unlit), larger lit type; CTA / count /
-  hint copy 2× develop sizes (padding/gaps unchanged)
+  hint copy 2× develop sizes; mobile overlay tightens card padding/gaps
+  and parks the hint on the globe bottom edge (`lg` card stays in-flow)
 - `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales
 - `src/lib/consent-cache.ts` — localStorage cache for intro skip
 - `docs/consent-memory.md` — IP + localStorage limitations
 - `eslint.config.mjs` — ignores `deploy/**`
-- `src/app/page.tsx` — header brand/tagline 2× develop type; globe pane
-  still `flex-1` (no chrome shrink)
+- `src/app/page.tsx` — header brand/tagline 2× develop type; below `lg`
+  header + panel overlay the full-height globe (`absolute`); `lg` stays
+  header + row sidebar in-flow
 - `src/app/` — pages and API routes
 - `src/i18n/config.ts` — 14 locales + native names
 - `src/i18n/resolve-locale.ts` — cookie / Accept-Language / navigator match
@@ -176,14 +183,16 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   silent zeros. Likely host MySQL/.env; BigInt JSON is guarded in code.
   API now logs the real error and returns 503 when the DB is unreachable.
   See `docs/locations-api.md`. Production path untouched by this PR.
-- Doubling header/CTA/count/hint type while keeping in-flow chrome and
-  develop padding means a 390×844 phone leftover globe pane is only
-  ~98px (header ~238px + panel ~508px). Desktop (`lg` row) globe share
-  stays large. No 3/4 shrink was applied. Overlaying the card would
-  restore mobile globe pixels but would change develop layout.
+- Narrow/mobile leftover globe strip after ×2 in-flow type is addressed
+  by overlaying header + bottom chrome on the canvas below `lg`. Desktop
+  (`lg` row) globe share was already large and stays in-flow.
 
 ## Recent Commits
 
+- Overlay header and bottom CTA/count/hint on the globe below `lg` so
+  ×2 type no longer crushes the canvas into a thin band. Tighten overlay
+  padding/gaps; sit the hint on the globe bottom edge. Desktop layout,
+  zoom, stars, land, APIs, consent, and i18n strings unchanged.
 - Double header title/tagline, bottom CTA, lamp count / LAMPS LIT, and
   hint font sizes (mobile + desktop). Keep globe share and chrome
   padding/gaps as on develop; no 3/4 shrink.
@@ -251,7 +260,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `CREATE TABLE IF NOT EXISTS`.
 - Top/bottom copy (header title/tagline, CTA, lamp count label, hint)
   is sized 2× relative to the post-v10 develop type on both breakpoints.
-  Chrome footprint (padding, gaps, globe flex share) is not shrunk.
+  Below `lg`, that chrome overlays the globe instead of consuming flex
+  height; overlay padding/gaps are tighter. Desktop chrome stays in-flow.
 - Home chrome follows the v0 dark full-bleed + glass panel. Lighting a
   lamp still uses existing locations/consent APIs (not the zip’s
   `/api/lamps` or Postgres). v0 `zh-Hant` strings map to `zh-TW`; all 14
