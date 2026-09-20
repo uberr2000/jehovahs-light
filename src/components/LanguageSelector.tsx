@@ -30,60 +30,54 @@ export default function LanguageSelector({
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <button
-        type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label={t('select')}
-        aria-expanded={isOpen}
-        className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-lg
-          hover:bg-white/20 transition-colors text-white border border-white/20"
-      >
-        <span className="text-lg">{localeFlags[currentLocale]}</span>
-        <span className="text-base">{localeNames[currentLocale]}</span>
-        <svg
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
+      <div className="flex items-center gap-1 rounded-full border border-amber-200/15 bg-black/20 p-0.5 backdrop-blur-md">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          aria-label={t('select')}
+          aria-expanded={isOpen}
+          className="flex items-center gap-1.5 rounded-full bg-amber-300/90 px-3 py-1 text-xs font-medium text-neutral-900 transition-colors"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
+          <span aria-hidden="true">{localeFlags[currentLocale]}</span>
+          <span>{localeNames[currentLocale]}</span>
+          <svg
+            className={`h-3 w-3 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
 
       {isOpen && (
-        <div
-          className="absolute top-full mt-2 end-0 bg-gray-900/95 backdrop-blur-sm rounded-lg
-          shadow-xl border border-white/10 overflow-y-auto min-w-[180px] max-h-[min(70vh,24rem)] z-50"
-        >
-          {locales.map((locale) => (
-            <button
-              key={locale}
-              type="button"
-              onClick={() => {
-                onLocaleChange(locale);
-                setIsOpen(false);
-              }}
-              className={`w-full flex items-center gap-3 px-4 py-3 text-start transition-colors
-                ${
-                  currentLocale === locale
-                    ? 'bg-yellow-500/20 text-yellow-300'
-                    : 'text-gray-300 hover:bg-white/10 hover:text-white'
+        <div className="absolute top-full z-50 mt-2 max-h-[min(70vh,24rem)] min-w-[180px] overflow-y-auto rounded-2xl border border-amber-200/12 bg-neutral-950/90 p-1 shadow-[0_8px_60px_-12px_rgba(0,0,0,0.8)] backdrop-blur-xl end-0">
+          {locales.map((locale) => {
+            const active = currentLocale === locale;
+            return (
+              <button
+                key={locale}
+                type="button"
+                onClick={() => {
+                  onLocaleChange(locale);
+                  setIsOpen(false);
+                }}
+                aria-pressed={active}
+                className={`flex w-full items-center gap-3 rounded-full px-3 py-2 text-start text-xs font-medium transition-colors ${
+                  active
+                    ? 'bg-amber-300/90 text-neutral-900'
+                    : 'text-amber-50/70 hover:bg-white/5 hover:text-amber-50'
                 }`}
-            >
-              <span className="text-lg">{localeFlags[locale]}</span>
-              <span className="text-base">{localeNames[locale]}</span>
-              {currentLocale === locale && (
-                <svg className="w-4 h-4 ms-auto" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              )}
-            </button>
-          ))}
+              >
+                <span className="text-sm" aria-hidden="true">
+                  {localeFlags[locale]}
+                </span>
+                <span>{localeNames[locale]}</span>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>

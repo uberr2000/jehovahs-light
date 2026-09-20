@@ -1,0 +1,59 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
+
+function useAnimatedCount(target: number) {
+  const [display, setDisplay] = useState(target);
+  const fromRef = useRef(target);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const from = fromRef.current;
+    if (from === target) return;
+    const start = performance.now();
+    const duration = 900;
+
+    const tick = (now: number) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const value = Math.round(from + (target - from) * eased);
+      setDisplay(value);
+      if (progress < 1) {
+        rafRef.current = requestAnimationFrame(tick);
+      } else {
+        fromRef.current = target;
+      }
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      fromRef.current = target;
+    };
+  }, [target]);
+
+  return display;
+}
+
+export default function LampCounter({ count }: { count: number }) {
+  const t = useTranslations('home');
+  const display = useAnimatedCount(count);
+
+  return (
+    <div className="flex items-center gap-3">
+      <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
+        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-300/60" />
+        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_12px_2px_rgba(245,180,90,0.8)]" />
+      </span>
+      <div className="flex flex-col leading-tight">
+        <span className="font-mono text-2xl font-semibold tabular-nums tracking-tight text-amber-50">
+          {display.toLocaleString()}
+        </span>
+        <span className="text-[0.7rem] uppercase tracking-[0.18em] text-amber-100/50">
+          {t('counterLabel')}
+        </span>
+      </div>
+    </div>
+  );
+}

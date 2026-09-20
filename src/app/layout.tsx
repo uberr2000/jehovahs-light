@@ -19,14 +19,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Jehovah's Light | 耶和華的光 | 耶和华的光",
+  title: "萬國之光 · Light of the Nations | Jehovah's Light",
   description:
-    "Light up the world with Jehovah's guiding light - A global beacon of faith where users share their location to become part of a worldwide community of believers.",
-  keywords: ['Jehovah', 'Light', 'Faith', 'Global', 'Christian', 'Beacon', 'Prayer'],
+    '一人一燈，照亮全地。若你信靠耶和華，在互動地球上點一盞燈，與世界各地的信心之光連成星海。 Light a lamp on the globe and join a sea of lights with believers around the world.',
+  keywords: ['Jehovah', 'Light', 'Faith', 'Global', 'Christian', 'Beacon', 'Prayer', '萬國之光'],
   authors: [{ name: "Jehovah's Light" }],
   openGraph: {
-    title: "Jehovah's Light",
-    description: "Light up the world with Jehovah's guiding light",
+    title: '萬國之光 · Light of the Nations',
+    description: 'One soul, one lamp, lighting the whole earth.',
     type: 'website',
     locale: 'en_US',
     alternateLocale: ['zh_TW', 'zh_CN'],
@@ -38,6 +38,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  colorScheme: 'dark',
+  themeColor: '#04060e',
 };
 
 export default async function RootLayout({
@@ -60,7 +62,7 @@ export default async function RootLayout({
       data-locale-source={source}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-black">
+      <body className="flex min-h-full flex-col bg-[#04060e] text-amber-50">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <LocaleNavigatorFallback />
           {children}

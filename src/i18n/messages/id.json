@@ -47,5 +47,24 @@
   },
   "language": {
     "select": "Pilih bahasa"
+  },
+  "home": {
+    "brand": "Terang Segala Bangsa",
+    "tagline": "Satu jiwa, satu pelita, menerangi seluruh bumi",
+    "heroTitle": "Nyalakan pelita",
+    "heroSubtitle": "Jika Anda menaruh iman kepada Yehuwa, nyalakanlah pelita. Titik terang akan muncul di tempat Anda berada, menyatu dengan lautan bintang bersama saudara-saudari di seluruh dunia.",
+    "lightButton": "Nyalakan pelita",
+    "locating": "Mencari lokasi Anda…",
+    "saving": "Menyalakan pelita Anda…",
+    "litTitle": "Pelita Anda menyala",
+    "litMessage": "Kiranya ia bersinar bersama terang di mana-mana, dan tidak pernah padam.",
+    "counterLabel": "Pelita yang dinyalakan",
+    "rotateHint": "Seret bola dunia untuk melihat terang di seluruh bumi",
+    "alreadyLit": "Anda sudah menyalakan pelita",
+    "errorDenied": "Izin lokasi diperlukan untuk menyalakan pelita Anda di peta.",
+    "errorGeneric": "Tidak dapat menemukan lokasi Anda. Silakan coba lagi.",
+    "errorUnsupported": "Perangkat Anda tidak mendukung layanan lokasi.",
+    "loadError": "Tidak dapat memuat terang saat ini.",
+    "retry": "Coba lagi"
   }
 }

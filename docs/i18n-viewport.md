@@ -7,9 +7,9 @@
 - Layout stays responsive; users cannot pinch-shrink the page.
 - Globe3D OrbitControls: `enableZoom` is off when `(pointer: coarse)` or
   `max-width: 768px`. Mobile camera distance is computed from canvas
-  aspect and 45° FOV so the full sphere + atmosphere fits in the 60vh
-  canvas (about 7–8 units in portrait) and stays fixed. Desktop still
-  starts at 5 with zoom between 3 and 10.
+  aspect and 45° FOV so the full sphere + atmosphere fits in the remaining
+  viewport (the globe pane beside/above the glass welcome panel) and stays
+  fixed. Desktop still starts around distance 6 with zoom between 3.2 and 9.
 
 ## Locale priority
 
@@ -26,7 +26,8 @@ map to `en`. Language-only locales still accept regional tags (`es-MX` → `es`,
 RTL: `html dir="rtl"` only for `ar`.
 
 Choosing a language writes the `locale` cookie and reloads so SSR matches.
-The lighthouse intro is not replayed in the same tab (`sessionStorage`).
+v0 `zh-Hant` copy lives in `zh-TW` messages; detection still does not map
+unmatched `zh-Hant` / `zh-HK` to `zh-TW` (those fall back to `en`).
 
 ## Supported locales
 

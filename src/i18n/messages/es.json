@@ -47,5 +47,24 @@
   },
   "language": {
     "select": "Seleccionar idioma"
+  },
+  "home": {
+    "brand": "Luz de las Naciones",
+    "tagline": "Un alma, una lámpara, iluminando toda la tierra",
+    "heroTitle": "Enciende una lámpara",
+    "heroSubtitle": "Si pones tu fe en Jehová, enciende una lámpara. Un punto de luz se alzará donde estás, uniéndose a un mar de estrellas con hermanos y hermanas de todo el mundo.",
+    "lightButton": "Encender una lámpara",
+    "locating": "Buscando tu ubicación…",
+    "saving": "Encendiendo tu lámpara…",
+    "litTitle": "Tu lámpara ya brilla",
+    "litMessage": "Que brille junto con las luces de todas partes, y nunca se apague.",
+    "counterLabel": "Lámparas encendidas",
+    "rotateHint": "Arrastra el globo para ver las luces del mundo",
+    "alreadyLit": "Ya has encendido una lámpara",
+    "errorDenied": "Se necesita acceso a la ubicación para encender tu lámpara en el mapa.",
+    "errorGeneric": "No pudimos encontrar tu ubicación. Inténtalo de nuevo.",
+    "errorUnsupported": "Tu dispositivo no admite servicios de ubicación.",
+    "loadError": "No se pueden cargar las luces ahora.",
+    "retry": "Reintentar"
   }
 }

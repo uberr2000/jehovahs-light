@@ -47,5 +47,24 @@
   },
   "language": {
     "select": "Chọn ngôn ngữ"
+  },
+  "home": {
+    "brand": "Ánh sáng muôn dân",
+    "tagline": "Một linh hồn, một ngọn đèn, soi sáng cả đất",
+    "heroTitle": "Thắp một ngọn đèn",
+    "heroSubtitle": "Nếu bạn đặt đức tin nơi Đức Giê-hô-va, hãy thắp một ngọn đèn. Một điểm sáng sẽ hiện lên nơi bạn đang ở, hòa vào biển sao cùng anh chị em khắp thế giới.",
+    "lightButton": "Thắp một ngọn đèn",
+    "locating": "Đang tìm vị trí của bạn…",
+    "saving": "Đang thắp ngọn đèn của bạn…",
+    "litTitle": "Ngọn đèn của bạn đang tỏa sáng",
+    "litMessage": "Cầu mong nó sáng cùng ánh sáng khắp nơi, và không bao giờ tắt.",
+    "counterLabel": "Ngọn đèn đã thắp",
+    "rotateHint": "Kéo quả địa cầu để xem ánh sáng quanh thế giới",
+    "alreadyLit": "Bạn đã thắp một ngọn đèn",
+    "errorDenied": "Cần quyền truy cập vị trí để thắp ngọn đèn của bạn trên bản đồ.",
+    "errorGeneric": "Không tìm được vị trí của bạn. Vui lòng thử lại.",
+    "errorUnsupported": "Thiết bị của bạn không hỗ trợ dịch vụ định vị.",
+    "loadError": "Hiện không tải được ánh sáng.",
+    "retry": "Thử lại"
   }
 }

@@ -47,5 +47,24 @@
   },
   "language": {
     "select": "选择语言"
+  },
+  "home": {
+    "brand": "万国之光",
+    "tagline": "一人一灯，照亮全地",
+    "heroTitle": "点亮一盏灯",
+    "heroSubtitle": "若你信靠耶和华，请点一盏灯。你所在的地方会亮起一点光，与世界各地的弟兄姊妹连成一片星海。",
+    "lightButton": "点一盏灯",
+    "locating": "正在寻找你的位置…",
+    "saving": "正在点亮你的灯…",
+    "litTitle": "你的灯已点亮",
+    "litMessage": "愿它与各地的光一同闪耀，永不熄灭。",
+    "counterLabel": "已点亮的灯",
+    "rotateHint": "拖曳地球，看看世界各地的光",
+    "alreadyLit": "你已经点亮了一盏灯",
+    "errorDenied": "需要开启定位权限，才能在地图上点亮你的灯。",
+    "errorGeneric": "无法取得你的位置，请稍后再试。",
+    "errorUnsupported": "你的设备不支持定位功能。",
+    "loadError": "目前无法加载光芒。",
+    "retry": "再试一次"
   }
 }
