@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-20 (×2 header/CTA/count/hint type; chrome footprint unchanged)
+_Last updated: 2026-09-20 (×2 header/CTA/count/hint type; chrome padding unchanged)
 
 ## Project name & stack summary
 
@@ -176,6 +176,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   silent zeros. Likely host MySQL/.env; BigInt JSON is guarded in code.
   API now logs the real error and returns 503 when the DB is unreachable.
   See `docs/locations-api.md`. Production path untouched by this PR.
+- Doubling header/CTA/count/hint type while keeping in-flow chrome and
+  develop padding means a 390×844 phone leftover globe pane is only
+  ~98px (header ~238px + panel ~508px). Desktop (`lg` row) globe share
+  stays large. No 3/4 shrink was applied. Overlaying the card would
+  restore mobile globe pixels but would change develop layout.
 
 ## Recent Commits
 
