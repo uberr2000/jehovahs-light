@@ -92,6 +92,37 @@ function useViewportCanvasBox() {
   return shellRef;
 }
 
+function SyncDrawingBuffer() {
+  const { gl, setSize, setDpr } = useThree();
+
+  useLayoutEffect(() => {
+    const canvas = gl.domElement;
+    const parent = canvas.parentElement;
+    const apply = () => {
+      const w = Math.round(parent?.clientWidth || window.innerWidth);
+      const h = Math.round(parent?.clientHeight || window.innerHeight);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (w < 2 || h < 2) return;
+      setDpr(dpr);
+      setSize(w, h);
+      gl.setPixelRatio(dpr);
+      gl.setSize(w, h, false);
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    if (parent) ro.observe(parent);
+    window.addEventListener('resize', apply);
+    window.visualViewport?.addEventListener('resize', apply);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', apply);
+      window.visualViewport?.removeEventListener('resize', apply);
+    };
+  }, [gl, setDpr, setSize]);
+
+  return null;
+}
+
 function GlobeOrbitControls({ compact }: { compact: boolean }) {
   const { camera, size } = useThree();
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
@@ -217,7 +248,17 @@ export default function Globe3D({ lightPoints, userLocation, onGlobeReady }: Glo
         gl={{ antialias: true }}
         resize={{ debounce: 0, scroll: false }}
         style={{ width: '100%', height: '100%', display: 'block' }}
+        onCreated={({ gl, setSize }) => {
+          const parent = gl.domElement.parentElement;
+          const w = Math.round(parent?.clientWidth || window.innerWidth);
+          const h = Math.round(parent?.clientHeight || window.innerHeight);
+          if (w > 1 && h > 1) {
+            setSize(w, h);
+            gl.setSize(w, h, false);
+          }
+        }}
       >
+        <SyncDrawingBuffer />
         <color attach="background" args={['#04060e']} />
         <Stars
           radius={55}
