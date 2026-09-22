@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-22 (home chrome type ×3 vs develop; overlay + Earth ≥60% kept)
+_Last updated: 2026-09-22 (glossy blue plus favicons + chrome type ×3)
 
 ## Project name & stack summary
 
@@ -97,6 +97,12 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   that steals globe height); padding/gaps are tighter so the Earth disk
   from #18 still fills ≥60% of viewport height on ~390×844. Zoom,
   stars, land brightness, APIs, and consent are unchanged.
+- Site favicon / apple-touch / PNG icons use the glossy blue plus/cross
+  artwork (alpha kept). `public/favicon.ico` (16/32/48),
+  `icon-32.png` / `icon-192.png` / `icon-512.png`,
+  `apple-touch-icon.png` (180), plus Next file conventions
+  `src/app/favicon.ico`, `icon.png`, `apple-icon.png`. `layout`
+  `metadata.icons` points at the public files.
 - Compact globe camera no longer width-fits atmosphere + margin (that
   left a ~34% / tinier disk on 390×844). Default `position.z` uses
   vertical FOV so the Earth disk is ~72% of canvas height (≥60% gate).
@@ -165,6 +171,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `src/lib/consent-cache.ts` — localStorage cache for intro skip
 - `docs/consent-memory.md` — IP + localStorage limitations
 - `eslint.config.mjs` — ignores `deploy/**`
+- `public/favicon.ico` / `icon-32.png` / `icon-192.png` / `icon-512.png`
+  / `apple-touch-icon.png` — glossy blue plus (alpha); also
+  `src/app/favicon.ico`, `icon.png`, `apple-icon.png`
+- `public/icon-SOURCE.txt` — icon artwork provenance
+- `src/app/layout.tsx` — `metadata.icons` for ico / 32 / 192 / 512 / apple 180
 - `src/app/page.tsx` — header brand/tagline **3× current develop** type;
   `main` is `h-[100dvh]` with the globe `absolute inset-0` (full
   viewport) below `lg`; header + short bottom bar overlay; `lg` stays
@@ -217,6 +228,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Replace default Next favicon with the glossy blue plus/cross
+  (transparent alpha). Multi-size ICO + 32/192/512 PNGs + 180
+  apple-touch; wire `metadata.icons`. Chrome type ×3 and Earth ≥60%
+  unchanged.
 - Triple header title/tagline, bottom CTA, lamp count / LAMPS LIT,
   hint, and lit title/message vs current develop (mobile + desktop).
   Keep short overlay chrome and #18 Earth disk ≥60% viewport height;
