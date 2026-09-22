@@ -209,30 +209,33 @@ export default function Home() {
   const hasLit = Boolean(userConsent?.hasLocation || userLocation);
 
   return (
-    <main className="relative h-[100dvh] w-full overflow-hidden bg-[#04060e] lg:flex lg:flex-col">
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-1.5 bg-gradient-to-b from-[#04060e]/50 to-transparent px-2 pt-2 pb-1 sm:gap-2 sm:px-3 sm:pt-3 lg:pointer-events-auto lg:static lg:shrink-0 lg:gap-4 lg:bg-none lg:p-6">
+    <main
+      className="home-shell relative h-[100dvh] w-full overflow-hidden bg-[#04060e] lg:flex lg:flex-col"
+      style={{ height: '100dvh', minHeight: '100vh', position: 'relative', overflow: 'hidden' }}
+    >
+      <header className="home-header pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-1.5 bg-gradient-to-b from-[#04060e]/50 to-transparent px-2 pt-2 pb-1 sm:gap-2 sm:px-3 sm:pt-3 lg:pointer-events-auto lg:static lg:shrink-0 lg:gap-4 lg:bg-none lg:p-6">
         <div className="flex min-w-0 flex-col gap-0 leading-none">
-          <span className="text-[6rem] font-semibold leading-none tracking-wide text-amber-50 sm:text-[6.75rem]">
+          <span className="home-brand font-semibold leading-none tracking-wide text-amber-50">
             {t('brand')}
           </span>
-          <span className="text-[4.5rem] leading-none text-amber-100/55 sm:text-[5.25rem]">{t('tagline')}</span>
+          <span className="home-tagline leading-none text-amber-100/55">{t('tagline')}</span>
         </div>
         <div className="pointer-events-auto shrink-0">
           <LanguageSelector currentLocale={locale} onLocaleChange={handleLocaleChange} />
         </div>
       </header>
 
-      <div className="absolute inset-0 lg:relative lg:flex lg:min-h-0 lg:flex-1">
+      <div className="home-stage absolute inset-0 lg:relative lg:flex lg:min-h-0 lg:flex-1">
         <div
           data-testid="home-globe"
-          className="absolute inset-0 lg:relative lg:min-h-0 lg:flex-1"
+          className="home-globe absolute inset-0 lg:relative lg:min-h-0 lg:flex-1"
         >
           <Globe3D lightPoints={locations} userLocation={userLocation} />
         </div>
 
         <div
           data-testid="home-bottom-chrome"
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/40 via-[#04060e]/12 to-transparent px-1.5 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-3 lg:pointer-events-auto lg:static lg:w-[26rem] lg:min-h-0 lg:shrink-0 lg:items-center lg:overflow-y-auto lg:bg-none lg:p-8"
+          className="home-bottom pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/40 via-[#04060e]/12 to-transparent px-1.5 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-3 lg:pointer-events-auto lg:static lg:w-[26rem] lg:min-h-0 lg:shrink-0 lg:items-center lg:overflow-y-auto lg:bg-none lg:p-8"
         >
           <WelcomePanel
             count={stats.total}

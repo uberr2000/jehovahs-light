@@ -47,10 +47,10 @@ export default function LampCounter({ count }: { count: number }) {
         <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_16px_3px_rgba(245,180,90,0.85)] lg:h-3.5 lg:w-3.5" />
       </span>
       <div className="flex flex-row flex-wrap items-baseline gap-x-2 gap-y-0 leading-none lg:flex-col lg:leading-tight">
-        <span className="font-mono text-[8.25rem] font-semibold leading-none tabular-nums tracking-tight text-amber-50 lg:text-[18rem]">
+        <span className="home-count font-mono font-semibold leading-none tabular-nums tracking-tight text-amber-50">
           {display.toLocaleString()}
         </span>
-        <span className="text-[2.625rem] uppercase leading-none tracking-[0.18em] text-amber-100/55 lg:text-[5.25rem] lg:tracking-[0.22em]">
+        <span className="home-count-label uppercase leading-none tracking-[0.18em] text-amber-100/55 lg:tracking-[0.22em]">
           {t('counterLabel')}
         </span>
       </div>
