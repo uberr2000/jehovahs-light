@@ -211,6 +211,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   was a small circle in a sea of black. Compact default now uses
   vertical FOV height-fill (~72%, `z` ≈ 6.7) so the disk is ≥60% of
   viewport height. Zoom-out can still reach the full-sphere fit.
+- ×3 chrome type on ~390px wraps to many lines (title 96px, CTA 84px,
+  count 132px, hint 48px). Overlay still does not shrink the canvas;
+  the Earth disk stays ~72% of viewport height behind the chrome.
 
 ## Recent Commits
 
