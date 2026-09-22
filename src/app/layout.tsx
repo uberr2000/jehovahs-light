@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { cookies, headers } from 'next/headers';
 import LocaleNavigatorFallback from '@/components/LocaleNavigatorFallback';
+import { HOME_CRITICAL_CSS } from '@/app/home-critical';
 import { LOCALE_COOKIE } from '@/i18n/config';
 import { htmlDir, resolveRequestLocale } from '@/i18n/resolve-locale';
 import './globals.css';
@@ -72,6 +73,9 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-[#04060e] text-amber-50">
+        <style href="home-critical" precedence="high">
+          {HOME_CRITICAL_CSS}
+        </style>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <LocaleNavigatorFallback />
           {children}

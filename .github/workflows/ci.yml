@@ -64,6 +64,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Assert compact Earth framing
+        run: npm run test:framing
+
       - name: Build
         run: npm run build
 

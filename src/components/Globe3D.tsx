@@ -3,73 +3,27 @@
 import { Suspense, useMemo, useLayoutEffect, useEffect, useRef, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 import { Beacons, type BeaconPoint } from './globe/Beacons';
 import { Earth } from './globe/Earth';
 import { OwnBeacon } from './globe/OwnBeacon';
+import {
+  ATMOSPHERE_RADIUS,
+  CAMERA_FOV,
+  COMPACT_CAMERA_DISTANCE,
+  COMPACT_MAX_GATE_DISTANCE,
+  EARTH_RADIUS,
+  earthDiskHeightFill,
+  fitCameraDistance,
+} from '@/lib/earth-framing';
 
 const DESKTOP_CAMERA_DISTANCE = 6;
-const CAMERA_FOV = 45;
-const EARTH_RADIUS = 2;
-const ATMOSPHERE_RADIUS = EARTH_RADIUS * 1.12;
-const FIT_MARGIN = 1.22;
 const MIN_ZOOM_DISTANCE = 3.2;
 const DESKTOP_MAX_ZOOM_DISTANCE = 9;
-/** Compact default: Earth disk as a fraction of canvas height. Must stay ≥ 0.6. */
-const COMPACT_EARTH_HEIGHT_FILL = 0.72;
-const MIN_EARTH_HEIGHT_FILL = 0.6;
 const MOBILE_MAX_WIDTH = '(max-width: 768px)';
 const COARSE_POINTER = '(pointer: coarse)';
-
-/** Distance so a sphere of `radius` fits in the canvas with margin (portrait uses the narrower FOV). */
-export function fitCameraDistance(
-  radius: number,
-  fovDeg: number,
-  aspect: number,
-  margin = FIT_MARGIN
-): number {
-  const vFov = (fovDeg * Math.PI) / 180;
-  const safeAspect = Number.isFinite(aspect) && aspect > 0 ? aspect : 1;
-  const hFov = 2 * Math.atan(Math.tan(vFov / 2) * safeAspect);
-  const limiting = Math.min(vFov, hFov);
-  return (radius / Math.tan(limiting / 2)) * margin;
-}
-
-/**
- * Camera distance so a sphere of `radius` fills `fill` of the vertical FOV
- * (canvas / viewport height). Portrait width is allowed to crop.
- */
-export function fillHeightCameraDistance(
-  radius: number,
-  fovDeg: number,
-  fill: number
-): number {
-  const vFov = (fovDeg * Math.PI) / 180;
-  const safeFill = Number.isFinite(fill) && fill > 0 ? fill : COMPACT_EARTH_HEIGHT_FILL;
-  return radius / (safeFill * Math.tan(vFov / 2));
-}
-
-/** Projected Earth-disk diameter ÷ canvas height at `distance`. */
-export function earthDiskHeightFill(
-  distance: number,
-  fovDeg: number,
-  radius = EARTH_RADIUS
-): number {
-  const vFov = (fovDeg * Math.PI) / 180;
-  const safeDistance = Number.isFinite(distance) && distance > 0 ? distance : 1;
-  return radius / (safeDistance * Math.tan(vFov / 2));
-}
-
-const COMPACT_CAMERA_DISTANCE = fillHeightCameraDistance(
-  EARTH_RADIUS,
-  CAMERA_FOV,
-  COMPACT_EARTH_HEIGHT_FILL
-);
-const COMPACT_MAX_GATE_DISTANCE = fillHeightCameraDistance(
-  EARTH_RADIUS,
-  CAMERA_FOV,
-  MIN_EARTH_HEIGHT_FILL
-);
+const LG_MIN_WIDTH = 1024;
 
 function useCompactGlobeView() {
   const [compact, setCompact] = useState(true);
@@ -94,40 +48,129 @@ function useCompactGlobeView() {
   return compact;
 }
 
+/** Pin the WebGL shell to the visual viewport so it cannot stay at canvas default 300×150. */
+function useViewportCanvasBox() {
+  const shellRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const el = shellRef.current;
+    if (!el) return;
+
+    const apply = () => {
+      // Pixel-lock only below `lg`. Coarse pointers on a wide desktop must
+      // keep the in-flow globe pane (do not cover the glass card).
+      const narrow = window.innerWidth < LG_MIN_WIDTH;
+      if (narrow) {
+        const w = Math.round(window.visualViewport?.width ?? window.innerWidth);
+        const h = Math.round(window.visualViewport?.height ?? window.innerHeight);
+        el.style.position = 'absolute';
+        el.style.top = '0';
+        el.style.left = '0';
+        el.style.width = `${Math.max(w, 1)}px`;
+        el.style.height = `${Math.max(h, 1)}px`;
+      } else {
+        el.style.position = '';
+        el.style.top = '';
+        el.style.left = '';
+        el.style.width = '100%';
+        el.style.height = '100%';
+      }
+    };
+
+    apply();
+    window.addEventListener('resize', apply);
+    window.visualViewport?.addEventListener('resize', apply);
+    const ro = new ResizeObserver(apply);
+    ro.observe(document.documentElement);
+    return () => {
+      window.removeEventListener('resize', apply);
+      window.visualViewport?.removeEventListener('resize', apply);
+      ro.disconnect();
+    };
+  }, []);
+
+  return shellRef;
+}
+
+function SyncDrawingBuffer() {
+  const { gl, setSize, setDpr } = useThree();
+
+  useLayoutEffect(() => {
+    const canvas = gl.domElement;
+    const parent = canvas.parentElement;
+    const apply = () => {
+      const w = Math.round(parent?.clientWidth || window.innerWidth);
+      const h = Math.round(parent?.clientHeight || window.innerHeight);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (w < 2 || h < 2) return;
+      setDpr(dpr);
+      setSize(w, h);
+      gl.setPixelRatio(dpr);
+      gl.setSize(w, h, false);
+    };
+    apply();
+    const ro = new ResizeObserver(apply);
+    if (parent) ro.observe(parent);
+    window.addEventListener('resize', apply);
+    window.visualViewport?.addEventListener('resize', apply);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', apply);
+      window.visualViewport?.removeEventListener('resize', apply);
+    };
+  }, [gl, setDpr, setSize]);
+
+  return null;
+}
+
 function GlobeOrbitControls({ compact }: { compact: boolean }) {
   const { camera, size } = useThree();
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
+  const userAdjustedRef = useRef(false);
+  const lastBoxRef = useRef({ w: 0, h: 0 });
   const aspect = size.width / Math.max(size.height, 1);
   const fullFitDistance = useMemo(
     () => fitCameraDistance(ATMOSPHERE_RADIUS, CAMERA_FOV, aspect),
     [aspect]
   );
-  // Portrait width-fit pulls the camera too far (Earth disk ~width/height, well
-  // below the 60% height gate). Frame compact views by vertical fill instead.
   const compactFrameDistance = Math.min(COMPACT_CAMERA_DISTANCE, COMPACT_MAX_GATE_DISTANCE);
   const maxDistance = compact
     ? Math.max(fullFitDistance, DESKTOP_MAX_ZOOM_DISTANCE, compactFrameDistance)
     : DESKTOP_MAX_ZOOM_DISTANCE;
-  const framedRef = useRef(false);
 
-  useLayoutEffect(() => {
-    if (!compact) {
-      if (framedRef.current) {
-        camera.position.set(0, 0.45, DESKTOP_CAMERA_DISTANCE);
-        camera.lookAt(0, 0, 0);
-        camera.updateProjectionMatrix();
-        framedRef.current = false;
-      }
-      return;
-    }
-    if (framedRef.current) return;
-    camera.position.set(0, 0, compactFrameDistance);
+  const applyFrame = (distance: number, y = 0) => {
+    camera.position.set(0, y, distance);
     camera.lookAt(0, 0, 0);
     camera.updateProjectionMatrix();
-    framedRef.current = true;
-  }, [camera, compact, compactFrameDistance]);
+    const controls = controlsRef.current;
+    if (controls) {
+      controls.target.set(0, 0, 0);
+      controls.update();
+    }
+  };
+
+  useLayoutEffect(() => {
+    const boxChanged =
+      lastBoxRef.current.w !== size.width || lastBoxRef.current.h !== size.height;
+    lastBoxRef.current = { w: size.width, h: size.height };
+
+    if (!compact) {
+      applyFrame(DESKTOP_CAMERA_DISTANCE, 0.45);
+      userAdjustedRef.current = false;
+      return;
+    }
+
+    if (size.height < 2) return;
+    if (userAdjustedRef.current && !boxChanged) return;
+    if (boxChanged) userAdjustedRef.current = false;
+    applyFrame(compactFrameDistance, 0);
+    // applyFrame reads the latest camera / controls; size + compact are the triggers.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- frame when the drawing box changes
+  }, [camera, compact, compactFrameDistance, size.height, size.width]);
 
   return (
     <OrbitControls
+      ref={controlsRef}
       enablePan={false}
       enableZoom
       minDistance={MIN_ZOOM_DISTANCE}
@@ -138,6 +181,9 @@ function GlobeOrbitControls({ compact }: { compact: boolean }) {
       zoomSpeed={0.7}
       autoRotate
       autoRotateSpeed={0.35}
+      onStart={() => {
+        userAdjustedRef.current = true;
+      }}
     />
   );
 }
@@ -181,11 +227,18 @@ function GlobeContent({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
   );
 }
 
+export { earthDiskHeightFill };
+
 export default function Globe3D({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
   const compact = useCompactGlobeView();
+  const shellRef = useViewportCanvasBox();
 
   return (
-    <div className="h-full w-full touch-none">
+    <div
+      ref={shellRef}
+      className="home-globe-canvas h-full w-full touch-none"
+      style={{ width: '100%', height: '100%' }}
+    >
       <Canvas
         camera={{
           position: [0, compact ? 0 : 0.45, compact ? COMPACT_CAMERA_DISTANCE : DESKTOP_CAMERA_DISTANCE],
@@ -193,7 +246,19 @@ export default function Globe3D({ lightPoints, userLocation, onGlobeReady }: Glo
         }}
         dpr={[1, 2]}
         gl={{ antialias: true }}
+        resize={{ debounce: 0, scroll: false }}
+        style={{ width: '100%', height: '100%', display: 'block' }}
+        onCreated={({ gl, setSize }) => {
+          const parent = gl.domElement.parentElement;
+          const w = Math.round(parent?.clientWidth || window.innerWidth);
+          const h = Math.round(parent?.clientHeight || window.innerHeight);
+          if (w > 1 && h > 1) {
+            setSize(w, h);
+            gl.setSize(w, h, false);
+          }
+        }}
       >
+        <SyncDrawingBuffer />
         <color attach="background" args={['#04060e']} />
         <Stars
           radius={55}

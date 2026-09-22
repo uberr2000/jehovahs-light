@@ -20,7 +20,7 @@ export default function WelcomePanel({
   const t = useTranslations('home');
 
   const hint = (
-    <p className="text-[5.25rem] leading-none text-amber-100/50 sm:text-[6rem]">{t('rotateHint')}</p>
+    <p className="home-hint home-hint-desktop leading-none text-amber-100/50">{t('rotateHint')}</p>
   );
 
   return (
@@ -29,10 +29,10 @@ export default function WelcomePanel({
         {hasLit ? (
           <div className="flex flex-col gap-1.5 lg:gap-6">
             <div className="flex flex-col gap-0.5 lg:gap-2.5">
-              <h2 className="text-balance text-[3.75rem] font-semibold leading-none tracking-tight text-amber-50 lg:text-[5.625rem]">
+              <h2 className="home-lit-title text-balance font-semibold leading-none tracking-tight text-amber-50">
                 {t('litTitle')}
               </h2>
-              <p className="text-pretty text-[2.625rem] leading-none text-amber-100/75 lg:text-[3.375rem] lg:leading-tight">
+              <p className="home-lit-message text-pretty leading-none text-amber-100/75 lg:leading-tight">
                 {t('litMessage')}
               </p>
             </div>
@@ -49,7 +49,7 @@ export default function WelcomePanel({
           </div>
         )}
       </div>
-      <p className="px-1 text-center text-[3rem] leading-none text-amber-100/50 lg:hidden">
+      <p className="home-hint px-1 text-center leading-none text-amber-100/50 lg:hidden">
         {t('rotateHint')}
       </p>
     </div>

@@ -8,6 +8,7 @@
     "postbuild": "node scripts/copy-standalone-assets.mjs",
     "start": "next start",
     "lint": "eslint",
+    "test:framing": "node scripts/assert-earth-framing.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",

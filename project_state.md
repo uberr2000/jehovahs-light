@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-22 (glossy blue plus favicons + chrome type ×3)
+_Last updated: 2026-09-22 (live 390×844: px chrome type + viewport-locked Earth canvas)
 
 ## Project name & stack summary
 
@@ -102,7 +102,15 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `icon-32.png` / `icon-192.png` / `icon-512.png`,
   `apple-touch-icon.png` (180), plus Next file conventions
   `src/app/favicon.ico`, `icon.png`, `apple-icon.png`. `layout`
-  `metadata.icons` points at the public files.
+  `metadata.icons` points at the public files. Icons left unchanged in
+  the live 390×844 type/Earth follow-up.
+- Live QA after #18/#19: HTML had ×3 `text-[6rem]` but computed title
+  stayed ~32px (pre-#19 `2rem`), and the Earth disk stayed ~80px. Chrome
+  type is now document-inlined **px** classes (`home-brand` 96px, etc.)
+  so a stale hashed Tailwind chunk or a tiny rem root cannot keep 32px.
+  The compact WebGL shell is pixel-locked to the visual viewport so R3F
+  cannot sit at the default 300×150 box (~80px disk). Overlay chrome,
+  APIs, consent, land, stars, zoom, and favicons are unchanged.
 - Compact globe camera no longer width-fits atmosphere + margin (that
   left a ~34% / tinier disk on 390×844). Default `position.z` uses
   vertical FOV so the Earth disk is ~72% of canvas height (≥60% gate).
@@ -156,9 +164,13 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `docs/globe-texture.md` — NASA Blue Marble source, credit, license
 - `public/globe/earth-blue-marble.jpg` — local 2048×1024 satellite map
 - `public/globe/SOURCE.txt` — asset provenance next to the JPEG
+- `src/lib/earth-framing.ts` — compact / desktop camera distance math
+- `src/app/home-critical.ts` — document-inlined px type + viewport layout
+- `scripts/assert-earth-framing.mjs` — compact disk ≥60% of 844px height
 - `src/components/Globe3D.tsx` — R3F scene: Earth + beacons + own beacon,
   OrbitControls rotate + zoom, compact height-fill framing (Earth disk
-  ≥60% of viewport height) then zoom, brighter Stars
+  ≥60% of viewport height) then zoom, brighter Stars; below `lg` the
+  canvas box is `visualViewport` pixels (not `%` of a 0-height parent)
 - `src/components/globe/Earth.tsx` — Blue Marble + land/sea contrast shader;
   `LAND_LUMINANCE_FACTOR` (0.5 vs v0/develop land lift; sea unchanged)
 - `src/components/globe/Beacons.tsx` / `OwnBeacon.tsx` / `lat-lng.ts`
@@ -175,17 +187,17 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   / `apple-touch-icon.png` — glossy blue plus (alpha); also
   `src/app/favicon.ico`, `icon.png`, `apple-icon.png`
 - `public/icon-SOURCE.txt` — icon artwork provenance
-- `src/app/layout.tsx` — `metadata.icons` for ico / 32 / 192 / 512 / apple 180
-- `src/app/page.tsx` — header brand/tagline **3× current develop** type;
-  `main` is `h-[100dvh]` with the globe `absolute inset-0` (full
-  viewport) below `lg`; header + short bottom bar overlay; `lg` stays
-  header + row sidebar in-flow with the glass card
+- `src/app/layout.tsx` — `metadata.icons`, viewport lock, html lang/dir,
+  locale source, inlined `HOME_CRITICAL_CSS` (`<style href="home-critical">`)
+- `src/app/page.tsx` — header brand/tagline **3×** type via `home-brand`
+  / `home-tagline` (96px / 72px, not rem utilities); `main` is `100dvh`
+  with the globe `absolute inset-0` below `lg`; header + short bottom
+  bar overlay; `lg` stays header + row sidebar in-flow with the glass card
 - `src/app/` — pages and API routes
 - `src/i18n/config.ts` — 14 locales + native names
 - `src/i18n/resolve-locale.ts` — cookie / Accept-Language / navigator match
 - `src/i18n/messages/*.json` — en, zh-TW, zh-CN, es, pt, fr, de, ja, ko, ru, ar, id, th, vi
 - `src/components/LocaleNavigatorFallback.tsx` — navigator fallback when SSR defaulted
-- `src/app/layout.tsx` — viewport lock, html lang/dir, locale source
 - `docs/i18n-viewport.md` — page viewport lock + globe zoom + locale list
 - `src/lib/json-safe.ts` — BigInt-safe JSON for mysql2 COUNT / insertId
 - `docs/locations-api.md` — GET /api/locations 500 diagnosis
@@ -225,9 +237,21 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - ×3 chrome type on ~390px wraps to many lines (title 96px, CTA 84px,
   count 132px, hint 48px). Overlay still does not shrink the canvas;
   the Earth disk stays ~72% of viewport height behind the chrome.
+- Live after #18/#19 still showed title ~32px and Earth ~80px because
+  (1) ×3 type lived only as Tailwind `rem` utilities in a hashed CSS
+  chunk — computed stayed at the old 2rem when that rule did not win —
+  and (2) the WebGL canvas could remain the 300×150 default inside a
+  full-viewport black page, so #18's 72% fill of a ~150px box is ~80px.
+  Document-inlined px + viewport pixel lock address both. Cloudflare
+  `/_next/static/chunks/*.js` may 403 non-browser UAs (WAF); browsers
+  with a normal User-Agent get 200.
 
 ## Recent Commits
 
+- Make live 390×844 actually show #18 Earth ≥60% VH and #19 ×3 type:
+  inline px chrome classes in the HTML document; pixel-lock the compact
+  WebGL canvas to the visual viewport; re-frame on resize. Favicons,
+  APIs, consent, land, stars, zoom unchanged.
 - Replace default Next favicon with the glossy blue plus/cross
   (transparent alpha). Multi-size ICO + 32/192/512 PNGs + 180
   apple-touch; wire `metadata.icons`. Chrome type ×3 and Earth ≥60%
@@ -317,13 +341,14 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `CREATE TABLE IF NOT EXISTS`.
 - Top/bottom copy (header title/tagline, CTA, lamp count label, hint,
   lit title/message) is sized **3× current develop** on mobile and
-  desktop. Below `lg`, chrome overlays a full-viewport canvas; the
-  bottom bar stays a short translucent strip (not a solid card) with
-  tighter padding so type growth does not steal globe height. Compact
-  camera frames the Earth disk at ~72% of canvas height (vertical FOV /
-  `position.z`, not CSS scale) so the sphere itself is ≥60% of viewport
-  height on ~390×844. Desktop chrome stays an in-flow glass card with
-  the existing distance-6 framing.
+  desktop, as **px** in document-inlined CSS (`home-brand` 96px = 3×
+  the pre-#19 `2rem` / 32px). Tailwind `text-[6rem]` alone was not
+  enough on live (computed stayed ~32px). Below `lg`, chrome overlays a
+  full-viewport canvas whose drawing box is locked to visual-viewport
+  pixels so R3F cannot keep a 300×150 default (~80px disk). Compact
+  camera still frames the Earth disk at ~72% of that canvas height
+  (vertical FOV / `position.z`, not CSS scale). Desktop chrome stays an
+  in-flow glass card with the existing distance-6 framing.
 - Home chrome follows the v0 dark full-bleed + glass panel. Lighting a
   lamp still uses existing locations/consent APIs (not the zip’s
   `/api/lamps` or Postgres). v0 `zh-Hant` strings map to `zh-TW`; all 14
