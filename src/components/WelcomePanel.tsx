@@ -28,7 +28,7 @@ export default function WelcomePanel({
   const t = useTranslations("home");
 
   const hint = (
-    <p className="text-[0.875rem] leading-none text-amber-100/50 sm:text-[1rem]">
+    <p className="home-hint home-hint-desktop leading-none text-amber-100/50">
       {t("rotateHint")}
     </p>
   );
@@ -61,7 +61,7 @@ export default function WelcomePanel({
           </div>
         )}
       </div>
-      <p className="px-1 text-center text-xs leading-snug text-amber-100/50 lg:hidden">
+      <p className="home-hint px-1 text-center leading-snug text-amber-100/50 lg:hidden">
         {t("rotateHint")}
       </p>
     </div>

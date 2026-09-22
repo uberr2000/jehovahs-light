@@ -128,7 +128,7 @@ export default function ShareLightButton({
   };
 
   return (
-    <div className="flex flex-col gap-1" data-testid="share-root" data-share-state={shareState}>
+    <div className="home-share flex flex-col gap-1" data-testid="share-root" data-share-state={shareState}>
       <div className="flex flex-wrap items-center gap-1.5">
         <button
           type="button"
