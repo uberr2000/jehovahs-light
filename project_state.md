@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-20 (narrow Earth camera pull-in so disk ≥60% viewport height)
+_Last updated: 2026-09-22 (home chrome type ×3 vs develop; overlay + Earth ≥60% kept)
 
 ## Project name & stack summary
 
@@ -78,9 +78,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   LAMPS LIT count (no packed tiny-text card); lit title/body/count
   are larger. 14-locale detection unchanged.
 - Header title/tagline, bottom CTA, lamp count / LAMPS LIT, and hint
-  copy are 2× the previous develop sizes on both mobile and desktop.
-  Header/panel padding, gaps, and globe `flex-1` share are unchanged
-  (no 3/4 chrome shrink).
+  copy were 2× the previous develop sizes on both mobile and desktop
+  (later raised to 3× current develop; overlay padding tightened).
 - Below `lg`, header and bottom CTA/count/hint overlay the globe canvas
   (`absolute`) so ×2 type no longer consumes flex height. Overlay
   padding/gaps are tighter; the rotate hint sits on the globe’s bottom
@@ -92,6 +91,12 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   tight padding). Overlay type is slightly reduced so the bar stays
   short; desktop (`lg`) keeps the glass card and ×2 sizes. Zoom, stars,
   land, APIs, and consent are unchanged.
+- Home chrome type (header title/tagline, bottom CTA, lamp count /
+  LAMPS LIT, hint, lit title/message) is **3× current develop** on
+  mobile and desktop. Overlay chrome stays overlay (not a flex column
+  that steals globe height); padding/gaps are tighter so the Earth disk
+  from #18 still fills ≥60% of viewport height on ~390×844. Zoom,
+  stars, land brightness, APIs, and consent are unchanged.
 - Compact globe camera no longer width-fits atmosphere + margin (that
   left a ~34% / tinier disk on 390×844). Default `position.z` uses
   vertical FOV so the Earth disk is ~72% of canvas height (≥60% gate).
@@ -152,18 +157,18 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `LAND_LUMINANCE_FACTOR` (0.5 vs v0/develop land lift; sea unchanged)
 - `src/components/globe/Beacons.tsx` / `OwnBeacon.tsx` / `lat-lng.ts`
 - `src/components/WelcomePanel.tsx` / `LightLampButton.tsx` / `LampCounter.tsx`
-  — v10-scale CTA + lamp count (unlit), larger lit type; CTA / count /
-  hint copy 2× develop sizes on `lg`; below `lg` the bottom chrome is a
-  short translucent overlay (no solid card; slightly smaller type,
-  wrapping, tight padding) so the globe stays ≥60% of the viewport
+  — v10-scale CTA + lamp count (unlit); CTA / count / hint / lit copy
+  **3× current develop** on mobile and `lg`. Below `lg` the bottom chrome
+  stays a short translucent overlay (no solid card; wrapping, tighter
+  padding) so the globe stays ≥60% of the viewport
 - `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales
 - `src/lib/consent-cache.ts` — localStorage cache for intro skip
 - `docs/consent-memory.md` — IP + localStorage limitations
 - `eslint.config.mjs` — ignores `deploy/**`
-- `src/app/page.tsx` — header brand/tagline 2× develop type; `main` is
-  `h-[100dvh]` with the globe `absolute inset-0` (full viewport) below
-  `lg`; header + short bottom bar overlay; `lg` stays header + row
-  sidebar in-flow with the glass card
+- `src/app/page.tsx` — header brand/tagline **3× current develop** type;
+  `main` is `h-[100dvh]` with the globe `absolute inset-0` (full
+  viewport) below `lg`; header + short bottom bar overlay; `lg` stays
+  header + row sidebar in-flow with the glass card
 - `src/app/` — pages and API routes
 - `src/i18n/config.ts` — 14 locales + native names
 - `src/i18n/resolve-locale.ts` — cookie / Accept-Language / navigator match
@@ -209,6 +214,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Triple header title/tagline, bottom CTA, lamp count / LAMPS LIT,
+  hint, and lit title/message vs current develop (mobile + desktop).
+  Keep short overlay chrome and #18 Earth disk ≥60% viewport height;
+  tighter overlay padding only. No API / consent / land / zoom / stars
+  changes.
 - Narrow screens: pull the compact globe camera closer (vertical FOV
   height-fill ~72%, `z` ≈ 6.7) so the rendered Earth disk is ≥60% of
   viewport height. Keep short translucent bottom bar, zoom, stars,
@@ -287,14 +297,15 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   column names stay `lit_locations` / `gps_consent` with the original
   snake_case columns so existing host tables are reused. Migrations are
   `CREATE TABLE IF NOT EXISTS`.
-- Top/bottom copy (header title/tagline, CTA, lamp count label, hint)
-  is sized 2× relative to the post-v10 develop type on desktop. Below
-  `lg`, chrome overlays a full-viewport canvas; the bottom bar is a
-  short translucent strip (not a solid card) and may use slightly
-  smaller type. Compact camera frames the Earth disk at ~72% of canvas
-  height (vertical FOV / `position.z`, not CSS scale) so the sphere
-  itself is ≥60% of viewport height on ~390×844. Desktop chrome stays
-  an in-flow glass card with the existing distance-6 framing.
+- Top/bottom copy (header title/tagline, CTA, lamp count label, hint,
+  lit title/message) is sized **3× current develop** on mobile and
+  desktop. Below `lg`, chrome overlays a full-viewport canvas; the
+  bottom bar stays a short translucent strip (not a solid card) with
+  tighter padding so type growth does not steal globe height. Compact
+  camera frames the Earth disk at ~72% of canvas height (vertical FOV /
+  `position.z`, not CSS scale) so the sphere itself is ≥60% of viewport
+  height on ~390×844. Desktop chrome stays an in-flow glass card with
+  the existing distance-6 framing.
 - Home chrome follows the v0 dark full-bleed + glass panel. Lighting a
   lamp still uses existing locations/consent APIs (not the zip’s
   `/api/lamps` or Postgres). v0 `zh-Hant` strings map to `zh-TW`; all 14
