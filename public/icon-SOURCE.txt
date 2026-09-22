@@ -1,0 +1,7 @@
+Site icons (favicon.ico, icon-32/192/512.png, apple-touch-icon.png)
+Glossy blue plus / cross. Transparency is real alpha (the source
+checkerboard is not stored as pixels).
+
+Source artwork: Terry + 幕僚長 (attached PNG). Resized only — not redrawn.
+Also wired via Next file conventions: src/app/favicon.ico, icon.png,
+apple-icon.png.

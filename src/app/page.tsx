@@ -210,12 +210,12 @@ export default function Home() {
 
   return (
     <main className="relative h-[100dvh] w-full overflow-hidden bg-[#04060e] lg:flex lg:flex-col">
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-2 bg-gradient-to-b from-[#04060e]/50 to-transparent px-3 pt-3 pb-2 sm:gap-3 sm:px-4 sm:pt-4 lg:pointer-events-auto lg:static lg:shrink-0 lg:gap-4 lg:bg-none lg:p-6">
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <span className="text-[2rem] font-semibold tracking-wide text-amber-50 sm:text-[2.25rem]">
+      <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-1.5 bg-gradient-to-b from-[#04060e]/50 to-transparent px-2 pt-2 pb-1 sm:gap-2 sm:px-3 sm:pt-3 lg:pointer-events-auto lg:static lg:shrink-0 lg:gap-4 lg:bg-none lg:p-6">
+        <div className="flex min-w-0 flex-col gap-0 leading-none">
+          <span className="text-[6rem] font-semibold leading-none tracking-wide text-amber-50 sm:text-[6.75rem]">
             {t('brand')}
           </span>
-          <span className="text-[1.5rem] text-amber-100/55 sm:text-[1.75rem]">{t('tagline')}</span>
+          <span className="text-[4.5rem] leading-none text-amber-100/55 sm:text-[5.25rem]">{t('tagline')}</span>
         </div>
         <div className="pointer-events-auto shrink-0">
           <LanguageSelector currentLocale={locale} onLocaleChange={handleLocaleChange} />
@@ -232,7 +232,7 @@ export default function Home() {
 
         <div
           data-testid="home-bottom-chrome"
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/40 via-[#04060e]/12 to-transparent px-2 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-5 lg:pointer-events-auto lg:static lg:w-[26rem] lg:shrink-0 lg:items-center lg:bg-none lg:p-8"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/40 via-[#04060e]/12 to-transparent px-1.5 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-3 lg:pointer-events-auto lg:static lg:w-[26rem] lg:min-h-0 lg:shrink-0 lg:items-center lg:overflow-y-auto lg:bg-none lg:p-8"
         >
           <WelcomePanel
             count={stats.total}
