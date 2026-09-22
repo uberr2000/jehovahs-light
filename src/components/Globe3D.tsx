@@ -3,6 +3,7 @@
 import { Suspense, useMemo, useLayoutEffect, useEffect, useRef, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 import { Beacons, type BeaconPoint } from './globe/Beacons';
 import { Earth } from './globe/Earth';
@@ -93,9 +94,7 @@ function useViewportCanvasBox() {
 
 function GlobeOrbitControls({ compact }: { compact: boolean }) {
   const { camera, size } = useThree();
-  const controlsRef = useRef<{ target: { set: (x: number, y: number, z: number) => void }; update: () => void } | null>(
-    null
-  );
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const userAdjustedRef = useRef(false);
   const lastBoxRef = useRef({ w: 0, h: 0 });
   const aspect = size.width / Math.max(size.height, 1);
