@@ -8,12 +8,9 @@
 - Globe3D OrbitControls: `enableZoom` is on for every viewport (drag rotate
   stays). The globe canvas uses `touch-action: none` so pinch/wheel zoom the
   camera, not the page. Compact viewports (`pointer: coarse` or
-  `max-width: 768px`) **frame by vertical FOV**: the Earth disk starts at
-  ~72% of canvas height (`fillHeightCameraDistance`, camera `z` ≈ 6.7).
-  Portrait width may crop; the old min(h/v FOV) fit is only the zoom-out
-  max so the full sphere stays reachable. That keeps the rendered disk
-  ≥ 60% of viewport height on ~390×844. Below `lg`, header and bottom
-  chrome overlay the canvas so they do not shrink the pane. Zoom range is
+  `max-width: 768px`) **init with a full-sphere fit** (`fitCameraDistance`
+  on the atmosphere + margin) so the whole Earth is visible with no crop.
+  Users can still pinch/scroll zoom in. Zoom range is
   `3.2` … `max(fullFitDistance, 9)`. Desktop still starts around distance 6
   with zoom between 3.2 and 9. Hint copy is `home.rotateHint`
   (“Drag or zoom…”) in all 14 locale files.

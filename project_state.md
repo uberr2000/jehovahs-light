@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-23 (chrome ÷3; header brand/tagline ×0.5)
+_Last updated: 2026-09-23 (compact globe init = full-sphere fit)
 
 ## Project name & stack summary
 
@@ -102,10 +102,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `apple-touch-icon.png` (180), plus Next file conventions
   `src/app/favicon.ico`, `icon.png`, `apple-icon.png`. `layout`
   `metadata.icons` points at the public files.
-- Compact globe camera no longer width-fits atmosphere + margin (that
-  left a ~34% / tinier disk on 390×844). Default `position.z` uses
-  vertical FOV so the Earth disk is ~72% of canvas height (≥60% gate).
-  Zoom-out still reaches the full-sphere fit; desktop stays at distance 6.
+- Compact globe camera inits with a full-sphere fit (atmosphere +
+  margin via `fitCameraDistance`) so the whole Earth is visible; users
+  can still zoom in. Desktop framing stays distance 6.
 - Stats no longer treat a failed `GET /api/locations` as zeros; error + retry.
   Live `/api/locations` 500 is documented in `docs/locations-api.md`
   (likely host MySQL/.env; BigInt JSON serialize is also guarded in code).
@@ -156,15 +155,17 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `public/globe/earth-blue-marble.jpg` — local 2048×1024 satellite map
 - `public/globe/SOURCE.txt` — asset provenance next to the JPEG
 - `src/components/Globe3D.tsx` — R3F scene: Earth + beacons + own beacon,
-  OrbitControls rotate + zoom, compact height-fill framing (Earth disk
-  ≥60% of viewport height) then zoom, brighter Stars
+  OrbitControls rotate + zoom, compact **full-sphere fit** on init
+  (atmosphere + margin; no height-fill crop), then zoom, brighter Stars
 - `src/components/globe/Earth.tsx` — Blue Marble + land/sea contrast shader;
   `LAND_LUMINANCE_FACTOR` (0.5 vs v0/develop land lift; sea unchanged)
 - `src/components/globe/Beacons.tsx` / `OwnBeacon.tsx` / `lat-lng.ts`
 - `src/components/WelcomePanel.tsx` / `LightLampButton.tsx` / `LampCounter.tsx`
-  — CTA / count / hint / lit copy at ÷3 of the prior ×3 scale (readable
-  rem sizes). Below `lg` the bottom chrome stays a short translucent
-  overlay so the globe stays ≥60% of the viewport
+  — Desktop (`lg`) keeps the compact halved chrome. Mobile uses
+  readable overlay type (CTA `min-h-11` / `1.125rem`, count `2rem`,
+  lit `text-base`/`text-sm`, hint `text-xs`) so tap targets and copy
+  stay usable without changing the desktop look. Below `lg` the bottom
+  chrome stays a short translucent overlay.
 - `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales
 - `src/lib/consent-cache.ts` — localStorage cache for intro skip
 - `docs/consent-memory.md` — IP + localStorage limitations
@@ -224,8 +225,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 ## Recent Commits
 
 - Shrink home chrome type ÷3, then halve header brand and tagline
-  (brand ×0.5; tagline 缩小一倍 → ×0.5). Overlay / Earth ≥60% /
-  APIs unchanged.
+  (brand ×0.5; tagline 缩小一倍 → ×0.5). Halve WelcomePanel /
+  LightLampButton / LampCounter text **and** button chrome to match.
+  Overlay / Earth ≥60% / APIs unchanged.
 - Replace default Next favicon with the glossy blue plus/cross
   (transparent alpha). Multi-size ICO + 32/192/512 PNGs + 180
   apple-touch; wire `metadata.icons`. Chrome type ×3 and Earth ≥60%
