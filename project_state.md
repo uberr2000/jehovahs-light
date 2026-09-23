@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-22 (glossy blue plus favicons + chrome type ×3)
+_Last updated: 2026-09-23 (chrome ÷3; header brand/tagline ×0.5)
 
 ## Project name & stack summary
 
@@ -92,11 +92,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   short; desktop (`lg`) keeps the glass card and ×2 sizes. Zoom, stars,
   land, APIs, and consent are unchanged.
 - Home chrome type (header title/tagline, bottom CTA, lamp count /
-  LAMPS LIT, hint, lit title/message) is **3× current develop** on
-  mobile and desktop. Overlay chrome stays overlay (not a flex column
-  that steals globe height); padding/gaps are tighter so the Earth disk
-  from #18 still fills ≥60% of viewport height on ~390×844. Zoom,
-  stars, land brightness, APIs, and consent are unchanged.
+  LAMPS LIT, hint, lit title/message) was briefly **3× develop**, then
+  **÷3** back toward readable sizes (`page.tsx` + WelcomePanel /
+  LampCounter / LightLampButton). Overlay chrome, Earth ≥60%, zoom,
+  stars, land, APIs, and consent are unchanged.
 - Site favicon / apple-touch / PNG icons use the glossy blue plus/cross
   artwork (alpha kept). `public/favicon.ico` (16/32/48),
   `icon-32.png` / `icon-192.png` / `icon-512.png`,
@@ -163,10 +162,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `LAND_LUMINANCE_FACTOR` (0.5 vs v0/develop land lift; sea unchanged)
 - `src/components/globe/Beacons.tsx` / `OwnBeacon.tsx` / `lat-lng.ts`
 - `src/components/WelcomePanel.tsx` / `LightLampButton.tsx` / `LampCounter.tsx`
-  — v10-scale CTA + lamp count (unlit); CTA / count / hint / lit copy
-  **3× current develop** on mobile and `lg`. Below `lg` the bottom chrome
-  stays a short translucent overlay (no solid card; wrapping, tighter
-  padding) so the globe stays ≥60% of the viewport
+  — CTA / count / hint / lit copy at ÷3 of the prior ×3 scale (readable
+  rem sizes). Below `lg` the bottom chrome stays a short translucent
+  overlay so the globe stays ≥60% of the viewport
 - `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales
 - `src/lib/consent-cache.ts` — localStorage cache for intro skip
 - `docs/consent-memory.md` — IP + localStorage limitations
@@ -176,10 +174,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `src/app/favicon.ico`, `icon.png`, `apple-icon.png`
 - `public/icon-SOURCE.txt` — icon artwork provenance
 - `src/app/layout.tsx` — `metadata.icons` for ico / 32 / 192 / 512 / apple 180
-- `src/app/page.tsx` — header brand/tagline **3× current develop** type;
-  `main` is `h-[100dvh]` with the globe `absolute inset-0` (full
-  viewport) below `lg`; header + short bottom bar overlay; `lg` stays
-  header + row sidebar in-flow with the glass card
+- `src/app/page.tsx` — header brand `1rem` / `1.125rem` (÷3 then ×0.5),
+  tagline `0.75rem` / `0.875rem` (÷3 then ×0.5); `main` is `h-[100dvh]`
+  with the globe `absolute inset-0` below `lg`; header + short bottom
+  bar overlay; `lg` stays header + row sidebar in-flow with the glass card
 - `src/app/` — pages and API routes
 - `src/i18n/config.ts` — 14 locales + native names
 - `src/i18n/resolve-locale.ts` — cookie / Accept-Language / navigator match
@@ -222,12 +220,12 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   was a small circle in a sea of black. Compact default now uses
   vertical FOV height-fill (~72%, `z` ≈ 6.7) so the disk is ≥60% of
   viewport height. Zoom-out can still reach the full-sphere fit.
-- ×3 chrome type on ~390px wraps to many lines (title 96px, CTA 84px,
-  count 132px, hint 48px). Overlay still does not shrink the canvas;
-  the Earth disk stays ~72% of viewport height behind the chrome.
 
 ## Recent Commits
 
+- Shrink home chrome type ÷3, then halve header brand and tagline
+  (brand ×0.5; tagline 缩小一倍 → ×0.5). Overlay / Earth ≥60% /
+  APIs unchanged.
 - Replace default Next favicon with the glossy blue plus/cross
   (transparent alpha). Multi-size ICO + 32/192/512 PNGs + 180
   apple-touch; wire `metadata.icons`. Chrome type ×3 and Earth ≥60%
@@ -316,14 +314,12 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   snake_case columns so existing host tables are reused. Migrations are
   `CREATE TABLE IF NOT EXISTS`.
 - Top/bottom copy (header title/tagline, CTA, lamp count label, hint,
-  lit title/message) is sized **3× current develop** on mobile and
-  desktop. Below `lg`, chrome overlays a full-viewport canvas; the
-  bottom bar stays a short translucent strip (not a solid card) with
-  tighter padding so type growth does not steal globe height. Compact
-  camera frames the Earth disk at ~72% of canvas height (vertical FOV /
-  `position.z`, not CSS scale) so the sphere itself is ≥60% of viewport
-  height on ~390×844. Desktop chrome stays an in-flow glass card with
-  the existing distance-6 framing.
+  lit title/message) is sized at **÷3 of the prior ×3** scale so type
+  stays readable on ~390px. Below `lg`, chrome overlays a full-viewport
+  canvas; the bottom bar stays a short translucent strip. Compact
+  camera frames the Earth disk at ~72% of canvas height so the sphere
+  is ≥60% of viewport height. Desktop chrome stays an in-flow glass
+  card with distance-6 framing.
 - Home chrome follows the v0 dark full-bleed + glass panel. Lighting a
   lamp still uses existing locations/consent APIs (not the zip’s
   `/api/lamps` or Postgres). v0 `zh-Hant` strings map to `zh-TW`; all 14

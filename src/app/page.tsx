@@ -212,10 +212,10 @@ export default function Home() {
     <main className="relative h-[100dvh] w-full overflow-hidden bg-[#04060e] lg:flex lg:flex-col">
       <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-1.5 bg-gradient-to-b from-[#04060e]/50 to-transparent px-2 pt-2 pb-1 sm:gap-2 sm:px-3 sm:pt-3 lg:pointer-events-auto lg:static lg:shrink-0 lg:gap-4 lg:bg-none lg:p-6">
         <div className="flex min-w-0 flex-col gap-0 leading-none">
-          <span className="text-[6rem] font-semibold leading-none tracking-wide text-amber-50 sm:text-[6.75rem]">
+          <span className="text-[1rem] font-semibold leading-none tracking-wide text-amber-50 sm:text-[1.125rem]">
             {t('brand')}
           </span>
-          <span className="text-[4.5rem] leading-none text-amber-100/55 sm:text-[5.25rem]">{t('tagline')}</span>
+          <span className="text-[0.75rem] leading-none text-amber-100/55 sm:text-[0.875rem]">{t('tagline')}</span>
         </div>
         <div className="pointer-events-auto shrink-0">
           <LanguageSelector currentLocale={locale} onLocaleChange={handleLocaleChange} />
