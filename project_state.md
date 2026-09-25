@@ -182,6 +182,7 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   on mobile, clipboard toast + LINE/Facebook/X on desktop
 - `src/lib/share.ts` — payload builders, city/region phrase (no GPS),
   social deep links; `src/lib/share.test.ts` via `npm test`
+- `docs/adr/013-share-v1.md` — frontend-only share decision, no PII / API
 - `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales
 - `src/lib/consent-cache.ts` — localStorage cache for intro skip
 - `docs/consent-memory.md` — IP + localStorage limitations
@@ -243,6 +244,7 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - Add frontend-only Share v1 CTA (Web Share + clipboard + LINE/Facebook/X)
   with 14-locale copy; city/region phrase when a lamp is already lit;
   never put GPS in the share URL or text. Overlay / Earth ≥60% unchanged.
+  ADR `docs/adr/013-share-v1.md` records the frontend-only decision.
 - Shrink home chrome type ÷3, then halve header brand and tagline
   (brand ×0.5; tagline 缩小一倍 → ×0.5). Halve WelcomePanel /
   LightLampButton / LampCounter text **and** button chrome to match.
