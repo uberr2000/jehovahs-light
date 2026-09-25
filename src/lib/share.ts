@@ -159,15 +159,7 @@ export function isAbortError(error: unknown): boolean {
   );
 }
 
-export async function copyToClipboard(payload: string): Promise<boolean> {
-  if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-    try {
-      await navigator.clipboard.writeText(payload);
-      return true;
-    } catch {
-      // Permissions / non-gesture: fall through to execCommand.
-    }
-  }
+function copyViaExecCommand(payload: string): boolean {
   if (typeof document === 'undefined') return false;
   const textarea = document.createElement('textarea');
   textarea.value = payload;
@@ -193,4 +185,20 @@ export async function copyToClipboard(payload: string): Promise<boolean> {
   }
   document.body.removeChild(textarea);
   return ok;
+}
+
+export async function copyToClipboard(payload: string): Promise<boolean> {
+  // execCommand first so we still have the user gesture. Awaiting a
+  // rejected clipboard.writeText() drops transient activation and the
+  // fallback then fails too.
+  if (copyViaExecCommand(payload)) return true;
+  if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(payload);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  return false;
 }
