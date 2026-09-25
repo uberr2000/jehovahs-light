@@ -65,6 +65,15 @@
     "errorGeneric": "无法取得你的位置，请稍后再试。",
     "errorUnsupported": "你的设备不支持定位功能。",
     "loadError": "目前无法加载光芒。",
-    "retry": "再试一次"
+    "retry": "再试一次",
+    "shareButton": "分享这光",
+    "shareTitle": "分享这光",
+    "shareText": "一人一灯，照亮全地。一起来点亮一盏灯。",
+    "shareCopied": "已复制，可粘贴到任何地方分享。",
+    "shareSelect": "请选中后复制：",
+    "shareLocation": "有一盏灯在{place}闪耀。",
+    "shareViaLine": "分享到 LINE",
+    "shareViaFacebook": "分享到 Facebook",
+    "shareViaX": "分享到 X"
   }
 }
