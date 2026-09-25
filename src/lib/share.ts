@@ -145,9 +145,9 @@ export function canUseWebShare(data: ShareData): boolean {
 
 export function prefersNativeShare(): boolean {
   if (typeof window === 'undefined') return false;
-  const coarse = window.matchMedia?.('(pointer: coarse)').matches;
-  const narrow = window.matchMedia?.('(max-width: 1023px)').matches;
-  return Boolean(coarse || narrow);
+  // Desktop (lg+) always copies + social links, even on a touch display.
+  // Web Share is for the compact / mobile overlay only.
+  return Boolean(window.matchMedia?.('(max-width: 1023px)').matches);
 }
 
 export function isAbortError(error: unknown): boolean {
