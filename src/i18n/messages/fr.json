@@ -65,6 +65,14 @@
     "errorGeneric": "Impossible de trouver ta position. Merci de réessayer.",
     "errorUnsupported": "Ton appareil ne prend pas en charge la géolocalisation.",
     "loadError": "Impossible de charger les lumières pour le moment.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "shareButton": "Partagez la lumière",
+    "shareTitle": "Partagez la lumière",
+    "shareText": "Une âme, une lampe, éclairant toute la terre. Allumez une lampe avec nous.",
+    "shareCopied": "Copié — collez-le où vous voulez pour partager.",
+    "shareLocation": "Une lampe brille à {place}.",
+    "shareViaLine": "Partager sur LINE",
+    "shareViaFacebook": "Partager sur Facebook",
+    "shareViaX": "Partager sur X"
   }
 }

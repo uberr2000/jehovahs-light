@@ -65,6 +65,14 @@
     "errorGeneric": "Dein Standort konnte nicht ermittelt werden. Bitte versuche es erneut.",
     "errorUnsupported": "Dein Gerät unterstützt keine Standortdienste.",
     "loadError": "Lichter können gerade nicht geladen werden.",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "shareButton": "Teile das Licht",
+    "shareTitle": "Teile das Licht",
+    "shareText": "Eine Seele, eine Lampe, die die ganze Erde erhellt. Entzünde mit uns eine Lampe.",
+    "shareCopied": "Kopiert — zum Teilen irgendwo einfügen.",
+    "shareLocation": "Eine Lampe leuchtet in {place}.",
+    "shareViaLine": "Auf LINE teilen",
+    "shareViaFacebook": "Auf Facebook teilen",
+    "shareViaX": "Auf X teilen"
   }
 }

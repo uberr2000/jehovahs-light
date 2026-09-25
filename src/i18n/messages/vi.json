@@ -65,6 +65,14 @@
     "errorGeneric": "Không tìm được vị trí của bạn. Vui lòng thử lại.",
     "errorUnsupported": "Thiết bị của bạn không hỗ trợ dịch vụ định vị.",
     "loadError": "Hiện không tải được ánh sáng.",
-    "retry": "Thử lại"
+    "retry": "Thử lại",
+    "shareButton": "Chia sẻ ánh sáng",
+    "shareTitle": "Chia sẻ ánh sáng",
+    "shareText": "Một linh hồn, một ngọn đèn, soi sáng cả đất. Hãy thắp một ngọn đèn cùng chúng tôi.",
+    "shareCopied": "Đã sao chép — dán ở bất kỳ đâu để chia sẻ.",
+    "shareLocation": "Một ngọn đèn đang tỏa sáng tại {place}.",
+    "shareViaLine": "Chia sẻ trên LINE",
+    "shareViaFacebook": "Chia sẻ trên Facebook",
+    "shareViaX": "Chia sẻ trên X"
   }
 }

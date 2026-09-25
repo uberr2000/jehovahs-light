@@ -65,6 +65,14 @@
     "errorGeneric": "We couldn't find your location. Please try again.",
     "errorUnsupported": "Your device doesn't support location services.",
     "loadError": "Unable to load lights right now.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "shareButton": "Share the light",
+    "shareTitle": "Share the light",
+    "shareText": "One soul, one lamp, lighting the whole earth. Light a lamp with us.",
+    "shareCopied": "Copied — paste it anywhere to share.",
+    "shareLocation": "A lamp is shining in {place}.",
+    "shareViaLine": "Share on LINE",
+    "shareViaFacebook": "Share on Facebook",
+    "shareViaX": "Share on X"
   }
 }

@@ -65,6 +65,14 @@
     "errorGeneric": "位置を取得できませんでした。もう一度お試しください。",
     "errorUnsupported": "お使いの端末は位置情報に対応していません。",
     "loadError": "現在、光を読み込めません。",
-    "retry": "再試行"
+    "retry": "再試行",
+    "shareButton": "この光を分かち合う",
+    "shareTitle": "この光を分かち合う",
+    "shareText": "一人一灯、地を照らす。一緒に灯をともしましょう。",
+    "shareCopied": "コピーしました。どこにでも貼って共有できます。",
+    "shareLocation": "{place}で灯が輝いています。",
+    "shareViaLine": "LINEでシェア",
+    "shareViaFacebook": "Facebookでシェア",
+    "shareViaX": "Xでシェア"
   }
 }

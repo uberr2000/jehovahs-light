@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-23 (compact globe init = full-sphere fit)
+_Last updated: 2026-09-25 (Share v1: Web Share + clipboard + social)
 
 ## Project name & stack summary
 
@@ -25,7 +25,7 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   never edit `package.json` start; `pm2 reload 14` is not enough;
   one-time migration if old name `jehovahs-light.ink.net.tw`
 - `.github/workflows/ci.yml` — `pull_request` + `push` to `develop`;
-  Node 22, `npm ci`, `npm run lint`, `npm run build` (dummy `DB_*` /
+  Node 22, `npm ci`, `npm run lint`, `npm test`, `npm run build` (dummy `DB_*` /
   `NEXT_PUBLIC_APP_URL` / `PORT` in the job env); verifies
   `.next/standalone/public/globe/earth-blue-marble.jpg` after postbuild;
   then `npm run db:check` and `npm run db:migrate` twice against ephemeral
@@ -105,6 +105,16 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - Compact globe camera inits with a full-sphere fit (atmosphere +
   margin via `fitCameraDistance`) so the whole Earth is visible; users
   can still zoom in. Desktop framing stays distance 6.
+- Share v1 (frontend-only): “Share the light” CTA on the home globe
+  panel. Payload is site origin + invite copy; if a lamp is already lit,
+  a city/region phrase from existing location data may be appended.
+  Precise GPS / lat-lng / PII never go into the URL or share text.
+  Mobile prefers `navigator.share` (title + text + url) and falls back
+  to clipboard + “copied” toast on cancel/unavailable. Desktop copies
+  the same payload and offers LINE / Facebook / X deep links in a new
+  tab. Strings live in all 14 `home.*` locales. No new API, DB, short
+  links, tracking, or login gate. Overlay chrome / Earth ≥60% /
+  favicon / type fixes from #18–#20 are unchanged.
 - Stats no longer treat a failed `GET /api/locations` as zeros; error + retry.
   Live `/api/locations` 500 is documented in `docs/locations-api.md`
   (likely host MySQL/.env; BigInt JSON serialize is also guarded in code).
@@ -143,7 +153,7 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `docs/schema.sql` — canonical CREATE IF NOT EXISTS
 - `next.config.ts` — `output: 'standalone'`
 - `.env.example` — `PORT` + DB vars
-- `.github/workflows/ci.yml`
+- `.github/workflows/ci.yml` — lint, `npm test`, build, migrate
 - `.github/workflows/deploy-develop.yml`
 - `deploy/with-env.sh`
 - `deploy/ecosystem.config.cjs`
@@ -166,6 +176,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   lit `text-base`/`text-sm`, hint `text-xs`) so tap targets and copy
   stay usable without changing the desktop look. Below `lg` the bottom
   chrome stays a short translucent overlay.
+- `src/components/ShareLightButton.tsx` — Share the light CTA; Web Share
+  on mobile, clipboard toast + LINE/Facebook/X on desktop
+- `src/lib/share.ts` — payload builders, city/region phrase (no GPS),
+  social deep links; `src/lib/share.test.ts` via `npm test`
 - `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales
 - `src/lib/consent-cache.ts` — localStorage cache for intro skip
 - `docs/consent-memory.md` — IP + localStorage limitations
@@ -224,6 +238,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Add frontend-only Share v1 CTA (Web Share + clipboard + LINE/Facebook/X)
+  with 14-locale copy; city/region phrase when a lamp is already lit;
+  never put GPS in the share URL or text. Overlay / Earth ≥60% unchanged.
 - Shrink home chrome type ÷3, then halve header brand and tagline
   (brand ×0.5; tagline 缩小一倍 → ×0.5). Halve WelcomePanel /
   LightLampButton / LampCounter text **and** button chrome to match.
@@ -329,3 +346,7 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   a land-brighter-than-sea contrast boost (no hotlink). Land luminance
   after that lift is `LAND_LUMINANCE_FACTOR` (`0.5` vs v0; set `1` to
   restore). Sea mix is not scaled.
+- Share v1 is client-only. The share URL is `window.location.origin` with
+  query/hash stripped. Location copy is city/country from the existing
+  POST `/api/locations` body or a nearby row already on GET — never
+  lat-lng. No short links, pixels, or new routes.

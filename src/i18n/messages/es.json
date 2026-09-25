@@ -65,6 +65,14 @@
     "errorGeneric": "No pudimos encontrar tu ubicación. Inténtalo de nuevo.",
     "errorUnsupported": "Tu dispositivo no admite servicios de ubicación.",
     "loadError": "No se pueden cargar las luces ahora.",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "shareButton": "Comparte la luz",
+    "shareTitle": "Comparte la luz",
+    "shareText": "Un alma, una lámpara, iluminando toda la tierra. Enciende una lámpara con nosotros.",
+    "shareCopied": "Copiado — pégalo donde quieras para compartir.",
+    "shareLocation": "Una lámpara brilla en {place}.",
+    "shareViaLine": "Compartir en LINE",
+    "shareViaFacebook": "Compartir en Facebook",
+    "shareViaX": "Compartir en X"
   }
 }
