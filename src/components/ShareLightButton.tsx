@@ -71,11 +71,16 @@ export default function ShareLightButton({
     await copyPayload(payload.clipboard);
   };
 
-  const openSocial = (network: 'line' | 'facebook' | 'x') => {
+  const handleSocialClick = (
+    event: { currentTarget: HTMLAnchorElement },
+    network: 'line' | 'facebook' | 'x'
+  ) => {
     const payload = getPayload();
-    if (!assertSafeSharePayload(payload.clipboard)) return;
-    const href = socialShareUrls(payload.text, payload.url)[network];
-    window.open(href, '_blank', 'noopener,noreferrer');
+    if (!assertSafeSharePayload(payload.clipboard) || !payload.url) {
+      event.preventDefault();
+      return;
+    }
+    event.currentTarget.href = socialShareUrls(payload.text, payload.url)[network];
   };
 
   return (
@@ -94,27 +99,30 @@ export default function ShareLightButton({
           data-testid="share-social-links"
           className="hidden items-center gap-1 lg:flex"
         >
-          <SocialButton
+          <SocialLink
+            href="https://social-plugins.line.me/lineit/share"
             label={t('shareViaLine')}
             testId="share-via-line"
-            onClick={() => openSocial('line')}
+            onClick={(event) => handleSocialClick(event, 'line')}
           >
             <LineGlyph />
-          </SocialButton>
-          <SocialButton
+          </SocialLink>
+          <SocialLink
+            href="https://www.facebook.com/sharer/sharer.php"
             label={t('shareViaFacebook')}
             testId="share-via-facebook"
-            onClick={() => openSocial('facebook')}
+            onClick={(event) => handleSocialClick(event, 'facebook')}
           >
             <FacebookGlyph />
-          </SocialButton>
-          <SocialButton
+          </SocialLink>
+          <SocialLink
+            href="https://twitter.com/intent/tweet"
             label={t('shareViaX')}
             testId="share-via-x"
-            onClick={() => openSocial('x')}
+            onClick={(event) => handleSocialClick(event, 'x')}
           >
             <XGlyph />
-          </SocialButton>
+          </SocialLink>
         </div>
       </div>
       {copied ? (
@@ -131,27 +139,31 @@ export default function ShareLightButton({
   );
 }
 
-function SocialButton({
+function SocialLink({
+  href,
   label,
   testId,
   onClick,
   children,
 }: {
+  href: string;
   label: string;
   testId: string;
-  onClick: () => void;
+  onClick: (event: { currentTarget: HTMLAnchorElement }) => void;
   children: ReactNode;
 }) {
   return (
-    <button
-      type="button"
+    <a
+      href={href}
       data-testid={testId}
-      onClick={onClick}
+      target="_blank"
+      rel="noopener noreferrer"
       aria-label={label}
+      onClick={onClick}
       className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-amber-200/20 bg-white/5 text-amber-50 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
     >
       {children}
-    </button>
+    </a>
   );
 }
 
@@ -178,7 +190,7 @@ function ShareGlyph() {
 function LineGlyph() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor">
-      <path d="M12 3C6.9 3 2.8 6.6 2.8 11c0 4 3.5 7.4 8.3 8 .3 0 .8.2.9.5l.6 2c.1.3.5.2.6 0l1.7-2.3c.1-.1.3-.2.5-.2 4.6-.3 8-3.8 8-7.9C23.4 6.6 19.1 3 12 3zm-4.2 9.3H6.2c-.3 0-.5-.2-.5-.5V8.6c0-.3.2-.5.5-.5s.5.2.5.5v3.2h1.6c.3 0 .5.2.5.5s-.2.5-.5.5zm2.3-.5c0 .3-.2.5-.5.5s-.5-.2-.5-.5V8.6c0-.3.2-.5.5-.5s.5.2.5.5zm4.4.5h-2.3c-.3 0-.5-.2-.5-.5V8.6c0-.3.2-.5.5-.5s.5.2.5.5v3.2h1.8c.3 0 .5.2.5.5s-.2.5-.5.5zm3.5 0h-1.6c-.3 0-.5-.2-.5-.5V8.6c0-.3.2-.5.5-.5h1.6c.3 0 .5.2.5.5s-.2.5-.5.5h-1.1v.6h1.1c.3 0 .5.2.5.5s-.2.5-.5.5h-1.1v.6h1.1c.3 0 .5.2.5.5s-.2.5-.5.5z" />
+      <path d="M19.2 4.6H4.8A2.3 2.3 0 0 0 2.5 6.9v8.2c0 1.3 1 2.3 2.3 2.3h.9v2.4c0 .4.5.6.8.4l3.3-2.8h9.4c1.3 0 2.3-1 2.3-2.3V6.9c0-1.3-1-2.3-2.3-2.3z" />
     </svg>
   );
 }

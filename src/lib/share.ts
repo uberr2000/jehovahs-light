@@ -160,27 +160,37 @@ export function isAbortError(error: unknown): boolean {
 }
 
 export async function copyToClipboard(payload: string): Promise<boolean> {
-  try {
-    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+  if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+    try {
       await navigator.clipboard.writeText(payload);
       return true;
+    } catch {
+      // Permissions / non-gesture: fall through to execCommand.
     }
-  } catch {
-    // fall through to execCommand
   }
   if (typeof document === 'undefined') return false;
+  const textarea = document.createElement('textarea');
+  textarea.value = payload;
+  textarea.setAttribute('readonly', '');
+  textarea.setAttribute('aria-hidden', 'true');
+  textarea.style.position = 'fixed';
+  textarea.style.top = '0';
+  textarea.style.left = '0';
+  textarea.style.width = '1px';
+  textarea.style.height = '1px';
+  textarea.style.padding = '0';
+  textarea.style.border = 'none';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  textarea.setSelectionRange(0, payload.length);
+  let ok = false;
   try {
-    const textarea = document.createElement('textarea');
-    textarea.value = payload;
-    textarea.setAttribute('readonly', '');
-    textarea.style.position = 'fixed';
-    textarea.style.left = '-9999px';
-    document.body.appendChild(textarea);
-    textarea.select();
-    const ok = document.execCommand('copy');
-    document.body.removeChild(textarea);
-    return ok;
+    ok = document.execCommand('copy');
   } catch {
-    return false;
+    ok = false;
   }
+  document.body.removeChild(textarea);
+  return ok;
 }

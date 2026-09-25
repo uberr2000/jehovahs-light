@@ -47,6 +47,7 @@ describe('share payload', () => {
     assert.match(clipboard, /Taipei, Taiwan/);
     assert.match(clipboard, /https:\/\/jehovahs-light\.ink\.net\.tw\//);
     assert.equal(assertSafeSharePayload(clipboard), true);
+    assert.equal(assertSafeSharePayload('text\nhttp://127.0.0.1:3000/'), true);
     assert.equal(assertSafeSharePayload('Meet at 25.0330, 121.5654'), false);
   });
 
