@@ -112,7 +112,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   Mobile prefers `navigator.share` (title + text + url) and falls back
   to clipboard + “copied” toast on cancel/unavailable. Desktop copies
   the same payload and offers LINE / Facebook / X deep links in a new
-  tab. Strings live in all 14 `home.*` locales. No new API, DB, short
+  tab. If the Clipboard API is blocked, sync `execCommand` runs first;
+  if copy still fails, a compact select-to-copy field appears.
+  Strings live in all 14 `home.*` locales. No new API, DB, short
   links, tracking, or login gate. Overlay chrome / Earth ≥60% /
   favicon / type fixes from #18–#20 are unchanged.
 - Stats no longer treat a failed `GET /api/locations` as zeros; error + retry.

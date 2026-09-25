@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type MouseEvent, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   assertSafeSharePayload,
@@ -24,6 +24,8 @@ export default function ShareLightButton({
 }) {
   const t = useTranslations('home');
   const [copied, setCopied] = useState(false);
+  const [manualText, setManualText] = useState<string | null>(null);
+  const [shareState, setShareState] = useState('idle');
 
   const placeLabel = formatPlaceLabel(place);
   const locationLine =
@@ -38,20 +40,42 @@ export default function ShareLightButton({
   };
 
   useEffect(() => {
-    if (!copied) return;
-    const timer = window.setTimeout(() => setCopied(false), 2400);
+    if (!copied && !manualText) return;
+    const timer = window.setTimeout(() => {
+      setCopied(false);
+      setManualText(null);
+    }, 4000);
     return () => window.clearTimeout(timer);
-  }, [copied]);
+  }, [copied, manualText]);
 
   const copyPayload = async (clipboard: string) => {
-    if (!assertSafeSharePayload(clipboard)) return;
+    if (!assertSafeSharePayload(clipboard)) {
+      setShareState('unsafe');
+      return;
+    }
     const ok = await copyToClipboard(clipboard);
-    if (ok) setCopied(true);
+    if (ok) {
+      setManualText(null);
+      setCopied(true);
+      setShareState('copied');
+      return;
+    }
+    setCopied(false);
+    setManualText(clipboard);
+    setShareState('manual');
   };
 
   const handleShare = async () => {
+    setShareState('clicked');
     const payload = getPayload();
-    if (!assertSafeSharePayload(payload.clipboard)) return;
+    if (!payload.url) {
+      setShareState('nourl');
+      return;
+    }
+    if (!assertSafeSharePayload(payload.clipboard)) {
+      setShareState('unsafe');
+      return;
+    }
 
     const shareData: ShareData = {
       title: payload.title,
@@ -62,6 +86,7 @@ export default function ShareLightButton({
     if (prefersNativeShare() && canUseWebShare(shareData)) {
       try {
         await navigator.share(shareData);
+        setShareState('shared');
         return;
       } catch {
         // cancel or unavailable → clipboard
@@ -72,7 +97,7 @@ export default function ShareLightButton({
   };
 
   const handleSocialClick = (
-    event: { currentTarget: HTMLAnchorElement },
+    event: MouseEvent<HTMLAnchorElement>,
     network: 'line' | 'facebook' | 'x'
   ) => {
     const payload = getPayload();
@@ -84,7 +109,7 @@ export default function ShareLightButton({
   };
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1" data-testid="share-root" data-share-state={shareState}>
       <div className="flex flex-wrap items-center gap-1.5">
         <button
           type="button"
@@ -135,6 +160,20 @@ export default function ShareLightButton({
           {t('shareCopied')}
         </p>
       ) : null}
+      {manualText ? (
+        <div className="flex flex-col gap-1" data-testid="share-manual">
+          <p className="px-1 text-center text-[0.6875rem] leading-none text-amber-100/70 lg:text-start lg:text-[0.625rem]">
+            {t('shareSelect')}
+          </p>
+          <textarea
+            readOnly
+            data-testid="share-manual-payload"
+            value={manualText}
+            onFocus={(event) => event.currentTarget.select()}
+            className="max-h-16 w-full resize-none rounded-md border border-amber-200/20 bg-black/40 px-2 py-1 text-[0.625rem] leading-snug text-amber-50"
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -149,7 +188,7 @@ function SocialLink({
   href: string;
   label: string;
   testId: string;
-  onClick: (event: { currentTarget: HTMLAnchorElement }) => void;
+  onClick: (event: MouseEvent<HTMLAnchorElement>) => void;
   children: ReactNode;
 }) {
   return (

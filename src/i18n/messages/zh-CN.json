@@ -70,6 +70,7 @@
     "shareTitle": "分享这光",
     "shareText": "一人一灯，照亮全地。一起来点亮一盏灯。",
     "shareCopied": "已复制，可粘贴到任何地方分享。",
+    "shareSelect": "请选中后复制：",
     "shareLocation": "有一盏灯在{place}闪耀。",
     "shareViaLine": "分享到 LINE",
     "shareViaFacebook": "分享到 Facebook",
