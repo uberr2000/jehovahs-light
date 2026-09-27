@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
+import FitSingleLine from '@/components/FitSingleLine';
 import InstallAppButton from '@/components/InstallAppButton';
 import IntroScreen, { useIntroEntered } from '@/components/IntroScreen';
 import LanguageSelector from '@/components/LanguageSelector';
+import { HOME_BRAND_PX } from '@/lib/home-chrome';
 import WelcomePanel from '@/components/WelcomePanel';
 import { type Locale } from '@/i18n/config';
 import { isLocale, localeCookieString } from '@/i18n/resolve-locale';
@@ -227,14 +229,20 @@ export default function Home() {
       )}
       <main
         inert={showIntro}
-        className="relative h-[100dvh] w-full overflow-hidden bg-[#04060e] lg:flex lg:flex-col"
+        className="home-shell relative h-[100dvh] w-full overflow-hidden bg-[#04060e] lg:flex lg:flex-col"
       >
-        <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-1.5 bg-gradient-to-b from-[#04060e]/50 to-transparent px-2 pt-2 pb-1 sm:gap-2 sm:px-3 sm:pt-3 lg:pointer-events-auto lg:static lg:shrink-0 lg:gap-4 lg:bg-none lg:p-6">
-          <div className="flex min-w-0 flex-col gap-0.5">
-            <span className="text-[1rem] font-semibold leading-tight tracking-wide text-amber-50 sm:text-[1.125rem]">
+        <header className="home-header pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-1.5 bg-gradient-to-b from-[#04060e]/50 to-transparent px-2 pt-2 pb-1 sm:gap-2 sm:px-3 sm:pt-3 lg:pointer-events-auto lg:static lg:shrink-0 lg:gap-4 lg:bg-none lg:p-6">
+          <div className="home-header-titles flex min-w-0 flex-1 flex-col gap-0.5">
+            <FitSingleLine
+              testId="home-brand"
+              className="home-brand font-semibold leading-tight tracking-wide text-amber-50"
+              maxPx={HOME_BRAND_PX}
+            >
               {t('brand')}
+            </FitSingleLine>
+            <span data-testid="home-tagline" className="home-tagline leading-snug text-amber-100/55">
+              {t('tagline')}
             </span>
-            <span className="text-[0.75rem] leading-snug text-amber-100/55 sm:text-[0.875rem]">{t('tagline')}</span>
           </div>
           <div className="pointer-events-auto flex shrink-0 items-center gap-1.5">
             <InstallAppButton />
@@ -242,17 +250,17 @@ export default function Home() {
           </div>
         </header>
 
-        <div className="absolute inset-0 lg:relative lg:flex lg:min-h-0 lg:flex-1">
+        <div className="home-stage absolute inset-0 lg:relative lg:flex lg:min-h-0 lg:flex-1">
           <div
             data-testid="home-globe"
-            className="absolute inset-0 lg:relative lg:min-h-0 lg:flex-1"
+            className="home-globe absolute inset-0 lg:relative lg:min-h-0 lg:flex-1"
           >
             <Globe3D lightPoints={locations} userLocation={userLocation} />
           </div>
 
           <div
             data-testid="home-bottom-chrome"
-            className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/40 via-[#04060e]/12 to-transparent px-1.5 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-3 lg:pointer-events-auto lg:static lg:w-[26rem] lg:min-h-0 lg:shrink-0 lg:items-center lg:overflow-y-auto lg:bg-none lg:p-8"
+            className="home-bottom pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/40 via-[#04060e]/12 to-transparent px-1.5 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-3 lg:pointer-events-auto lg:static lg:w-[36rem] lg:min-h-0 lg:shrink-0 lg:items-start lg:bg-none lg:px-6 lg:py-4"
           >
             <WelcomePanel
               count={stats.total}

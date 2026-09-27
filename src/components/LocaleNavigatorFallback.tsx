@@ -17,7 +17,7 @@ function readLocaleCookie(): string | undefined {
 }
 
 /**
- * Cookie → Accept-Language are applied on the server.
+ * Cookie → Accept-Language are applied on the server (default zh-TW).
  * navigator.language only runs when neither resolved a locale (html
  * data-locale-source="default"), then persists via cookie + reload so SSR matches.
  */

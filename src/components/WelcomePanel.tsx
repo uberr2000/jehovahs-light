@@ -28,16 +28,16 @@ export default function WelcomePanel({
   const t = useTranslations("home");
 
   const hint = (
-    <p className="text-[0.875rem] leading-none text-amber-100/50 sm:text-[1rem]">
+    <p data-testid="home-hint-desktop" className="home-hint home-hint-desktop leading-none text-amber-100/50">
       {t("rotateHint")}
     </p>
   );
 
   return (
-    <div className="flex w-full max-w-lg flex-col gap-1.5 lg:max-w-md lg:gap-0">
+    <div className="flex w-full max-w-lg flex-col gap-1.5 lg:max-w-none lg:gap-0">
       <div className="pointer-events-auto w-full rounded-none border-0 bg-transparent px-1 py-0 shadow-none backdrop-blur-none lg:rounded-[0.875rem] lg:border lg:border-amber-200/12 lg:bg-neutral-950/45 lg:px-4 lg:py-4 lg:shadow-[0_4px_30px_-6px_rgba(0,0,0,0.8)] lg:backdrop-blur-xl">
         {hasLit ? (
-          <div className="flex flex-col gap-2 lg:gap-3">
+          <div className="flex flex-col gap-2 lg:gap-2">
             <div className="flex flex-col gap-1 lg:gap-1.5">
               <h2 className="text-balance text-base font-semibold leading-snug tracking-tight text-amber-50 lg:text-[1rem] lg:leading-none">
                 {t("litTitle")}
@@ -61,7 +61,7 @@ export default function WelcomePanel({
           </div>
         )}
       </div>
-      <p className="px-1 text-center text-xs leading-snug text-amber-100/50 lg:hidden">
+      <p data-testid="home-hint" className="home-hint px-1 text-center leading-snug text-amber-100/50 lg:hidden">
         {t("rotateHint")}
       </p>
     </div>
