@@ -56,6 +56,14 @@ export default function ShareLightButton({
   const social = socialSafe
     ? socialShareUrls(text, shareUrl, title)
     : { line: '#', facebook: '#', x: '#', whatsapp: '#', email: '#' };
+  // Neutral until mount — Cloudflare Email Obfuscation rewrites any SSR `mailto:`.
+  const [emailHref, setEmailHref] = useState('#');
+
+  useEffect(() => {
+    // Cloudflare must not see `mailto:` in the first HTML. Assign after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- post-mount email href
+    setEmailHref(socialSafe ? social.email : '#');
+  }, [social.email, socialSafe]);
 
   useEffect(() => {
     if (!copied && !manualText) return;
@@ -115,7 +123,8 @@ export default function ShareLightButton({
   };
 
   const handleSocialClick = (event: MouseEvent<HTMLAnchorElement>) => {
-    if (!socialSafe) event.preventDefault();
+    const href = event.currentTarget.getAttribute('href') ?? '';
+    if (!socialSafe || href === '#' || href === '') event.preventDefault();
   };
 
   return (
@@ -167,7 +176,7 @@ export default function ShareLightButton({
             <WhatsAppGlyph />
           </SocialLink>
           <SocialLink
-            href={social.email}
+            href={emailHref}
             label={t('shareViaEmail')}
             testId="share-via-email"
             newTab={false}

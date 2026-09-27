@@ -52,8 +52,9 @@ See `.env.example`. **PORT** must be set in `.env` (Next.js / standalone
 `server.js` read it). Never add `--port` to `package.json` `start`.
 `DB_HOST` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` are used by Drizzle
 (`drizzle.config.ts` and `src/lib/db`; pool host defaults to `localhost`).
-`NEXT_PUBLIC_APP_URL` is the public site root used for Share v1 social
-hrefs on SSR (query/hash stripped).
+`NEXT_PUBLIC_APP_URL` is the public site root used for Share v1 LINE /
+Facebook / X / WhatsApp hrefs on SSR (query/hash stripped). Email
+`mailto:` is set after mount (Cloudflare Email Obfuscation).
 Schema SQL: [docs/schema.sql](docs/schema.sql). Server deploy (including
 `db:migrate` before PM2): [docs/deploy.md](docs/deploy.md).
 Develop CI/CD: [docs/ci-cd.md](docs/ci-cd.md).

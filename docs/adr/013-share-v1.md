@@ -17,8 +17,9 @@ Share v1 is **frontend-only**:
 
 - Share the **live site URL** (`NEXT_PUBLIC_APP_URL` when set, otherwise
   `window.location.origin`, query/hash stripped) plus a short **i18n invite**
-  (`home.shareTitle` / `home.shareText`). Social `href`s are the full encoded
-  URLs at render so middle-click / open-in-new-tab / copy-link-address work.
+  (`home.shareTitle` / `home.shareText`). LINE / Facebook / X / WhatsApp
+  `href`s are the full encoded URLs at render. The email `mailto:` is assigned
+  after mount so Cloudflare Email Obfuscation cannot rewrite SSR HTML.
 - If the visitor has already lit a lamp, optionally append a **city/region
   phrase** from existing location data (POST body city/country, or a nearby
   GET row). Never put coordinates in the URL or the share text.

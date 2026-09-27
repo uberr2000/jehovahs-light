@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (Share SSR hrefs; no ci.yml overlap)
+_Last updated: 2026-09-27 (Share SSR hrefs / email after mount; no ci.yml overlap)
 
 ## Project name & stack summary
 
@@ -120,10 +120,12 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   Mobile prefers `navigator.share` (title + text + url) and falls back
   to clipboard + “copied” toast on cancel/unavailable. Desktop copies
   the same payload and offers LINE / Facebook / X / WhatsApp deep links
-  in a new tab plus an email (`mailto:`, same tab) link. Those social
-  `href`s are the full encoded URLs at first render (prefer
-  `NEXT_PUBLIC_APP_URL`, else a post-mount `window` fallback) so
-  middle-click / open-in-new-tab / copy-link-address work. If the Clipboard API is blocked, sync `execCommand` runs first;
+  in a new tab plus an email (`mailto:`, same tab) link. LINE / Facebook /
+  X / WhatsApp `href`s are the full encoded URLs at first render (prefer
+  `NEXT_PUBLIC_APP_URL`). Email is **not** emitted as `mailto:` in SSR
+  HTML (Cloudflare Email Obfuscation would rewrite it to
+  `/cdn-cgi/l/email-protection#…`); the full `mailto:?subject=&body=` is
+  set after mount. If the Clipboard API is blocked, sync `execCommand` runs first;
   if copy still fails, a compact select-to-copy field appears.
   Strings live in all 14 `home.*` locales. No new API, DB, short
   links, tracking, or login gate. Overlay chrome / Earth ≥60% /
@@ -194,7 +196,7 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   chrome stays a short translucent overlay.
 - `src/components/ShareLightButton.tsx` — Share the light CTA; Web Share
   on mobile, clipboard toast + LINE/Facebook/X/WhatsApp/email on desktop;
-  social `href`s precomputed at render (`NEXT_PUBLIC_APP_URL` / post-mount)
+  LINE/FB/X/WhatsApp `href`s at SSR; email `mailto:` after mount
 - `src/lib/share.ts` — payload builders, city/region phrase (no GPS),
   social deep links; `src/lib/share.test.ts` +
   `src/components/ShareLightButton.test.ts` via `npm test`
@@ -257,11 +259,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
-- Pre-compute LINE / Facebook / X / WhatsApp / email share `href`s at
-  render from `NEXT_PUBLIC_APP_URL` so SSR emits the full encoded URL
-  (not `#`). Post-mount `window` fallback if the env is missing. Tests
-  assert the actually rendered href. This PR does not change `ci.yml`.
-  Production / main untouched.
+- Pre-compute LINE / Facebook / X / WhatsApp share `href`s at render
+  from `NEXT_PUBLIC_APP_URL`. Email `mailto:` is assigned after mount
+  so Cloudflare Email Obfuscation cannot rewrite SSR HTML. Tests assert
+  SSR hrefs for the four social links and all five after mount.
+  This PR does not change `ci.yml`. Production / main untouched.
 - Guard develop deploy on host `NEXT_PUBLIC_APP_URL` (https host, reject
   placeholders/local) before checkout/`npm ci`/build; fixture tests;
   rule documented in `docs/deploy.md`.
@@ -404,5 +406,6 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   (SSR + client) and falls back to `window.location.origin` after mount,
   with query/hash stripped. Location copy is city/country from the
   existing POST `/api/locations` body or a nearby row already on GET —
-  never lat-lng. Social `href`s are the full encoded deep links at
-  render (not filled on click). No short links, pixels, or new routes.
+  never lat-lng. LINE / Facebook / X / WhatsApp `href`s are the full
+  encoded deep links at render. Email `mailto:` is client-only after
+  mount (Cloudflare). No short links, pixels, or new routes.
