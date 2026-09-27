@@ -3,9 +3,15 @@
  * chunk is stale / missing arbitrary utilities. Inlined into the HTML
  * document (not only `/_next/static/chunks/*.css`).
  *
- * Type is px (not rem) so a tiny root font-size cannot keep the title at
- * the pre-#19 2rem / 32px computed size. Compact layout is viewport-sized
- * so the WebGL canvas cannot collapse to the 300×150 default.
+ * Type is 3× the current develop computed sizes (16px root), as px so a
+ * tiny rem root cannot keep the pre-#19 2rem / 32px title. Compact
+ * layout is viewport-sized so the WebGL canvas cannot collapse to the
+ * 300×150 default.
+ *
+ * Mobile (390×844): brand ≤48 (single line), tagline 36, CTA 54,
+ * count 96, label 36, hint 36.
+ * Desktop (lg / 1440×900): brand 54, tagline 42, CTA 54, count 144,
+ * label 42, hint 48.
  */
 export const HOME_CRITICAL_CSS = `
 html { font-size: 16px; }
@@ -25,6 +31,12 @@ html, body { height: 100%; }
   right: 0 !important;
   top: 0 !important;
   z-index: 20;
+  max-height: 8.5rem;
+  overflow: hidden;
+}
+.home-header-titles {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 .home-stage {
   position: absolute !important;
@@ -49,21 +61,37 @@ html, body { height: 100%; }
   right: 0 !important;
   bottom: 0 !important;
   z-index: 10;
+  max-height: 55%;
+  overflow: hidden;
 }
-.home-brand { font-size: 96px !important; line-height: 1 !important; }
-.home-tagline { font-size: 72px !important; line-height: 1 !important; }
-.home-cta { font-size: 84px !important; line-height: 1 !important; }
-.home-count { font-size: 132px !important; line-height: 1 !important; }
-.home-count-label { font-size: 42px !important; line-height: 1 !important; }
-.home-hint { font-size: 48px !important; line-height: 1 !important; }
-.home-hint-desktop { font-size: 84px !important; }
-.home-lit-title { font-size: 60px !important; line-height: 1 !important; }
-.home-lit-message { font-size: 42px !important; line-height: 1 !important; }
-.home-brand, .home-tagline, .home-cta, .home-count, .home-count-label, .home-hint, .home-lit-title, .home-lit-message {
-  overflow-wrap: anywhere;
-  word-break: break-word;
+.home-brand {
+  display: block;
+  font-size: 48px !important;
+  line-height: 1.25 !important;
+  white-space: nowrap !important;
   max-width: 100%;
+  overflow: hidden;
 }
+.home-tagline {
+  font-size: 36px !important;
+  line-height: 1.3 !important;
+}
+.home-cta {
+  font-size: 54px !important;
+  line-height: 1.15 !important;
+  min-height: 4.75rem !important;
+  overflow: visible !important;
+  white-space: normal;
+}
+.home-count { font-size: 96px !important; line-height: 1 !important; }
+.home-count-label { font-size: 36px !important; line-height: 1.1 !important; }
+.home-hint {
+  font-size: 36px !important;
+  line-height: 1.15 !important;
+  max-height: 4.6rem;
+  overflow: hidden;
+}
+.home-hint-desktop { font-size: 36px !important; }
 .home-share, .home-share button {
   font-size: 14px !important;
   line-height: 1.2 !important;
@@ -74,16 +102,14 @@ html, body { height: 100%; }
   font-size: 11px !important;
   line-height: 1.2 !important;
 }
-@media (min-width: 640px) {
-  .home-brand { font-size: 108px !important; }
-  .home-tagline { font-size: 84px !important; }
-  .home-hint-desktop { font-size: 96px !important; }
-}
 @media (min-width: 1024px) {
   .home-shell { display: flex !important; flex-direction: column !important; }
   .home-header {
     position: static !important;
     flex-shrink: 0 !important;
+    max-height: 7.5rem;
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
   }
   .home-stage {
     position: relative !important;
@@ -104,12 +130,16 @@ html, body { height: 100%; }
     right: auto !important;
     bottom: auto !important;
     width: 26rem !important;
+    max-height: 100%;
     flex-shrink: 0 !important;
+    overflow-y: auto !important;
   }
-  .home-cta { font-size: 108px !important; }
-  .home-count { font-size: 288px !important; }
-  .home-count-label { font-size: 84px !important; }
-  .home-lit-title { font-size: 90px !important; }
-  .home-lit-message { font-size: 54px !important; }
+  .home-brand { font-size: 54px !important; }
+  .home-tagline { font-size: 42px !important; }
+  .home-cta { font-size: 54px !important; min-height: 4.75rem !important; }
+  .home-count { font-size: 144px !important; }
+  .home-count-label { font-size: 42px !important; }
+  .home-hint,
+  .home-hint-desktop { font-size: 48px !important; }
 }
 `;

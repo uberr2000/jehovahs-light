@@ -4,8 +4,10 @@ export const EARTH_RADIUS = 2;
 export const CAMERA_FOV = 45;
 export const ATMOSPHERE_RADIUS = EARTH_RADIUS * 1.12;
 export const FIT_MARGIN = 1.22;
-export const COMPACT_EARTH_HEIGHT_FILL = 0.72;
+/** QA: rendered Earth diameter on 390×844 must be 60–65% of viewport height. */
+export const COMPACT_EARTH_HEIGHT_FILL = 0.62;
 export const MIN_EARTH_HEIGHT_FILL = 0.6;
+export const MAX_EARTH_HEIGHT_FILL = 0.65;
 
 /** Distance so a sphere of `radius` fits in the canvas with margin (portrait uses the narrower FOV). */
 export function fitCameraDistance(

@@ -97,7 +97,8 @@ export default function LightLampButton({
         type="button"
         onClick={handleClick}
         disabled={busy}
-        className="home-cta group relative inline-flex min-h-11 w-full flex-wrap items-center justify-center gap-2 overflow-hidden rounded-full bg-gradient-to-b from-amber-300 to-amber-500 px-4 py-2.5 text-center font-semibold leading-none whitespace-normal text-neutral-900 shadow-[0_0_36px_-4px_rgba(245,180,90,0.75)] transition-all hover:shadow-[0_0_48px_-2px_rgba(245,180,90,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-80 lg:min-h-7 lg:gap-1.5 lg:px-4 lg:py-2 lg:shadow-[0_0_18px_-2px_rgba(245,180,90,0.75)] lg:hover:shadow-[0_0_24px_-1px_rgba(245,180,90,0.95)]"
+        data-testid="home-cta"
+        className="home-cta group relative inline-flex min-h-11 w-full flex-wrap items-center justify-center gap-2 rounded-full bg-gradient-to-b from-amber-300 to-amber-500 px-4 py-2.5 text-center font-semibold leading-none whitespace-normal text-neutral-900 shadow-[0_0_36px_-4px_rgba(245,180,90,0.75)] transition-all hover:shadow-[0_0_48px_-2px_rgba(245,180,90,0.95)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950 disabled:cursor-not-allowed disabled:opacity-80 lg:min-h-7 lg:gap-1.5 lg:px-4 lg:py-2 lg:shadow-[0_0_18px_-2px_rgba(245,180,90,0.75)] lg:hover:shadow-[0_0_24px_-1px_rgba(245,180,90,0.95)]"
       >
         <LampGlyph busy={busy} />
         <span>

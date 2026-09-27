@@ -43,3 +43,4 @@ database/schema.sql
 
 # Temp files
 /tmp/
+.tmp/

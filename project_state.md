@@ -77,8 +77,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `GET /api/locations` `userConsent` (IP). No new consent endpoint.
 - Mobile **page** zoom locked (`viewport` initial-scale=1, maximum-scale=1,
   user-scalable=no). Globe pinch/scroll zoom is on (`enableZoom`, canvas
-  `touch-action: none`); compact camera frames the Earth disk at ~72% of
-  canvas height (camera `z` / vertical FOV, not width-limited fit), then
+  `touch-action: none`); compact camera frames the Earth disk at 60–65%
+  of viewport height on 390×844 (camera `z` / vertical FOV), then
   the user can zoom. Hint is “Drag or zoom…”.
   Layout is column on mobile (globe above panel) and row on desktop.
 - Home chrome matches v10 type scale: larger header title/tagline,
@@ -113,14 +113,15 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   the live 390×844 type/Earth follow-up.
 - Live QA after #18/#19: HTML had ×3 `text-[6rem]` but computed title
   stayed ~32px (pre-#19 `2rem`), and the Earth disk stayed ~80px. Chrome
-  type is now document-inlined **px** classes (`home-brand` 96px, etc.)
-  so a stale hashed Tailwind chunk or a tiny rem root cannot keep 32px.
+  type is now document-inlined **px** classes (`home-brand` ≤48px on
+  mobile = 3× develop’s 16px, not the old 96px) so a stale hashed
+  Tailwind chunk or a tiny rem root cannot keep 32px.
   The compact WebGL shell is pixel-locked to the visual viewport so R3F
   cannot sit at the default 300×150 box (~80px disk). Overlay chrome,
   APIs, consent, land, stars, zoom, and favicons are unchanged.
 - Compact globe camera no longer width-fits atmosphere + margin (that
   left a ~34% / tinier disk on 390×844). Default `position.z` uses
-  vertical FOV so the Earth disk is ~72% of canvas height (≥60% gate).
+  vertical FOV so the Earth disk is 60–65% of viewport height on 390×844.
   Zoom-out still reaches the full-sphere fit; desktop stays at distance 6.
 - Share v1 (frontend-only): “Share the light” CTA on the home globe
   panel. Payload is site origin + invite copy; if a lamp is already lit,
@@ -232,10 +233,15 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `public/icon-SOURCE.txt` — icon artwork provenance
 - `src/app/layout.tsx` — `metadata.icons`, viewport lock, html lang/dir,
   locale source, inlined `HOME_CRITICAL_CSS` (`<style href="home-critical">`)
-- `src/app/page.tsx` — header brand/tagline **3×** type via `home-brand`
-  / `home-tagline` (96px / 72px, not rem utilities); `main` is `100dvh`
-  with the globe `absolute inset-0` below `lg`; header + short bottom
-  bar overlay; `lg` stays header + row sidebar in-flow with the glass card
+- `src/app/page.tsx` — header brand/tagline **3× current develop** via
+  `home-brand` / `home-tagline` (mobile ≤48 / 36, desktop 54 / 42);
+  `main` is `100dvh` with the globe `absolute inset-0` below `lg`;
+  header + short bottom bar overlay; `lg` stays header + row sidebar
+- `src/components/FitSingleLine.tsx` — shrink brand to one line
+- `scripts/measure-home-chrome.mjs` — Playwright render gates (390×844 +
+  1440×900) against the standalone build
+- `docs/home-framing.md` — QA acceptance: Earth 60–65% VH, 3× type,
+  no overlap, CI render measure
 - `src/app/` — pages and API routes
 - `src/i18n/config.ts` — 14 locales + native names
 - `src/i18n/resolve-locale.ts` — cookie / Accept-Language / navigator match
@@ -476,17 +482,16 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   column names stay `lit_locations` / `gps_consent` with the original
   snake_case columns so existing host tables are reused. Migrations are
   `CREATE TABLE IF NOT EXISTS`.
-- Top/bottom copy (header title/tagline, CTA, lamp count label, hint,
-  lit title/message) is sized **3× current develop** on mobile and
-  desktop, as **px** in document-inlined CSS (`home-brand` 96px = 3×
-  the pre-#19 `2rem` / 32px). Tailwind `text-[6rem]` alone was not
-  enough on live (computed stayed ~32px). Below `lg`, chrome overlays a
-  full-viewport canvas whose drawing box is locked to visual-viewport
-  pixels so R3F cannot keep a 300×150 default (~80px disk). Compact
-  camera still frames the Earth disk at ~72% of that canvas height
-  (vertical FOV / `position.z`, not CSS scale). Desktop chrome stays an
-  in-flow glass card with the existing distance-6 framing. Share v1
-  stays a compact overlay control and does not take flex height.
+- Top/bottom copy (header title/tagline, CTA, lamp count label, hint)
+  is sized **3× current develop computed sizes** (±10%) as document-
+  inlined px (`home-brand` ≤48 mobile / 54 desktop = 3× 16 / 18).
+  Brand stays one line (may shrink). Tailwind `text-[6rem]` alone was
+  not enough on live. Below `lg`, chrome overlays a full-viewport
+  canvas locked to visual-viewport pixels. Compact camera frames the
+  Earth disk at 60–65% of viewport height. Desktop chrome stays an
+  in-flow glass card with distance-6 framing; header/panel heights are
+  capped so the globe does not shrink. Share v1 stays compact. CI
+  Playwright (`npm run test:chrome`) measures both viewports.
 - Home chrome follows the v0 dark full-bleed + glass panel. Lighting a
   lamp still uses existing locations/consent APIs (not the zip’s
   `/api/lamps` or Postgres). v0 `zh-Hant` strings map to `zh-TW`; all 14

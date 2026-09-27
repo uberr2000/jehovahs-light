@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
+import FitSingleLine from '@/components/FitSingleLine';
 import InstallAppButton from '@/components/InstallAppButton';
 import IntroScreen, { useIntroEntered } from '@/components/IntroScreen';
 import LanguageSelector from '@/components/LanguageSelector';
@@ -231,10 +232,17 @@ export default function Home() {
       >
         <header className="home-header pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-1.5 bg-gradient-to-b from-[#04060e]/50 to-transparent px-2 pt-2 pb-1 sm:gap-2 sm:px-3 sm:pt-3 lg:pointer-events-auto lg:static lg:shrink-0 lg:gap-4 lg:bg-none lg:p-6">
           <div className="home-header-titles flex min-w-0 flex-1 flex-col gap-0.5">
-            <span className="home-brand font-semibold leading-tight tracking-wide text-amber-50">
+            <FitSingleLine
+              testId="home-brand"
+              className="home-brand font-semibold leading-tight tracking-wide text-amber-50"
+              maxPx={48}
+              maxPxLg={54}
+            >
               {t('brand')}
+            </FitSingleLine>
+            <span data-testid="home-tagline" className="home-tagline leading-snug text-amber-100/55">
+              {t('tagline')}
             </span>
-            <span className="home-tagline leading-snug text-amber-100/55">{t('tagline')}</span>
           </div>
           <div className="pointer-events-auto flex shrink-0 items-center gap-1.5">
             <InstallAppButton />

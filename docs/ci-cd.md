@@ -23,10 +23,12 @@ take effect. The default branch is unchanged; Production is untouched.
 | Install | `npm ci` |
 | Lint | `npm run lint` (`eslint` + `eslint-config-next` 16.2.4).
   `deploy/**` is ignored (PM2 CommonJS). |
-| Test | `npm test` (`node --experimental-strip-types --test src/lib/share.test.ts`) |
+| Test | `npm test` (`tsx --test` on share helpers + ShareLightButton) |
 | Deploy guard fixtures | `bash deploy/check-app-url.test.sh` |
 | Build | `npm run build` (`postbuild` copies `public` + `.next/static` into standalone) |
 | Verify | `test -f .next/standalone/public/globe/earth-blue-marble.jpg` |
+| Render measure | `npx playwright install --with-deps chromium` then
+  `npm run test:chrome` (390×844 + 1440×900 Earth / type / overlap) |
 | Drizzle check | `npm run db:check` (`drizzle-kit check`, no live DB) |
 | Migrate | `npm run db:migrate` against an ephemeral MySQL 8 service
   (`DB_HOST=127.0.0.1`). Run twice to confirm `CREATE TABLE IF NOT EXISTS`

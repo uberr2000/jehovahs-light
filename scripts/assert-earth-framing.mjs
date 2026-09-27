@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 /**
- * Compact Earth disk must stay ≥ 60% of canvas / viewport height at the
- * default camera distance (vertical FOV height-fill, not width-fit).
+ * Arithmetic check that compact camera fill is in the QA 60–65% VH band.
+ * CI also runs the Playwright render measurement (`npm run test:chrome`).
  */
 const EARTH_RADIUS = 2;
 const CAMERA_FOV = 45;
-const FILL = 0.72;
+const FILL = 0.62;
 const MIN_FILL = 0.6;
+const MAX_FILL = 0.65;
 
 function fillHeightCameraDistance(radius, fovDeg, fill) {
   const vFov = (fovDeg * Math.PI) / 180;
@@ -31,12 +32,12 @@ const widthFitZ = fitCameraDistance(EARTH_RADIUS * 1.12, CAMERA_FOV, 390 / 844);
 const widthFitFill = earthDiskHeightFill(widthFitZ, CAMERA_FOV);
 const pxOn844 = fill * 844;
 
-if (fill < MIN_FILL) {
-  console.error(`earth fill ${fill} < ${MIN_FILL} at z=${z}`);
+if (fill < MIN_FILL || fill > MAX_FILL) {
+  console.error(`earth fill ${fill} outside ${MIN_FILL}–${MAX_FILL} at z=${z}`);
   process.exit(1);
 }
-if (pxOn844 < 844 * MIN_FILL) {
-  console.error(`earth px ${pxOn844} < 60% of 844`);
+if (pxOn844 < 844 * MIN_FILL || pxOn844 > 844 * MAX_FILL) {
+  console.error(`earth px ${pxOn844} outside 60–65% of 844`);
   process.exit(1);
 }
 if (widthFitFill >= MIN_FILL) {
