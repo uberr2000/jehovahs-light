@@ -76,6 +76,8 @@
     "shareViaFacebook": "Поделиться в Facebook",
     "shareViaX": "Поделиться в X",
     "shareViaWhatsApp": "Поделиться в WhatsApp",
-    "shareViaEmail": "Поделиться по эл. почте"
+    "shareViaEmail": "Поделиться по эл. почте",
+    "installApp": "Установить приложение",
+    "installIosHint": "Нажмите «Поделиться», затем «На экран „Домой“»."
   }
 }

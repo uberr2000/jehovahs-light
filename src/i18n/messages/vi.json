@@ -76,6 +76,8 @@
     "shareViaFacebook": "Chia sẻ trên Facebook",
     "shareViaX": "Chia sẻ trên X",
     "shareViaWhatsApp": "Chia sẻ trên WhatsApp",
-    "shareViaEmail": "Chia sẻ qua email"
+    "shareViaEmail": "Chia sẻ qua email",
+    "installApp": "Cài đặt ứng dụng",
+    "installIosHint": "Nhấn nút Chia sẻ, rồi chọn “Thêm vào MH chính”."
   }
 }

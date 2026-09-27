@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
+import InstallAppButton from '@/components/InstallAppButton';
 import LanguageSelector from '@/components/LanguageSelector';
 import WelcomePanel from '@/components/WelcomePanel';
 import { type Locale } from '@/i18n/config';
@@ -221,7 +222,8 @@ export default function Home() {
           </span>
           <span className="text-[0.75rem] leading-snug text-amber-100/55 sm:text-[0.875rem]">{t('tagline')}</span>
         </div>
-        <div className="pointer-events-auto shrink-0">
+        <div className="pointer-events-auto flex shrink-0 items-center gap-1.5">
+          <InstallAppButton />
           <LanguageSelector currentLocale={locale} onLocaleChange={handleLocaleChange} />
         </div>
       </header>

@@ -76,6 +76,8 @@
     "shareViaFacebook": "Partager sur Facebook",
     "shareViaX": "Partager sur X",
     "shareViaWhatsApp": "Partager sur WhatsApp",
-    "shareViaEmail": "Partager par e-mail"
+    "shareViaEmail": "Partager par e-mail",
+    "installApp": "Installer l’app",
+    "installIosHint": "Touchez Partager, puis « Sur l’écran d’accueil »."
   }
 }

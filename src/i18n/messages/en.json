@@ -76,6 +76,8 @@
     "shareViaFacebook": "Share on Facebook",
     "shareViaX": "Share on X",
     "shareViaWhatsApp": "Share on WhatsApp",
-    "shareViaEmail": "Share by email"
+    "shareViaEmail": "Share by email",
+    "installApp": "Install app",
+    "installIosHint": "Tap the Share button, then “Add to Home Screen”."
   }
 }

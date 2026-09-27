@@ -76,6 +76,8 @@
     "shareViaFacebook": "Facebookでシェア",
     "shareViaX": "Xでシェア",
     "shareViaWhatsApp": "WhatsAppでシェア",
-    "shareViaEmail": "メールでシェア"
+    "shareViaEmail": "メールでシェア",
+    "installApp": "アプリをインストール",
+    "installIosHint": "共有ボタンをタップし、「ホーム画面に追加」を選んでください。"
   }
 }

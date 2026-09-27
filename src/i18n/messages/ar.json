@@ -76,6 +76,8 @@
     "shareViaFacebook": "مشاركة عبر فيسبوك",
     "shareViaX": "مشاركة عبر X",
     "shareViaWhatsApp": "مشاركة عبر WhatsApp",
-    "shareViaEmail": "مشاركة عبر البريد الإلكتروني"
+    "shareViaEmail": "مشاركة عبر البريد الإلكتروني",
+    "installApp": "تثبيت التطبيق",
+    "installIosHint": "اضغط على زر المشاركة، ثم اختر «إضافة إلى الشاشة الرئيسية»."
   }
 }

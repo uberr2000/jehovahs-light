@@ -76,6 +76,8 @@
     "shareViaFacebook": "分享到 Facebook",
     "shareViaX": "分享到 X",
     "shareViaWhatsApp": "分享到 WhatsApp",
-    "shareViaEmail": "透過電子郵件分享"
+    "shareViaEmail": "透過電子郵件分享",
+    "installApp": "安裝 App",
+    "installIosHint": "點擊「分享」按鈕，再選擇「加入主畫面」。"
   }
 }

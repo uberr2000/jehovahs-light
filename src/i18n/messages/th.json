@@ -76,6 +76,8 @@
     "shareViaFacebook": "แชร์ทาง Facebook",
     "shareViaX": "แชร์ทาง X",
     "shareViaWhatsApp": "แชร์ทาง WhatsApp",
-    "shareViaEmail": "แชร์ทางอีเมล"
+    "shareViaEmail": "แชร์ทางอีเมล",
+    "installApp": "ติดตั้งแอป",
+    "installIosHint": "แตะปุ่มแชร์ แล้วเลือก “เพิ่มไปยังหน้าจอโฮม”"
   }
 }

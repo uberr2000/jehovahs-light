@@ -76,6 +76,8 @@
     "shareViaFacebook": "Bagikan ke Facebook",
     "shareViaX": "Bagikan ke X",
     "shareViaWhatsApp": "Bagikan ke WhatsApp",
-    "shareViaEmail": "Bagikan lewat email"
+    "shareViaEmail": "Bagikan lewat email",
+    "installApp": "Pasang aplikasi",
+    "installIosHint": "Ketuk tombol Bagikan, lalu pilih “Tambah ke Layar Utama”."
   }
 }

@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (WelcomePanel lit-state type bump)
+_Last updated: 2026-09-27 (Installable PWA; manifest follows site locale)
 
 ## Project name & stack summary
 
@@ -220,13 +220,30 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `src/i18n/resolve-locale.ts` — cookie / Accept-Language / navigator match
 - `src/i18n/messages/*.json` — en, zh-TW, zh-CN, es, pt, fr, de, ja, ko, ru, ar, id, th, vi
 - `src/components/LocaleNavigatorFallback.tsx` — navigator fallback when SSR defaulted
-- `src/app/layout.tsx` — viewport lock, html lang/dir, locale source
+- `src/app/layout.tsx` — viewport lock, html lang/dir, locale source;
+  `generateMetadata` points `rel=manifest` at `/app-manifest?locale=`
+  and sets `appleWebApp.title` from the current locale
+- `src/app/app-manifest/route.ts` — install manifest; `?locale=` wins,
+  otherwise Accept-Language. `id` stays `/` so every language is one app.
+  Not `manifest.webmanifest`: Next treats that name as a metadata file.
+- `src/i18n/load-messages.ts` — shared locale → messages loader used by
+  `request.ts` and `/app-manifest`
+- `src/components/InstallAppButton.tsx` + `src/lib/install-prompt.ts` —
+  header install button: `beforeinstallprompt` on Chromium, iOS share hint
+- `src/components/ServiceWorkerRegister.tsx` — registers `/sw.js` in
+  production only
+- `public/sw.js` + `public/offline.html` — navigation-only offline page;
+  API, JS, and images stay on the network
+- `next.config.ts` — `Cache-Control: no-store` on `/sw.js`
+- Did not add `next-pwa` (webpack-only, unmaintained; Next 16 builds
+  with Turbopack)
 - `docs/i18n-viewport.md` — page viewport lock + globe zoom + locale list
 - `src/lib/json-safe.ts` — BigInt-safe JSON for mysql2 COUNT / insertId
 - `docs/locations-api.md` — GET /api/locations 500 diagnosis
 
 ## API Routes Summary
 
+- `GET /app-manifest?locale=` — web app manifest for install (not under `/api`)
 - `GET/POST /api/locations` — lit locations; GET also returns `userConsent`
   (IP) used to skip intro. Connection failures: 503 `Database unavailable`.
 - `POST /api/consent` — GPS consent by IP (decline path; no new routes)
@@ -257,8 +274,17 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   was a small circle in a sea of black. Compact default now uses
   vertical FOV height-fill (~72%, `z` ≈ 6.7) so the disk is ≥60% of
   viewport height. Zoom-out can still reach the full-sphere fit.
+- The installed app name is fixed at install time. Changing the site
+  language later does not rename the home-screen icon; delete and
+  reinstall to pick up another locale.
 
 ## Recent Commits
+
+- Installable PWA without `next-pwa`: locale-aware `/app-manifest`,
+  header install button (Chromium prompt / iOS hint), production-only
+  service worker with an offline page. Manifest name follows the
+  language picker via `?locale=`.
+
 
 - WelcomePanel lit state: title `lg:text-[1rem]` (was 0.9375rem),
   message `text-base` / `lg:text-[0.7rem]` (was `text-sm` / 0.5625rem);
