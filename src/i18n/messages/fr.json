@@ -48,6 +48,11 @@
   "language": {
     "select": "Choisir la langue"
   },
+  "intro": {
+    "tagline": "Dans les ténèbres, trouver la lumière",
+    "title": "La Lumière de Jéhovah",
+    "enter": "Entrer"
+  },
   "home": {
     "brand": "Illuminer la Terre",
     "tagline": "Que la lumière de Dieu commence là où vous êtes",

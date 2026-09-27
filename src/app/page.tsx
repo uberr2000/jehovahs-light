@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import InstallAppButton from '@/components/InstallAppButton';
+import IntroScreen, { useIntroEntered } from '@/components/IntroScreen';
 import LanguageSelector from '@/components/LanguageSelector';
 import WelcomePanel from '@/components/WelcomePanel';
 import { type Locale } from '@/i18n/config';
@@ -96,6 +97,9 @@ export default function Home() {
   );
   const [litPlace, setLitPlace] = useState<PlaceFields | null>(null);
   const [statsStatus, setStatsStatus] = useState<StatsStatus>('loading');
+  const enteredEarlier = useIntroEntered();
+  const [enteredNow, setEnteredNow] = useState(false);
+  const showIntro = !enteredEarlier && !enteredNow;
 
   useEffect(() => {
     let cancelled = false;
@@ -214,42 +218,53 @@ export default function Home() {
   const resolvedPlace = resolveLitPlace(litPlace, userLocation, locations);
 
   return (
-    <main className="relative h-[100dvh] w-full overflow-hidden bg-[#04060e] lg:flex lg:flex-col">
-      <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-1.5 bg-gradient-to-b from-[#04060e]/50 to-transparent px-2 pt-2 pb-1 sm:gap-2 sm:px-3 sm:pt-3 lg:pointer-events-auto lg:static lg:shrink-0 lg:gap-4 lg:bg-none lg:p-6">
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <span className="text-[1rem] font-semibold leading-tight tracking-wide text-amber-50 sm:text-[1.125rem]">
-            {t('brand')}
-          </span>
-          <span className="text-[0.75rem] leading-snug text-amber-100/55 sm:text-[0.875rem]">{t('tagline')}</span>
-        </div>
-        <div className="pointer-events-auto flex shrink-0 items-center gap-1.5">
-          <InstallAppButton />
-          <LanguageSelector currentLocale={locale} onLocaleChange={handleLocaleChange} />
-        </div>
-      </header>
+    <>
+      {showIntro && (
+        <IntroScreen
+          onEnter={() => setEnteredNow(true)}
+          toolbar={<LanguageSelector currentLocale={locale} onLocaleChange={handleLocaleChange} />}
+        />
+      )}
+      <main
+        inert={showIntro}
+        className="relative h-[100dvh] w-full overflow-hidden bg-[#04060e] lg:flex lg:flex-col"
+      >
+        <header className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-1.5 bg-gradient-to-b from-[#04060e]/50 to-transparent px-2 pt-2 pb-1 sm:gap-2 sm:px-3 sm:pt-3 lg:pointer-events-auto lg:static lg:shrink-0 lg:gap-4 lg:bg-none lg:p-6">
+          <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="text-[1rem] font-semibold leading-tight tracking-wide text-amber-50 sm:text-[1.125rem]">
+              {t('brand')}
+            </span>
+            <span className="text-[0.75rem] leading-snug text-amber-100/55 sm:text-[0.875rem]">{t('tagline')}</span>
+          </div>
+          <div className="pointer-events-auto flex shrink-0 items-center gap-1.5">
+            <InstallAppButton />
+            <LanguageSelector currentLocale={locale} onLocaleChange={handleLocaleChange} />
+          </div>
+        </header>
 
-      <div className="absolute inset-0 lg:relative lg:flex lg:min-h-0 lg:flex-1">
-        <div
-          data-testid="home-globe"
-          className="absolute inset-0 lg:relative lg:min-h-0 lg:flex-1"
-        >
-          <Globe3D lightPoints={locations} userLocation={userLocation} />
-        </div>
+        <div className="absolute inset-0 lg:relative lg:flex lg:min-h-0 lg:flex-1">
+          <div
+            data-testid="home-globe"
+            className="absolute inset-0 lg:relative lg:min-h-0 lg:flex-1"
+          >
+            <Globe3D lightPoints={locations} userLocation={userLocation} />
+          </div>
 
-        <div
-          data-testid="home-bottom-chrome"
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/40 via-[#04060e]/12 to-transparent px-1.5 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-3 lg:pointer-events-auto lg:static lg:w-[26rem] lg:min-h-0 lg:shrink-0 lg:items-center lg:overflow-y-auto lg:bg-none lg:p-8"
-        >
-          <WelcomePanel
-            count={stats.total}
-            hasLit={hasLit}
-            litPlace={resolvedPlace}
-            statsStatus={statsStatus}
-            onRetry={handleRetryStats}
-            onLocationReceived={handleLocationReceived}
-          />
+          <div
+            data-testid="home-bottom-chrome"
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/40 via-[#04060e]/12 to-transparent px-1.5 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-3 lg:pointer-events-auto lg:static lg:w-[26rem] lg:min-h-0 lg:shrink-0 lg:items-center lg:overflow-y-auto lg:bg-none lg:p-8"
+          >
+            <WelcomePanel
+              count={stats.total}
+              hasLit={hasLit}
+              litPlace={resolvedPlace}
+              statsStatus={statsStatus}
+              onRetry={handleRetryStats}
+              onLocationReceived={handleLocationReceived}
+            />
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }

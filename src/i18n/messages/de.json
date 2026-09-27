@@ -48,6 +48,11 @@
   "language": {
     "select": "Sprache wählen"
   },
+  "intro": {
+    "tagline": "In der Dunkelheit das Licht finden",
+    "title": "Das Licht Jehovas",
+    "enter": "Eintreten"
+  },
   "home": {
     "brand": "Die Erde erleuchten",
     "tagline": "Lass Gottes Licht dort beginnen, wo du bist",

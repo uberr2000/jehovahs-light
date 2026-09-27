@@ -48,6 +48,11 @@
   "language": {
     "select": "Pilih bahasa"
   },
+  "intro": {
+    "tagline": "Dalam kegelapan, temukan terang itu",
+    "title": "Terang Yehuwa",
+    "enter": "Masuk"
+  },
   "home": {
     "brand": "Terangi Bumi",
     "tagline": "Biarlah terang Allah bermula dari tempat Anda berada",

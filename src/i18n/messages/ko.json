@@ -48,6 +48,11 @@
   "language": {
     "select": "언어 선택"
   },
+  "intro": {
+    "tagline": "어둠 속에서 그 빛을 찾다",
+    "title": "여호와의 빛",
+    "enter": "들어가기"
+  },
   "home": {
     "brand": "지구를 밝히다",
     "tagline": "하느님의 빛이 당신이 있는 곳에서 시작되도록",

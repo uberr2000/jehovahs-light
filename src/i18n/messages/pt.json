@@ -48,6 +48,11 @@
   "language": {
     "select": "Selecionar idioma"
   },
+  "intro": {
+    "tagline": "Na escuridão, encontrar a luz",
+    "title": "A Luz de Jeová",
+    "enter": "Entrar"
+  },
   "home": {
     "brand": "Ilumine a Terra",
     "tagline": "Que a luz de Deus comece onde você está",

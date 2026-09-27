@@ -48,6 +48,11 @@
   "language": {
     "select": "Select Language"
   },
+  "intro": {
+    "tagline": "In the darkness, find the light",
+    "title": "Jehovah's Light",
+    "enter": "Enter"
+  },
   "home": {
     "brand": "Light Up the Earth",
     "tagline": "Let God's light begin right where you are",

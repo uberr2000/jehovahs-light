@@ -48,6 +48,11 @@
   "language": {
     "select": "Seleccionar idioma"
   },
+  "intro": {
+    "tagline": "En la oscuridad, hallar la luz",
+    "title": "La Luz de Jehová",
+    "enter": "Entrar"
+  },
   "home": {
     "brand": "Ilumina la Tierra",
     "tagline": "Que la luz de Dios comience donde tú estás",

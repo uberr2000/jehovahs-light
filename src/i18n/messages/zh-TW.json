@@ -48,6 +48,11 @@
   "language": {
     "select": "選擇語言"
   },
+  "intro": {
+    "tagline": "在黑夜中，尋見那光",
+    "title": "耶和華的光",
+    "enter": "進入"
+  },
   "home": {
     "brand": "點亮地球",
     "tagline": "讓神的光，從你所在之處開始",

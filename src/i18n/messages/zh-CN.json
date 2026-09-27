@@ -48,6 +48,11 @@
   "language": {
     "select": "选择语言"
   },
+  "intro": {
+    "tagline": "在黑夜中，寻见那光",
+    "title": "耶和华的光",
+    "enter": "进入"
+  },
   "home": {
     "brand": "点亮地球",
     "tagline": "让神的光，从你所在之处开始",

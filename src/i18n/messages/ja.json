@@ -48,6 +48,11 @@
   "language": {
     "select": "言語を選択"
   },
+  "intro": {
+    "tagline": "闇の中で、その光を見いだす",
+    "title": "エホバの光",
+    "enter": "入る"
+  },
   "home": {
     "brand": "地球を照らそう",
     "tagline": "神の光を、あなたのいる場所から",

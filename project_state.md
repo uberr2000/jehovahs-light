@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (Installable PWA; manifest follows site locale)
+_Last updated: 2026-09-27 (Intro splash before the globe, 14 locales)
 
 ## Project name & stack summary
 
@@ -168,6 +168,12 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `drizzle/` — SQL migrations + meta journal
 - `docs/schema.sql` — canonical CREATE IF NOT EXISTS
 - `next.config.ts` — `output: 'standalone'`
+- `src/components/IntroScreen.tsx` + `IntroScreen.module.css` — full-screen
+  splash over `/` (light point, rays, tagline, title, Enter). `main` is
+  `inert` underneath so the globe loads while the intro plays. Enter fades
+  out in 1s; sessionStorage `jl-intro-entered` skips it on reload in the
+  same tab (e.g. language switch). Title/tagline use `Noto_Serif_TC` via
+  `next/font` (`preload: false`). Copy in `intro.*` for all 14 locales.
 - `.env.example` — `PORT` + DB vars
 - `.github/workflows/ci.yml` — lint, `npm test`, URL-guard fixtures,
   build, migrate; develop SSH deploy job after CI on push/dispatch to
@@ -258,8 +264,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   asks for one-time `pm2 delete` + `pm2 start ecosystem` + `pm2 save`
 - GPS intro skip is IP + localStorage only: shared Wi-Fi / VPN / IP change
   can mis-identify; new device or cleared storage falls back to IP
-  (`docs/consent-memory.md`). Home no longer shows the lighthouse splash;
-  first visit is the v0 glass panel with CTA “Let your light shine”.
+  (`docs/consent-memory.md`). Each new tab opens on the `IntroScreen`
+  splash; after Enter, the glass panel with CTA “Let your light shine”.
 - Live `GET /api/locations` on jehovahs-light.ink.net.tw returns HTTP 500
   (`Failed to fetch locations`). UI now shows error + retry instead of
   silent zeros. Likely host MySQL/.env; BigInt JSON is guarded in code.
@@ -280,6 +286,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Intro splash from `light-intro.html` on `/`: overlay
+  above the globe with its own language picker, Enter fades into the
+  main page, translated in 14 locales (`intro.tagline/title/enter`).
+  Arabic drops letter-spacing so letters stay joined.
 - Installable PWA without `next-pwa`: locale-aware `/app-manifest`,
   header install button (Chromium prompt / iOS hint), production-only
   service worker with an offline page. Manifest name follows the
