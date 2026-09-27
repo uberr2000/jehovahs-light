@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (Share hrefs on latest develop; no ci.yml overlap)
+_Last updated: 2026-09-27 (Share hrefs rebased on 46ad8c5; develop ci/deploy/docs kept)
 
 ## Project name & stack summary
 
@@ -260,6 +260,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Rebase Share hrefs (#22) onto `46ad8c5` (#24 APP_URL deploy guard).
+  Keep develop’s `ci.yml` / deploy script / `docs/deploy.md` /
+  `docs/ci-cd.md`. Merge this file’s #24 + #22 entries.
 - Treat empty / non-https / placeholder `NEXT_PUBLIC_APP_URL` hosts
   (`your-domain.com`, `example.invalid`, `example.com`) as unset so SSR
   stays neutral and the client fills from `window.location.origin`.
