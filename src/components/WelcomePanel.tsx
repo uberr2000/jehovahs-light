@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useTranslations } from 'next-intl';
-import LampCounter from '@/components/LampCounter';
-import LightLampButton from '@/components/LightLampButton';
-import ShareLightButton from '@/components/ShareLightButton';
-import type { PlaceFields } from '@/lib/share';
+import { useTranslations } from "next-intl";
+import LampCounter from "@/components/LampCounter";
+import LightLampButton from "@/components/LightLampButton";
+import ShareLightButton from "@/components/ShareLightButton";
+import type { PlaceFields } from "@/lib/share";
 
 export default function WelcomePanel({
   count,
@@ -17,14 +17,20 @@ export default function WelcomePanel({
   count: number;
   hasLit: boolean;
   litPlace?: PlaceFields | null;
-  statsStatus: 'loading' | 'ok' | 'error';
+  statsStatus: "loading" | "ok" | "error";
   onRetry: () => void;
-  onLocationReceived: (lat: number, lng: number, place?: PlaceFields | null) => void;
+  onLocationReceived: (
+    lat: number,
+    lng: number,
+    place?: PlaceFields | null,
+  ) => void;
 }) {
-  const t = useTranslations('home');
+  const t = useTranslations("home");
 
   const hint = (
-    <p className="text-[0.875rem] leading-none text-amber-100/50 sm:text-[1rem]">{t('rotateHint')}</p>
+    <p className="text-[0.875rem] leading-none text-amber-100/50 sm:text-[1rem]">
+      {t("rotateHint")}
+    </p>
   );
 
   return (
@@ -33,11 +39,11 @@ export default function WelcomePanel({
         {hasLit ? (
           <div className="flex flex-col gap-2 lg:gap-3">
             <div className="flex flex-col gap-1 lg:gap-1.5">
-              <h2 className="text-balance text-base font-semibold leading-snug tracking-tight text-amber-50 lg:text-[0.9375rem] lg:leading-none">
-                {t('litTitle')}
+              <h2 className="text-balance text-base font-semibold leading-snug tracking-tight text-amber-50 lg:text-[1rem] lg:leading-none">
+                {t("litTitle")}
               </h2>
-              <p className="text-pretty text-sm leading-snug text-amber-100/75 lg:text-[0.5625rem] lg:leading-tight">
-                {t('litMessage')}
+              <p className="text-pretty text-md leading-snug text-amber-100/75 lg:text-[0.7rem] lg:leading-tight">
+                {t("litMessage")}
               </p>
             </div>
             <LampCounter count={count} />
@@ -56,7 +62,7 @@ export default function WelcomePanel({
         )}
       </div>
       <p className="px-1 text-center text-xs leading-snug text-amber-100/50 lg:hidden">
-        {t('rotateHint')}
+        {t("rotateHint")}
       </p>
     </div>
   );
@@ -66,21 +72,21 @@ function StatsError({
   status,
   onRetry,
 }: {
-  status: 'loading' | 'ok' | 'error';
+  status: "loading" | "ok" | "error";
   onRetry: () => void;
 }) {
-  const t = useTranslations('home');
-  if (status !== 'error') return null;
+  const t = useTranslations("home");
+  if (status !== "error") return null;
 
   return (
     <div className="flex flex-row flex-wrap items-center gap-x-2 gap-y-1 lg:flex-col lg:items-start lg:gap-1">
-      <p className="text-xs text-amber-200/80 lg:text-xs">{t('loadError')}</p>
+      <p className="text-xs text-amber-200/80 lg:text-xs">{t("loadError")}</p>
       <button
         type="button"
         onClick={onRetry}
         className="self-start rounded-full border border-amber-200/20 bg-white/5 px-3 py-1.5 text-xs text-amber-50 hover:bg-white/10 lg:px-2 lg:py-1"
       >
-        {t('retry')}
+        {t("retry")}
       </button>
     </div>
   );

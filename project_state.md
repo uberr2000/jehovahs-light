@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (Share hrefs rebased on 46ad8c5; develop ci/deploy/docs kept)
+_Last updated: 2026-09-27 (WelcomePanel lit-state type bump)
 
 ## Project name & stack summary
 
@@ -260,6 +260,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- WelcomePanel: lit-state title `lg:text-[1rem]` (was 0.9375rem) and
+  message `lg:text-[0.7rem]` (was 0.5625rem); file reformatted to double
+  quotes. Mobile message class is `text-md`, which is not a default
+  Tailwind size (no effect).
 - Rebase Share hrefs (#22) onto `46ad8c5` (#24 APP_URL deploy guard).
   Keep develop’s `ci.yml` / deploy script / `docs/deploy.md` /
   `docs/ci-cd.md`. Merge this file’s #24 + #22 entries.
