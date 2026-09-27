@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (CI-gated develop deploy: job in ci.yml after lint/build)
+_Last updated: 2026-09-27 (Rebrand header: 點亮地球 brand + new tagline, 14 locales)
 
 ## Project name & stack summary
 
@@ -240,9 +240,16 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   was a small circle in a sea of black. Compact default now uses
   vertical FOV height-fill (~72%, `z` ≈ 6.7) so the disk is ≥60% of
   viewport height. Zoom-out can still reach the full-sphere fit.
+- After the 點亮地球 rebrand, `src/app/layout.tsx` metadata (title /
+  OpenGraph / keywords) still says “萬國之光 · Light of the Nations”, and
+  `home.shareText` in all locales still uses the old “一人一燈” tagline.
 
 ## Recent Commits
 
+- Rebrand header: `home.brand` → 點亮地球 and `home.tagline` →
+  讓神的光，從你所在之處開始, translated into all 14 locales (God term
+  per locale: 神 / God / Gott / Dieu / Dios / Deus / Бог / الله / Allah /
+  하느님 / พระเจ้า / Đức Chúa Trời).
 - Gate develop SSH deploy on CI: move the job into `ci.yml` with
   `needs: lint-and-build`; run only on push or `workflow_dispatch` to
   `develop`; pin the host to the tested `github.sha`; delete
