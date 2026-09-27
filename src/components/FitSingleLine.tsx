@@ -4,6 +4,16 @@ import { useLayoutEffect, useRef, type ReactNode } from 'react';
 
 const SAFETY_PX = 8;
 
+function inkWidth(el: HTMLElement) {
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  let w = 0;
+  for (const rect of range.getClientRects()) {
+    if (rect.width > w) w = rect.width;
+  }
+  return w;
+}
+
 /** Shrink font-size so `children` stay on one line with a safety margin. */
 export default function FitSingleLine({
   className,
@@ -33,18 +43,20 @@ export default function FitSingleLine({
     const fit = () => {
       const max = cap();
       el.style.setProperty('font-size', `${max}px`, 'important');
-      const avail = Math.min(parent.clientWidth, el.clientWidth || parent.clientWidth);
-      const budget = Math.max(8, avail - SAFETY_PX);
+      const box = el.clientWidth || parent.clientWidth;
+      const budget = Math.max(minPx, box - SAFETY_PX);
       let next = max;
-      if (el.scrollWidth > budget) {
-        next = Math.max(minPx, Math.floor((max * budget) / el.scrollWidth));
+      let ink = inkWidth(el);
+      if (ink > budget && ink > 0) {
+        next = Math.max(minPx, Math.floor((max * budget) / ink));
         el.style.setProperty('font-size', `${next}px`, 'important');
+        ink = inkWidth(el);
       }
-      let guard = 24;
+      let guard = 48;
       while (
         guard-- > 0 &&
         next > minPx &&
-        (el.scrollWidth > el.clientWidth + 1 || el.scrollWidth > budget)
+        (el.scrollWidth > el.clientWidth + 1 || inkWidth(el) > budget)
       ) {
         next -= 1;
         el.style.setProperty('font-size', `${next}px`, 'important');
@@ -54,7 +66,6 @@ export default function FitSingleLine({
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(parent);
-    ro.observe(el);
     window.addEventListener('resize', fit);
     return () => {
       ro.disconnect();

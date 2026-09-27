@@ -92,11 +92,11 @@ html, body { height: 100%; }
   overflow: visible !important;
   white-space: normal;
 }
-.home-count { font-size: ${HOME_COUNT_MOBILE_PX}px !important; line-height: 1 !important; overflow: visible; }
-.home-count-label { font-size: ${HOME_LABEL_MOBILE_PX}px !important; line-height: 1.1 !important; overflow: visible; }
+.home-count { font-size: ${HOME_COUNT_MOBILE_PX}px !important; line-height: 1.2 !important; overflow: visible; }
+.home-count-label { font-size: ${HOME_LABEL_MOBILE_PX}px !important; line-height: 1.25 !important; overflow: visible; }
 .home-hint {
   font-size: ${HOME_HINT_MOBILE_PX}px !important;
-  line-height: 1.2 !important;
+  line-height: 1.3 !important;
   overflow: visible;
   overflow-wrap: anywhere;
 }
