@@ -260,7 +260,7 @@ export default function Home() {
 
           <div
             data-testid="home-bottom-chrome"
-            className="home-bottom pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/40 via-[#04060e]/12 to-transparent px-1.5 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-3 lg:pointer-events-auto lg:static lg:w-[28rem] lg:min-h-0 lg:shrink-0 lg:items-start lg:bg-none lg:px-6 lg:py-4"
+            className="home-bottom pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/40 via-[#04060e]/12 to-transparent px-1.5 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-3 lg:pointer-events-auto lg:static lg:w-[36rem] lg:min-h-0 lg:shrink-0 lg:items-start lg:bg-none lg:px-6 lg:py-4"
           >
             <WelcomePanel
               count={stats.total}

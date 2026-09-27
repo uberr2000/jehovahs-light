@@ -138,7 +138,7 @@ html, body { height: 100%; }
     left: auto !important;
     right: auto !important;
     bottom: auto !important;
-    width: 28rem !important;
+    width: 36rem !important;
     max-height: 100%;
     flex-shrink: 0 !important;
     overflow: visible !important;
