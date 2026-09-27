@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (Rebrand metadata + shareText to 點亮地球)
+_Last updated: 2026-09-27 (NEXT_PUBLIC_APP_URL deploy guard; 點亮地球 rebrand)
 
 ## Project name & stack summary
 
@@ -23,7 +23,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   (not numeric id 14); standalone `node .next/standalone/server.js`
 - `docs/deploy.md` — path, PM2 name `jehovahs-light`, PORT from `.env`,
   never edit `package.json` start; `pm2 reload 14` is not enough;
-  one-time migration if old name `jehovahs-light.ink.net.tw`
+  one-time migration if old name `jehovahs-light.ink.net.tw`;
+  `NEXT_PUBLIC_APP_URL` guard (https host, reject placeholders/local)
+  before checkout/build
 - `.github/workflows/ci.yml` — `pull_request` + `push` to `develop` +
   `workflow_dispatch`; Node 22, `npm ci`, `npm run lint`, `npm test`,
   `npm run build` (dummy `DB_*` / `NEXT_PUBLIC_APP_URL` / `PORT` in the
@@ -41,6 +43,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   fail if still `next start`; no `script_stop` on `appleboy/ssh-action`.
   Separate `deploy-develop.yml` removed so develop cannot deploy twice.
   Not `workflow_run` — default branch is `main` and stays `main`.
+  Before checkout, host runs `deploy/check-app-url.sh` against `.env`
+  (last `NEXT_PUBLIC_APP_URL` only, no source); fail if missing/empty/
+  not `https://` with a host, or host is placeholder/local. Logs hostname
+  or the rule name only. Fixture tests in `deploy/check-app-url.test.sh`.
 - Drizzle-only ORM: `drizzle-orm` + `mysql2` + `drizzle-kit`. Schema
   tables `lit_locations` / `gps_consent` with the same column names as
   the previous raw SQL. Scripts: `db:generate`, `db:migrate`, `db:studio`,
@@ -157,8 +163,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `docs/schema.sql` — canonical CREATE IF NOT EXISTS
 - `next.config.ts` — `output: 'standalone'`
 - `.env.example` — `PORT` + DB vars
-- `.github/workflows/ci.yml` — lint, `npm test`, build, migrate; develop
-  SSH deploy job after CI on push/dispatch to `develop` only
+- `.github/workflows/ci.yml` — lint, `npm test`, URL-guard fixtures,
+  build, migrate; develop SSH deploy job after CI on push/dispatch to
+  `develop` only
+- `deploy/check-app-url.sh` — host `.env` `NEXT_PUBLIC_APP_URL` guard
+- `deploy/check-app-url.test.sh` + `deploy/testdata/app-url/` — fixtures
 - `deploy/with-env.sh`
 - `deploy/ecosystem.config.cjs`
 - `deploy/pm2-sync.sh` — startOrReload ecosystem by name + verify
@@ -240,8 +249,12 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   was a small circle in a sea of black. Compact default now uses
   vertical FOV height-fill (~72%, `z` ≈ 6.7) so the disk is ≥60% of
   viewport height. Zoom-out can still reach the full-sphere fit.
+
 ## Recent Commits
 
+- Guard develop deploy on host `NEXT_PUBLIC_APP_URL` (https host, reject
+  placeholders/local) before checkout/`npm ci`/build; fixture tests;
+  rule documented in `docs/deploy.md`.
 - Finish 點亮地球 rebrand: `layout.tsx` title / description / keywords /
   OpenGraph now “點亮地球 · Light Up the Earth” + new tagline;
   `home.shareText` in all 14 locales = new tagline + “light a lamp with
@@ -337,6 +350,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - Develop deploy is a job in `ci.yml` after CI, not a `workflow_run`
   workflow (default branch is `main` and is not changed) and not a
   parallel push-triggered workflow
+- Host `NEXT_PUBLIC_APP_URL` must be a real `https://` URL before
+  develop deploy changes the worktree (`next build` bakes it in)
 - Production remains untouched (no production workflow)
 - `appleboy/ssh-action` must not use `script_stop` (invalid / problematic);
   fail-fast is `set -euo pipefail` inside the remote script

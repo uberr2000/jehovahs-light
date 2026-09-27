@@ -76,6 +76,9 @@ jobs:
       - name: Test
         run: npm test
 
+      - name: Test NEXT_PUBLIC_APP_URL deploy guard
+        run: bash deploy/check-app-url.test.sh
+
       - name: Build
         run: npm run build
 
@@ -238,6 +241,31 @@ jobs:
               echo "error: tested SHA ${EXPECTED_SHA} is not a commit after fetch"
               exit 1
             fi
+
+            # Guard NEXT_PUBLIC_APP_URL on the current host .env before
+            # checkout / npm ci / build. Runs after the dirty-worktree
+            # check and after fetch so `git show SHA:deploy/check-app-url.sh`
+            # can resolve, without touching the worktree. A failed guard
+            # leaves the running site unchanged.
+            # `set +x` inside the checker prevents xtrace leaks.
+            # Chain onto any existing EXIT trap instead of replacing it.
+            existing_exit_trap="$(trap -p EXIT 2>/dev/null || true)"
+            existing_exit_cmd=""
+            if [ -n "${existing_exit_trap}" ]; then
+              existing_exit_cmd="${existing_exit_trap#*\'}"
+              existing_exit_cmd="${existing_exit_cmd%\'*}"
+            fi
+            checker="/tmp/jl-check-app-url.$$.sh"
+            cleanup_checker() {
+              rm -f "${checker}"
+              if [ -n "${existing_exit_cmd}" ]; then
+                eval "${existing_exit_cmd}"
+              fi
+            }
+            trap cleanup_checker EXIT
+            git show "${EXPECTED_SHA}:deploy/check-app-url.sh" > "${checker}"
+            set +x
+            bash "${checker}" .env
 
             current_branch="$(git rev-parse --abbrev-ref HEAD)"
             if [ "${current_branch}" != "develop" ]; then

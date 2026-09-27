@@ -24,6 +24,7 @@ take effect. The default branch is unchanged; Production is untouched.
 | Lint | `npm run lint` (`eslint` + `eslint-config-next` 16.2.4).
   `deploy/**` is ignored (PM2 CommonJS). |
 | Test | `npm test` (`node --experimental-strip-types --test src/lib/share.test.ts`) |
+| Deploy guard fixtures | `bash deploy/check-app-url.test.sh` |
 | Build | `npm run build` (`postbuild` copies `public` + `.next/static` into standalone) |
 | Verify | `test -f .next/standalone/public/globe/earth-blue-marble.jpg` |
 | Drizzle check | `npm run db:check` (`drizzle-kit check`, no live DB) |
@@ -91,20 +92,26 @@ a failing command still stops the deploy.
 3. Require host `.env` with `PORT` already set. The workflow never writes PORT
    and never edits `package.json`.
 4. Fetch `origin/develop` and the tested SHA (`EXPECTED_SHA` =
-   `github.sha`). `git checkout -B develop <sha>` (not `git pull` of
-   the branch tip, not `git reset --hard`). Fail if `HEAD` ≠ that SHA.
-5. `npm ci` and `npm run build`. `postbuild`
+   `github.sha`) — refs only, worktree unchanged. Extract
+   `deploy/check-app-url.sh` via `git show` and validate
+   `NEXT_PUBLIC_APP_URL` on the current host `.env`. Fail closed on
+   missing/empty/non-`https`/placeholder-or-local host. See the guard
+   rule in [deploy.md](deploy.md) (this file is the CD step list; the
+   rule lives in `docs/deploy.md`).
+5. `git checkout -B develop <sha>` (not `git pull` of the branch tip,
+   not `git reset --hard`). Fail if `HEAD` ≠ that SHA.
+6. `npm ci` and `npm run build`. `postbuild`
    (`scripts/copy-standalone-assets.mjs`) copies `public` →
    `.next/standalone/public` and `.next/static` →
    `.next/standalone/.next/static` so the globe texture
    (`/globe/earth-blue-marble.jpg`) is already in the standalone tree.
-6. The workflow still repeats that copy with `rm` + `cp -a` as
+7. The workflow still repeats that copy with `rm` + `cp -a` as
    belt-and-suspenders (Next standalone does not include these by
    default; see the [output docs](https://nextjs.org/docs/app/api-reference/config/next-config-js/output)).
    See [deploy.md](deploy.md) (Standalone assets).
-7. Source host `.env` and run `npm run db:migrate` (Drizzle; after pull/build,
+8. Source host `.env` and run `npm run db:migrate` (Drizzle; after pull/build,
    before PM2). Safe if `lit_locations` / `gps_consent` already exist.
-8. Apply `deploy/ecosystem.config.cjs` by **name** `jehovahs-light` (not
+9. Apply `deploy/ecosystem.config.cjs` by **name** `jehovahs-light` (not
    numeric id 14). `pm2 reload 14` is **not** enough to change an existing
    `npm start` / `next start` command. The remote script runs
    `bash deploy/pm2-sync.sh`, which:

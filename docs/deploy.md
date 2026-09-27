@@ -36,8 +36,36 @@ Copy and edit env on the server (do not commit `.env`):
 
 ```bash
 cp .env.example .env
-# set PORT and DB_* for this host
+# set PORT, NEXT_PUBLIC_APP_URL, and DB_* for this host
 ```
+
+## NEXT_PUBLIC_APP_URL guard
+
+`next build` on the host bakes `NEXT_PUBLIC_APP_URL` from the host `.env`
+into the client bundle. Share links will prefer that value. Develop
+deploy therefore validates it **before** `git checkout`, `npm ci`, or
+`npm run build`. A failed guard exits non-zero and leaves the running
+site on the current version.
+
+The checker is `deploy/check-app-url.sh` (fixture tests:
+`deploy/check-app-url.test.sh`). It reads **only** the last
+`NEXT_PUBLIC_APP_URL=` line (optional `export`, quotes, whitespace).
+It does **not** source `.env`. Logs print the parsed hostname on
+success, or the rule that failed — never the raw line, the full URL,
+or any other key. The script starts with `set +x` so xtrace cannot
+leak the value.
+
+Fail closed when:
+
+- host `.env` is missing
+- the key is missing or the value is empty
+- the value is not an `https://` URL with a host
+- the host is a placeholder or local address:
+  `your-domain.com`, `example.com`, `example.invalid`,
+  `*.example` / `*.invalid` / `*.test` / `*.localhost`,
+  `localhost`, `127.x`, `0.0.0.0`
+
+Pass example log: `NEXT_PUBLIC_APP_URL host: jehovahs-light.ink.net.tw`
 
 ## PM2
 
