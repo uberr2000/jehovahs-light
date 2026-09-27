@@ -38,8 +38,8 @@ does not fail:
 - `PORT=3000` (CI only; does **not** change `package.json`)
 - `DB_HOST=127.0.0.1` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` (`ci`) —
   used by Drizzle at runtime and by `db:migrate` against the MySQL service
-- `NEXT_PUBLIC_APP_URL=https://example.invalid` (Share v1 site root for
-  SSR social hrefs; listed in `.env.example`)
+- `NEXT_PUBLIC_APP_URL=https://example.invalid` (CI placeholder; Share
+  v1 treats this host as unset so SSR social hrefs stay neutral)
 
 ## Develop deploy — job `deploy-develop` in `.github/workflows/ci.yml`
 

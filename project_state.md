@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (Share SSR hrefs / email after mount; no ci.yml overlap)
+_Last updated: 2026-09-27 (Share: ignore placeholder APP_URL; no ci.yml overlap)
 
 ## Project name & stack summary
 
@@ -122,7 +122,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   the same payload and offers LINE / Facebook / X / WhatsApp deep links
   in a new tab plus an email (`mailto:`, same tab) link. LINE / Facebook /
   X / WhatsApp `href`s are the full encoded URLs at first render (prefer
-  `NEXT_PUBLIC_APP_URL`). Email is **not** emitted as `mailto:` in SSR
+  a real https `NEXT_PUBLIC_APP_URL`; empty / non-https / `your-domain.com`
+  / `example.invalid` / `example.com` are treated as unset). Email is **not** emitted as `mailto:` in SSR
   HTML (Cloudflare Email Obfuscation would rewrite it to
   `/cdn-cgi/l/email-protection#…`); the full `mailto:?subject=&body=` is
   set after mount. If the Clipboard API is blocked, sync `execCommand` runs first;
@@ -259,6 +260,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Treat empty / non-https / placeholder `NEXT_PUBLIC_APP_URL` hosts
+  (`your-domain.com`, `example.invalid`, `example.com`) as unset so SSR
+  stays neutral and the client fills from `window.location.origin`.
+  localhost / 127.0.0.1 still allowed for local dev.
 - Pre-compute LINE / Facebook / X / WhatsApp share `href`s at render
   from `NEXT_PUBLIC_APP_URL`. Email `mailto:` is assigned after mount
   so Cloudflare Email Obfuscation cannot rewrite SSR HTML. Tests assert
@@ -402,8 +407,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   a land-brighter-than-sea contrast boost (no hotlink). Land luminance
   after that lift is `LAND_LUMINANCE_FACTOR` (`0.5` vs v0; set `1` to
   restore). Sea mix is not scaled.
-- Share v1 is client-only. The share URL prefers `NEXT_PUBLIC_APP_URL`
-  (SSR + client) and falls back to `window.location.origin` after mount,
+- Share v1 is client-only. The share URL prefers a real https
+  `NEXT_PUBLIC_APP_URL` (SSR + client). Empty, non-https, and placeholder
+  hosts (`your-domain.com` / `example.invalid` / `example.com`) are
+  treated as unset and fall back to `window.location.origin` after mount,
   with query/hash stripped. Location copy is city/country from the
   existing POST `/api/locations` body or a nearby row already on GET —
   never lat-lng. LINE / Facebook / X / WhatsApp `href`s are the full

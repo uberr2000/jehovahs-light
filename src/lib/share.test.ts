@@ -13,6 +13,17 @@ import {
   socialShareUrls,
 } from './share.ts';
 
+function withAppUrl(value: string, fn: () => void) {
+  const previous = process.env.NEXT_PUBLIC_APP_URL;
+  process.env.NEXT_PUBLIC_APP_URL = value;
+  try {
+    fn();
+  } finally {
+    if (previous === undefined) delete process.env.NEXT_PUBLIC_APP_URL;
+    else process.env.NEXT_PUBLIC_APP_URL = previous;
+  }
+}
+
 describe('share payload', () => {
   it('formats city/region phrases and drops coordinate-like strings', () => {
     assert.equal(formatPlaceLabel({ city: 'Taipei', country: 'Taiwan' }), 'Taipei, Taiwan');
@@ -53,14 +64,55 @@ describe('share payload', () => {
   });
 
   it('prefers NEXT_PUBLIC_APP_URL as the share site root', () => {
-    const prev = process.env.NEXT_PUBLIC_APP_URL;
-    process.env.NEXT_PUBLIC_APP_URL = 'https://jehovahs-light.ink.net.tw/?utm=x#hash';
-    try {
+    withAppUrl('https://jehovahs-light.ink.net.tw/?utm=x#hash', () => {
       assert.equal(configuredShareUrl(), 'https://jehovahs-light.ink.net.tw/');
       assert.equal(siteShareUrl(), 'https://jehovahs-light.ink.net.tw/');
+    });
+  });
+
+  it('treats empty, non-https, and placeholder NEXT_PUBLIC_APP_URL as unset', () => {
+    withAppUrl('', () => {
+      assert.equal(configuredShareUrl(), '');
+      assert.equal(siteShareUrl(), '');
+    });
+    withAppUrl('not-a-url', () => {
+      assert.equal(configuredShareUrl(), '');
+    });
+    withAppUrl('http://jehovahs-light.ink.net.tw/', () => {
+      assert.equal(configuredShareUrl(), '');
+    });
+    for (const placeholder of [
+      'https://your-domain.com',
+      'https://example.invalid',
+      'https://example.com/?utm=ci',
+      'https://www.example.com',
+    ]) {
+      withAppUrl(placeholder, () => {
+        assert.equal(configuredShareUrl(), '');
+        assert.equal(siteShareUrl(), '');
+      });
+    }
+    withAppUrl('http://localhost:3000/', () => {
+      assert.equal(configuredShareUrl(), 'http://localhost:3000/');
+    });
+    withAppUrl('https://127.0.0.1:3000/', () => {
+      assert.equal(configuredShareUrl(), 'https://127.0.0.1:3000/');
+    });
+  });
+
+  it('falls back to window.origin when the env URL is a placeholder', () => {
+    const previous = (globalThis as { window?: unknown }).window;
+    (globalThis as { window?: { location: { origin: string } } }).window = {
+      location: { origin: 'https://jehovahs-light.ink.net.tw' },
+    };
+    try {
+      withAppUrl('https://example.invalid', () => {
+        assert.equal(configuredShareUrl(), '');
+        assert.equal(siteShareUrl(), 'https://jehovahs-light.ink.net.tw/');
+      });
     } finally {
-      if (prev === undefined) delete process.env.NEXT_PUBLIC_APP_URL;
-      else process.env.NEXT_PUBLIC_APP_URL = prev;
+      if (previous === undefined) delete (globalThis as { window?: unknown }).window;
+      else (globalThis as { window?: unknown }).window = previous;
     }
   });
 
