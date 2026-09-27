@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (Share: add WhatsApp + email links, desktop only)
+_Last updated: 2026-09-27 (CI-gated develop deploy: job in ci.yml after lint/build)
 
 ## Project name & stack summary
 
@@ -24,22 +24,23 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `docs/deploy.md` — path, PM2 name `jehovahs-light`, PORT from `.env`,
   never edit `package.json` start; `pm2 reload 14` is not enough;
   one-time migration if old name `jehovahs-light.ink.net.tw`
-- `.github/workflows/ci.yml` — `pull_request` + `push` to `develop`;
-  Node 22, `npm ci`, `npm run lint`, `npm test`, `npm run build` (dummy `DB_*` /
-  `NEXT_PUBLIC_APP_URL` / `PORT` in the job env); verifies
-  `.next/standalone/public/globe/earth-blue-marble.jpg` after postbuild;
-  then `npm run db:check` and `npm run db:migrate` twice against ephemeral
-  MySQL 8 (`DB_HOST=127.0.0.1`)
-- `.github/workflows/deploy-develop.yml` — SSH deploy on `push` to
-  `develop`; secrets `DEPLOY_HOST` / `DEPLOY_USER` / `DEPLOY_SSH_KEY`;
-  dirty-tree fail (no `git reset --hard`); `git pull --ff-only`;
-  standalone `public` + `.next/static` copy (belt-and-suspenders after
-  `postbuild`); `npm run db:migrate` after pull/build (sources host `.env`
-  for `DB_*`) before `pm2 startOrReload`
-  `deploy/ecosystem.config.cjs --update-env` (delete-by-name fallback);
-  verify script is standalone/`with-env.sh` (fail if still `next start`);
-  no `script_stop` on `appleboy/ssh-action` (`set -euo pipefail` in the
-  remote script instead)
+- `.github/workflows/ci.yml` — `pull_request` + `push` to `develop` +
+  `workflow_dispatch`; Node 22, `npm ci`, `npm run lint`, `npm test`,
+  `npm run build` (dummy `DB_*` / `NEXT_PUBLIC_APP_URL` / `PORT` in the
+  job env); verifies `.next/standalone/public/globe/earth-blue-marble.jpg`
+  after postbuild; then `npm run db:check` and `npm run db:migrate` twice
+  against ephemeral MySQL 8 (`DB_HOST=127.0.0.1`). Develop SSH deploy is
+  job `deploy-develop` in this same file (`needs: lint-and-build`) so a
+  red CI cannot deploy. Deploy `if` is push or `workflow_dispatch` on
+  `refs/heads/develop` only (PR events never deploy). Host checks out
+  the tested `github.sha` (fail if HEAD differs). Concurrency group
+  `deploy-develop` (`cancel-in-progress: false`). Secrets `DEPLOY_HOST` /
+  `DEPLOY_USER` / `DEPLOY_SSH_KEY`; dirty-tree fail (no `git reset --hard`);
+  standalone `public` + `.next/static` copy; `npm run db:migrate` (host
+  `.env`) then `pm2 startOrReload` ecosystem (delete-by-name fallback);
+  fail if still `next start`; no `script_stop` on `appleboy/ssh-action`.
+  Separate `deploy-develop.yml` removed so develop cannot deploy twice.
+  Not `workflow_run` — default branch is `main` and stays `main`.
 - Drizzle-only ORM: `drizzle-orm` + `mysql2` + `drizzle-kit`. Schema
   tables `lit_locations` / `gps_consent` with the same column names as
   the previous raw SQL. Scripts: `db:generate`, `db:migrate`, `db:studio`,
@@ -49,8 +50,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   failures return 503 `Database unavailable` (no secrets in the body).
 - `deploy/pm2-sync.sh` / `deploy/pm2-inspect.cjs` — name-based PM2 apply
   + sibling-path safety
-- `docs/ci-cd.md` — CI steps, secret names, path, PM2 name
-  `jehovahs-light`, no `package.json` port hacks, Production untouched
+- `docs/ci-cd.md` — CI then deploy-on-success, SHA pin, secret names,
+  path, PM2 name `jehovahs-light`, no `package.json` port hacks,
+  Production untouched
 - ESLint: ignore `deploy/**` (PM2 CJS) so `npm run lint` is green on CI
 - Earth land luminance is half the v0/develop contrast-lifted look
   (`LAND_LUMINANCE_FACTOR = 0.5` in `Earth.tsx`); ocean, beacons,
@@ -155,8 +157,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `docs/schema.sql` — canonical CREATE IF NOT EXISTS
 - `next.config.ts` — `output: 'standalone'`
 - `.env.example` — `PORT` + DB vars
-- `.github/workflows/ci.yml` — lint, `npm test`, build, migrate
-- `.github/workflows/deploy-develop.yml`
+- `.github/workflows/ci.yml` — lint, `npm test`, build, migrate; develop
+  SSH deploy job after CI on push/dispatch to `develop` only
 - `deploy/with-env.sh`
 - `deploy/ecosystem.config.cjs`
 - `deploy/pm2-sync.sh` — startOrReload ecosystem by name + verify
@@ -215,8 +217,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 ## Known Issues
 
 - Server must have `.env` with `PORT` before PM2 apply of `jehovahs-light`
-- First `deploy-develop.yml` run fails until `DEPLOY_HOST`,
-  `DEPLOY_USER`, and `DEPLOY_SSH_KEY` are set — workflow is still shipped
+- First `deploy-develop` job run fails until `DEPLOY_HOST`,
+  `DEPLOY_USER`, and `DEPLOY_SSH_KEY` are set — job is still shipped
 - Dirty host working tree aborts deploy (no `git reset --hard`)
 - If PM2 id 14 is still named `jehovahs-light.ink.net.tw`, CI aborts and
   asks for one-time `pm2 delete` + `pm2 start ecosystem` + `pm2 save`
@@ -241,6 +243,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Gate develop SSH deploy on CI: move the job into `ci.yml` with
+  `needs: lint-and-build`; run only on push or `workflow_dispatch` to
+  `develop`; pin the host to the tested `github.sha`; delete
+  `.github/workflows/deploy-develop.yml` so push cannot deploy twice.
+  Default branch stays `main`; Production untouched.
 - Share: add WhatsApp (`wa.me/?text=`) and email (`mailto:` with
   subject = share title, body = text + URL) links next to LINE / Facebook
   / X; `socialShareUrls` gains an optional `title` arg and `SocialNetwork`
@@ -317,6 +324,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - Identify the PM2 app by name `jehovahs-light` from ecosystem, not
   numeric id 14. `pm2 reload 14` does not change an existing start command
 - CI/CD lives in this repo; only **develop** is deployed over SSH
+- Develop deploy is a job in `ci.yml` after CI, not a `workflow_run`
+  workflow (default branch is `main` and is not changed) and not a
+  parallel push-triggered workflow
 - Production remains untouched (no production workflow)
 - `appleboy/ssh-action` must not use `script_stop` (invalid / problematic);
   fail-fast is `set -euo pipefail` inside the remote script

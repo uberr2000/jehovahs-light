@@ -51,7 +51,7 @@ only by numeric id 14. Sibling apps on the same host
 must not be reloaded, deleted, or started.
 
 From the deploy path, apply the ecosystem (this is what
-`.github/workflows/deploy-develop.yml` runs after build + standalone copy
+the `deploy-develop` job in `.github/workflows/ci.yml` runs after build + standalone copy
 + `npm run db:migrate`):
 
 ```bash
