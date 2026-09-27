@@ -74,6 +74,8 @@
     "shareLocation": "{place}에서 등불이 빛나고 있습니다.",
     "shareViaLine": "LINE으로 공유",
     "shareViaFacebook": "Facebook으로 공유",
-    "shareViaX": "X로 공유"
+    "shareViaX": "X로 공유",
+    "shareViaWhatsApp": "WhatsApp으로 공유",
+    "shareViaEmail": "이메일로 공유"
   }
 }

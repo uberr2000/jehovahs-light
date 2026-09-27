@@ -65,4 +65,18 @@ describe('share payload', () => {
     assert.match(social.x, /text=Share/);
     assert.match(social.x, /url=https%3A%2F%2Fjehovahs-light/);
   });
+
+  it('builds WhatsApp / email links with text + url in one body', () => {
+    const social = socialShareUrls(
+      'Light a lamp with us.',
+      'https://jehovahs-light.ink.net.tw/',
+      'Share the light'
+    );
+    assert.equal(
+      social.whatsapp,
+      'https://wa.me/?text=Light%20a%20lamp%20with%20us.%0Ahttps%3A%2F%2Fjehovahs-light.ink.net.tw%2F'
+    );
+    assert.match(social.email, /^mailto:\?subject=Share%20the%20light&body=/);
+    assert.match(social.email, /body=Light%20a%20lamp%20with%20us\.%0Ahttps%3A%2F%2Fjehovahs-light/);
+  });
 });

@@ -74,6 +74,8 @@
     "shareLocation": "有一盞燈在{place}閃耀。",
     "shareViaLine": "分享到 LINE",
     "shareViaFacebook": "分享到 Facebook",
-    "shareViaX": "分享到 X"
+    "shareViaX": "分享到 X",
+    "shareViaWhatsApp": "分享到 WhatsApp",
+    "shareViaEmail": "透過電子郵件分享"
   }
 }

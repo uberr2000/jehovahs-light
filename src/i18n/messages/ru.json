@@ -74,6 +74,8 @@
     "shareLocation": "Лампада горит в {place}.",
     "shareViaLine": "Поделиться в LINE",
     "shareViaFacebook": "Поделиться в Facebook",
-    "shareViaX": "Поделиться в X"
+    "shareViaX": "Поделиться в X",
+    "shareViaWhatsApp": "Поделиться в WhatsApp",
+    "shareViaEmail": "Поделиться по эл. почте"
   }
 }

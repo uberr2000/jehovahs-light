@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-25 (Share v1: Web Share + clipboard + social)
+_Last updated: 2026-09-27 (Share: add WhatsApp + email links, desktop only)
 
 ## Project name & stack summary
 
@@ -111,8 +111,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   Precise GPS / lat-lng / PII never go into the URL or share text.
   Mobile prefers `navigator.share` (title + text + url) and falls back
   to clipboard + “copied” toast on cancel/unavailable. Desktop copies
-  the same payload and offers LINE / Facebook / X deep links in a new
-  tab. If the Clipboard API is blocked, sync `execCommand` runs first;
+  the same payload and offers LINE / Facebook / X / WhatsApp deep links
+  in a new tab plus an email (`mailto:`, same tab) link. If the Clipboard API is blocked, sync `execCommand` runs first;
   if copy still fails, a compact select-to-copy field appears.
   Strings live in all 14 `home.*` locales. No new API, DB, short
   links, tracking, or login gate. Overlay chrome / Earth ≥60% /
@@ -179,7 +179,7 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   stay usable without changing the desktop look. Below `lg` the bottom
   chrome stays a short translucent overlay.
 - `src/components/ShareLightButton.tsx` — Share the light CTA; Web Share
-  on mobile, clipboard toast + LINE/Facebook/X on desktop
+  on mobile, clipboard toast + LINE/Facebook/X/WhatsApp/email on desktop
 - `src/lib/share.ts` — payload builders, city/region phrase (no GPS),
   social deep links; `src/lib/share.test.ts` via `npm test`
 - `docs/adr/013-share-v1.md` — frontend-only share decision, no PII / API
@@ -241,6 +241,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Share: add WhatsApp (`wa.me/?text=`) and email (`mailto:` with
+  subject = share title, body = text + URL) links next to LINE / Facebook
+  / X; `socialShareUrls` gains an optional `title` arg and `SocialNetwork`
+  type; `shareViaWhatsApp` / `shareViaEmail` added to all 14 locales.
+  Icons stay desktop-only (lg+); mobile relies on the native share sheet.
 - Add frontend-only Share v1 CTA (Web Share + clipboard + LINE/Facebook/X)
   with 14-locale copy; city/region phrase when a lamp is already lit;
   never put GPS in the share URL or text. Overlay / Earth ≥60% unchanged.

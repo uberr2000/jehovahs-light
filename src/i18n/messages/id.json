@@ -74,6 +74,8 @@
     "shareLocation": "Sebuah pelita menyala di {place}.",
     "shareViaLine": "Bagikan ke LINE",
     "shareViaFacebook": "Bagikan ke Facebook",
-    "shareViaX": "Bagikan ke X"
+    "shareViaX": "Bagikan ke X",
+    "shareViaWhatsApp": "Bagikan ke WhatsApp",
+    "shareViaEmail": "Bagikan lewat email"
   }
 }

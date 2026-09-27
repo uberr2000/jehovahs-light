@@ -74,6 +74,8 @@
     "shareLocation": "{place}で灯が輝いています。",
     "shareViaLine": "LINEでシェア",
     "shareViaFacebook": "Facebookでシェア",
-    "shareViaX": "Xでシェア"
+    "shareViaX": "Xでシェア",
+    "shareViaWhatsApp": "WhatsAppでシェア",
+    "shareViaEmail": "メールでシェア"
   }
 }

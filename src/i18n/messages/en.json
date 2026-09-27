@@ -74,6 +74,8 @@
     "shareLocation": "A lamp is shining in {place}.",
     "shareViaLine": "Share on LINE",
     "shareViaFacebook": "Share on Facebook",
-    "shareViaX": "Share on X"
+    "shareViaX": "Share on X",
+    "shareViaWhatsApp": "Share on WhatsApp",
+    "shareViaEmail": "Share by email"
   }
 }

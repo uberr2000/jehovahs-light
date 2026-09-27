@@ -117,15 +117,20 @@ export function assertSafeSharePayload(value: string): boolean {
   return !LAT_LNG_PAIR.test(value) && !COORD_LIKE.test(value);
 }
 
-export function socialShareUrls(text: string, url: string): {
-  line: string;
-  facebook: string;
-  x: string;
-} {
+export type SocialNetwork = 'line' | 'facebook' | 'x' | 'whatsapp' | 'email';
+
+export function socialShareUrls(
+  text: string,
+  url: string,
+  title = ''
+): Record<SocialNetwork, string> {
+  const body = encodeURIComponent(buildClipboardPayload(text, url));
   return {
     line: `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`,
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`,
     x: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
+    whatsapp: `https://wa.me/?text=${body}`,
+    email: `mailto:?subject=${encodeURIComponent(title)}&body=${body}`,
   };
 }
 

@@ -74,6 +74,8 @@
     "shareLocation": "มีดวงไฟส่องสว่างที่ {place}",
     "shareViaLine": "แชร์ทาง LINE",
     "shareViaFacebook": "แชร์ทาง Facebook",
-    "shareViaX": "แชร์ทาง X"
+    "shareViaX": "แชร์ทาง X",
+    "shareViaWhatsApp": "แชร์ทาง WhatsApp",
+    "shareViaEmail": "แชร์ทางอีเมล"
   }
 }

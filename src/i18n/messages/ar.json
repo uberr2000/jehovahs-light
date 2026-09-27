@@ -74,6 +74,8 @@
     "shareLocation": "مصباح يضيء في {place}.",
     "shareViaLine": "مشاركة عبر LINE",
     "shareViaFacebook": "مشاركة عبر فيسبوك",
-    "shareViaX": "مشاركة عبر X"
+    "shareViaX": "مشاركة عبر X",
+    "shareViaWhatsApp": "مشاركة عبر WhatsApp",
+    "shareViaEmail": "مشاركة عبر البريد الإلكتروني"
   }
 }

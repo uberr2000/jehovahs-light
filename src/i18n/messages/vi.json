@@ -74,6 +74,8 @@
     "shareLocation": "Một ngọn đèn đang tỏa sáng tại {place}.",
     "shareViaLine": "Chia sẻ trên LINE",
     "shareViaFacebook": "Chia sẻ trên Facebook",
-    "shareViaX": "Chia sẻ trên X"
+    "shareViaX": "Chia sẻ trên X",
+    "shareViaWhatsApp": "Chia sẻ trên WhatsApp",
+    "shareViaEmail": "Chia sẻ qua email"
   }
 }

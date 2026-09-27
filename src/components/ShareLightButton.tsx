@@ -13,6 +13,7 @@ import {
   siteShareUrl,
   socialShareUrls,
   type PlaceFields,
+  type SocialNetwork,
 } from '@/lib/share';
 
 export default function ShareLightButton({
@@ -98,14 +99,14 @@ export default function ShareLightButton({
 
   const handleSocialClick = (
     event: MouseEvent<HTMLAnchorElement>,
-    network: 'line' | 'facebook' | 'x'
+    network: SocialNetwork
   ) => {
     const payload = getPayload();
     if (!assertSafeSharePayload(payload.clipboard) || !payload.url) {
       event.preventDefault();
       return;
     }
-    event.currentTarget.href = socialShareUrls(payload.text, payload.url)[network];
+    event.currentTarget.href = socialShareUrls(payload.text, payload.url, payload.title)[network];
   };
 
   return (
@@ -148,6 +149,23 @@ export default function ShareLightButton({
           >
             <XGlyph />
           </SocialLink>
+          <SocialLink
+            href="https://wa.me/"
+            label={t('shareViaWhatsApp')}
+            testId="share-via-whatsapp"
+            onClick={(event) => handleSocialClick(event, 'whatsapp')}
+          >
+            <WhatsAppGlyph />
+          </SocialLink>
+          <SocialLink
+            href="mailto:"
+            label={t('shareViaEmail')}
+            testId="share-via-email"
+            newTab={false}
+            onClick={(event) => handleSocialClick(event, 'email')}
+          >
+            <EmailGlyph />
+          </SocialLink>
         </div>
       </div>
       {copied ? (
@@ -182,12 +200,14 @@ function SocialLink({
   href,
   label,
   testId,
+  newTab = true,
   onClick,
   children,
 }: {
   href: string;
   label: string;
   testId: string;
+  newTab?: boolean;
   onClick: (event: MouseEvent<HTMLAnchorElement>) => void;
   children: ReactNode;
 }) {
@@ -195,8 +215,8 @@ function SocialLink({
     <a
       href={href}
       data-testid={testId}
-      target="_blank"
-      rel="noopener noreferrer"
+      target={newTab ? '_blank' : undefined}
+      rel={newTab ? 'noopener noreferrer' : undefined}
       aria-label={label}
       onClick={onClick}
       className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-amber-200/20 bg-white/5 text-amber-50 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950"
@@ -246,6 +266,32 @@ function XGlyph() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" className="h-3 w-3" fill="currentColor">
       <path d="M17.6 3h3l-6.6 7.5L21.8 21h-5.5l-4.3-6.3L7 21H4l7-8L2.4 3h5.6l3.9 5.8zm-1 16.2h1.7L7.5 4.7H5.7z" />
+    </svg>
+  );
+}
+
+function WhatsAppGlyph() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor">
+      <path d="M12 2.2a9.7 9.7 0 0 0-8.4 14.6L2.3 21.8l5.1-1.3A9.7 9.7 0 1 0 12 2.2zm0 17.7a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 19.9zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.8 2.8 0 0 0-.9 2.1 4.9 4.9 0 0 0 1 2.6 11.2 11.2 0 0 0 4.3 3.8c1.6.7 2.2.7 3 .6.5-.1 1.4-.6 1.6-1.1.2-.6.2-1 .1-1.1l-.5-.3z" />
+    </svg>
+  );
+}
+
+function EmailGlyph() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="h-3.5 w-3.5"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m3.5 6.5 8.5 6.5 8.5-6.5" />
     </svg>
   );
 }

@@ -74,6 +74,8 @@
     "shareLocation": "Eine Lampe leuchtet in {place}.",
     "shareViaLine": "Auf LINE teilen",
     "shareViaFacebook": "Auf Facebook teilen",
-    "shareViaX": "Auf X teilen"
+    "shareViaX": "Auf X teilen",
+    "shareViaWhatsApp": "Auf WhatsApp teilen",
+    "shareViaEmail": "Per E-Mail teilen"
   }
 }
