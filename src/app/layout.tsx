@@ -7,6 +7,7 @@ import LocaleNavigatorFallback from '@/components/LocaleNavigatorFallback';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 import { LOCALE_COOKIE } from '@/i18n/config';
 import { htmlDir, isLocale, resolveRequestLocale } from '@/i18n/resolve-locale';
+import { configuredShareUrl } from '@/lib/share';
 import './globals.css';
 
 const geistSans = Geist({
@@ -19,12 +20,26 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
+const OG_TITLE = '點亮地球 · Light Up the Earth';
+const OG_DESCRIPTION = "讓神的光，從你所在之處開始。 Let God's light begin right where you are.";
+
+/** Crawlers need absolute og:image / og:url; fall back to the request host when the env is unset. */
+async function siteOrigin(): Promise<URL> {
+  const configured = configuredShareUrl();
+  if (configured) return new URL(configured);
+  const headerStore = await headers();
+  const host = headerStore.get('x-forwarded-host') ?? headerStore.get('host') ?? 'localhost:3000';
+  const proto = headerStore.get('x-forwarded-proto') ?? (host.startsWith('localhost') ? 'http' : 'https');
+  return new URL(`${proto}://${host}`);
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const requested = await getLocale();
   const locale = isLocale(requested) ? requested : 'en';
   const brand = (await getTranslations('home'))('brand');
 
   return {
+  metadataBase: await siteOrigin(),
   title: "點亮地球 · Light Up the Earth | Jehovah's Light",
   description:
     "讓神的光，從你所在之處開始。若你信靠耶和華，在互動地球上點一盞燈，與世界各地的信心之光連成星海。 Let God's light begin right where you are — light a lamp on the globe and join a sea of lights with believers around the world.",
@@ -38,11 +53,18 @@ export async function generateMetadata(): Promise<Metadata> {
     statusBarStyle: 'black-translucent',
   },
   openGraph: {
-    title: '點亮地球 · Light Up the Earth',
-    description: "讓神的光，從你所在之處開始。 Let God's light begin right where you are.",
+    title: OG_TITLE,
+    description: OG_DESCRIPTION,
+    url: '/',
+    siteName: OG_TITLE,
     type: 'website',
     locale: 'en_US',
     alternateLocale: ['zh_TW', 'zh_CN'],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: OG_TITLE,
+    description: OG_DESCRIPTION,
   },
   icons: {
     icon: [
