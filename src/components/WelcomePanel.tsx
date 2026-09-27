@@ -34,10 +34,10 @@ export default function WelcomePanel({
   );
 
   return (
-    <div className="flex w-full max-w-lg flex-col gap-1.5 lg:max-w-md lg:gap-0">
+    <div className="flex w-full max-w-lg flex-col gap-1.5 lg:max-w-none lg:gap-0">
       <div className="pointer-events-auto w-full rounded-none border-0 bg-transparent px-1 py-0 shadow-none backdrop-blur-none lg:rounded-[0.875rem] lg:border lg:border-amber-200/12 lg:bg-neutral-950/45 lg:px-4 lg:py-4 lg:shadow-[0_4px_30px_-6px_rgba(0,0,0,0.8)] lg:backdrop-blur-xl">
         {hasLit ? (
-          <div className="flex flex-col gap-2 lg:gap-3">
+          <div className="flex flex-col gap-2 lg:gap-2">
             <div className="flex flex-col gap-1 lg:gap-1.5">
               <h2 className="text-balance text-base font-semibold leading-snug tracking-tight text-amber-50 lg:text-[1rem] lg:leading-none">
                 {t("litTitle")}

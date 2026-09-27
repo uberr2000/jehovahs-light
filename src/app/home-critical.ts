@@ -73,7 +73,7 @@ html, body { height: 100%; }
 .home-brand {
   display: block;
   font-size: ${HOME_BRAND_PX}px !important;
-  line-height: 1.25 !important;
+  line-height: 1.3 !important;
   white-space: nowrap !important;
   max-width: 100%;
   overflow: visible;
@@ -92,8 +92,8 @@ html, body { height: 100%; }
   overflow: visible !important;
   white-space: normal;
 }
-.home-count { font-size: ${HOME_COUNT_MOBILE_PX}px !important; line-height: 1.2 !important; overflow: visible; }
-.home-count-label { font-size: ${HOME_LABEL_MOBILE_PX}px !important; line-height: 1.25 !important; overflow: visible; }
+.home-count { font-size: ${HOME_COUNT_MOBILE_PX}px !important; line-height: 1.3 !important; overflow: visible; }
+.home-count-label { font-size: ${HOME_LABEL_MOBILE_PX}px !important; line-height: 1.3 !important; overflow: visible; }
 .home-hint {
   font-size: ${HOME_HINT_MOBILE_PX}px !important;
   line-height: 1.3 !important;
@@ -138,7 +138,7 @@ html, body { height: 100%; }
     left: auto !important;
     right: auto !important;
     bottom: auto !important;
-    width: 26rem !important;
+    width: 28rem !important;
     max-height: 100%;
     flex-shrink: 0 !important;
     overflow: visible !important;
