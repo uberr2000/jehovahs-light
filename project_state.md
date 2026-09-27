@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (QA clip fix #20: no type caps, FitSingleLine margin)
+_Last updated: 2026-09-27 (QA #20: 1px overflow + desktop pane center)
 
 ## Project name & stack summary
 
@@ -243,10 +243,13 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `scrollWidth <= clientWidth` with an 8px safety margin
 - `scripts/measure-home-chrome.mjs` — Playwright render gates: click
   Enter (no sessionStorage bypass); en + zh-TW at 390×844 and
-  1440×900; fail on clip / visible-ratio; globe center from the
-  rendered atmosphere limb
+  1440×900; fail if overflow > 1px on the element or a clipping
+  ancestor; mobile globe center from the atmosphere limb; desktop
+  globe must sit ±5px of the left pane center and not overlap the
+  side panel
 - `docs/home-framing.md` — QA acceptance: Earth 60–65% VH, 3× type,
-  **no clipping**, no overlap, CI render measure
+  **no clipping** (≤1px overflow), desktop pane center, no overlap,
+  CI render measure
 - `src/app/` — pages and API routes
 - `src/i18n/config.ts` — 14 locales + native names
 - `src/i18n/resolve-locale.ts` — cookie / Accept-Language / navigator match
@@ -333,6 +336,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- QA #20 follow-up: overflow gate is absolute ≤1px on each chrome
+  element and clipping ancestor (no 99% visible-ratio); desktop globe
+  must be ±5px of the left pane center and must not overlap the side
+  panel. Docs updated. No extra line-height padding.
 - QA clip-fix #20: remove header/hint max-height clip caps so tagline
   and hint are fully visible; FitSingleLine keeps brand
   scrollWidth ≤ clientWidth (+8px); brand cap is `HOME_BRAND_PX` (48)

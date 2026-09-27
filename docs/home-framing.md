@@ -25,10 +25,13 @@ only a camera-math sanity check and is **not** sufficient on its own.
   Below `lg`, the WebGL shell is pixel-locked to the visual viewport
   so R3F cannot stay at the default 300×150 drawing box.
 
-Desktop (1440×900) keeps the existing distance-6 in-flow globe. Header
-and side panel stay in normal flow (`overflow: visible`) so they cannot
-steal globe height the way a 998px wrapping title did, and they must
-not clip type.
+Desktop (1440×900) keeps the existing distance-6 in-flow globe. The
+rendered globe center must sit within **±5px of the horizontal center
+of the left globe pane** (not the full viewport, which includes the
+side panel). The globe bounding box must **not overlap** the side
+panel. Header and side panel stay in normal flow (`overflow: visible`)
+so they cannot steal globe height the way a 998px wrapping title did,
+and they must not clip type.
 
 ## 2. Type = 3× current develop (±10%)
 
@@ -71,12 +74,13 @@ be fully visible at both viewports and both locales.
   header, tagline, hint, or bottom chrome. Those caps previously showed
   only ~53% of the mobile-en tagline, ~48% of mobile zh-TW, ~71% of
   desktop tagline, and ~58% / ~27% of the hint.
-- `scrollWidth <= clientWidth + 1` and `scrollHeight <= clientHeight + 1`
-  on each of those elements. The same inequality must hold on any
-  ancestor whose `overflow` / `overflow-x` / `overflow-y` is `hidden`
-  or `clip` whenever that ancestor would cut this element.
-- The visible rect must not be smaller than the content rect
-  (visible ratio 100% on width, height, and area).
+- Absolute 1px overflow rule (no visible-ratio percent): on each of
+  those elements **and** on any ancestor whose `overflow` /
+  `overflow-x` / `overflow-y` is `hidden` or `clip`,
+  `(scrollHeight - clientHeight) <= 1` and
+  `(scrollWidth - clientWidth) <= 1`. Anything over 1px fails.
+  Subpixel residuals of 1px are acceptable. Do **not** add
+  line-height padding to paper over a fail.
 - Boxes for **header, CTA, count, hint, and share row** do not overlap.
 - The CTA is fully on screen (`y ≥ 0`, bottom inside the viewport),
   clickable (`elementFromPoint` hits the button), and not clipped.
@@ -98,8 +102,11 @@ The measure script:
 - centers the globe using the atmosphere-limb median, not the canvas
   midpoint;
 - fails if tagline/hint are not 3× develop (±10%), if brand is over
-  48px or wraps, on clip / visible-ratio / overlap / off-screen CTA,
-  or if the mobile globe is outside 60–65% VH / not centered ±5px.
+  48px or wraps, if any checked element or clipping ancestor overflows
+  by more than 1px, on chrome overlap / off-screen CTA, if the mobile
+  globe is outside 60–65% VH / not centered ±5px on the viewport, or
+  if the desktop globe is more than ±5px from its left-pane center or
+  overlaps the side panel.
 
 The `deploy-develop` job still `needs: lint-and-build` and still
 runs `deploy/check-app-url.sh` on the host. `deploy/` scripts are

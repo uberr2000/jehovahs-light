@@ -92,9 +92,19 @@ function analyse(buf, dpr) {
       const s = land[y];
       if (s) mids.push((s[0] + s[1]) / 2);
     }
+    let left = Infinity;
+    let right = -Infinity;
+    for (let y = t; y <= b; y++) {
+      const s = land[y];
+      if (!s) continue;
+      if (s[0] < left) left = s[0];
+      if (s[1] > right) right = s[1];
+    }
     res.earth = {
       top: c(t),
       bottom: c(b),
+      left: Number.isFinite(left) ? c(left) : null,
+      right: Number.isFinite(right) ? c(right) : null,
       diameter: c(b - t + 1),
       poleCenterX: c(mids.reduce((a, v) => a + v, 0) / mids.length),
     };
@@ -107,9 +117,19 @@ function analyse(buf, dpr) {
       if (s && s[0] > 1 && s[1] < W - 2) mids.push((s[0] + s[1]) / 2);
     }
     mids.sort((a, b2) => a - b2);
+    let left = Infinity;
+    let right = -Infinity;
+    for (let y = t; y <= b; y++) {
+      const s = atm[y];
+      if (!s) continue;
+      if (s[0] < left) left = s[0];
+      if (s[1] > right) right = s[1];
+    }
     res.atmosphere = {
       top: c(t),
       bottom: c(b),
+      left: Number.isFinite(left) ? c(left) : null,
+      right: Number.isFinite(right) ? c(right) : null,
       diameter: c(b - t + 1),
       rowsBothEdgesVisible: mids.length,
       medianCenterX: mids.length ? c(mids[mids.length >> 1]) : null,
@@ -184,72 +204,28 @@ async function measure(browser, kind, locale) {
       `${a.tagName.toLowerCase()}.${String(a.className || '')
         .split(' ')
         .find(Boolean) || ''}`;
-    const clipped = (e) => {
-      if (!e) return null;
-      const hits = [];
-      if (e.scrollWidth > e.clientWidth + 1) {
-        hits.push(`self-scrollWidth ${e.scrollWidth}>${e.clientWidth}`);
-      }
-      if (e.scrollHeight > e.clientHeight + 1) {
-        hits.push(`self-scrollHeight ${e.scrollHeight}>${e.clientHeight}`);
-      }
-      const b = e.getBoundingClientRect();
+    const overflowOf = (node) => ({
+      dW: +(node.scrollWidth - node.clientWidth).toFixed(2),
+      dH: +(node.scrollHeight - node.clientHeight).toFixed(2),
+    });
+    const overflow = (e) => {
+      if (!e) return [];
+      const items = [{ target: 'self', ...overflowOf(e) }];
       for (let a = e.parentElement; a && a !== document.documentElement; a = a.parentElement) {
         const cs = getComputedStyle(a);
         const axes = clipAxes(cs);
         if (!axes.x && !axes.y) continue;
-        const ab = a.getBoundingClientRect();
-        if (axes.x && a.scrollWidth > a.clientWidth + 1) {
-          if (b.left < ab.left - 1 || b.right > ab.left + a.clientWidth + 1) {
-            hits.push(`ancestor-scrollWidth ${cls(a)}`);
-          }
-        }
-        if (axes.y && a.scrollHeight > a.clientHeight + 1) {
-          if (b.top < ab.top - 1 || b.bottom > ab.top + a.clientHeight + 1) {
-            hits.push(`ancestor-scrollHeight ${cls(a)}`);
-          }
-        }
-        if (axes.x && (b.left < ab.left - 1 || b.right > ab.right + 1)) {
-          hits.push(`ancestor-box-x ${cls(a)}`);
-        }
-        if (axes.y && (b.top < ab.top - 1 || b.bottom > ab.bottom + 1)) {
-          hits.push(`ancestor-box-y ${cls(a)}`);
-        }
+        items.push({ target: cls(a), ...overflowOf(a) });
       }
-      return hits.length ? hits.join('; ') : false;
+      return items;
     };
-    const visibleRatio = (e) => {
-      if (!e) return null;
-      const b = e.getBoundingClientRect();
-      const contentW = Math.max(e.scrollWidth, b.width);
-      const contentH = Math.max(e.scrollHeight, b.height);
-      let clip = { left: b.left, top: b.top, right: b.right, bottom: b.bottom };
-      for (let a = e; a && a !== document.documentElement; a = a.parentElement) {
-        const cs = getComputedStyle(a);
-        const axes = clipAxes(cs);
-        if (!axes.x && !axes.y && a !== e) continue;
-        const ab = a.getBoundingClientRect();
-        if (axes.x || a === e) {
-          clip.left = Math.max(clip.left, ab.left);
-          clip.right = Math.min(clip.right, ab.right);
-        }
-        if (axes.y || a === e) {
-          clip.top = Math.max(clip.top, ab.top);
-          clip.bottom = Math.min(clip.bottom, ab.bottom);
-        }
-      }
-      const visW = Math.max(0, clip.right - clip.left);
-      const visH = Math.max(0, clip.bottom - clip.top);
-      const area = contentW * contentH;
-      return {
-        w: contentW > 0 ? +(visW / contentW).toFixed(3) : 1,
-        h: contentH > 0 ? +(visH / contentH).toFixed(3) : 1,
-        area: area > 0 ? +((visW * visH) / area).toFixed(3) : 1,
-        visW: +visW.toFixed(1),
-        visH: +visH.toFixed(1),
-        contentW: +contentW.toFixed(1),
-        contentH: +contentH.toFixed(1),
-      };
+    const maxOverflowPx = (items) =>
+      items.reduce((m, it) => Math.max(m, it.dW, it.dH), 0);
+    const clipped = (items) => {
+      const hits = (items || [])
+        .filter((it) => it.dW > 1 || it.dH > 1)
+        .map((it) => `${it.target} dW=${it.dW} dH=${it.dH}`);
+      return hits.length ? hits.join('; ') : false;
     };
     const header = q('header');
     const bottom = q('[data-testid=home-bottom-chrome]');
@@ -288,21 +264,26 @@ async function measure(browser, kind, locale) {
       fonts: {},
       boxes: {},
       visible: {},
+      overflow: {},
+      maxOverflowPx: {},
       clipped: {},
-      visibleRatio: {},
       tappable: {},
       lines: {},
       text: {},
     };
     for (const [k, e] of Object.entries(els)) {
+      const ov = overflow(e);
       out.fonts[k] = fs(e);
       out.boxes[k] = box(e);
       out.visible[k] = vis(e);
-      out.clipped[k] = clipped(e);
-      out.visibleRatio[k] = visibleRatio(e);
+      out.overflow[k] = ov;
+      out.maxOverflowPx[k] = +maxOverflowPx(ov).toFixed(2);
+      out.clipped[k] = clipped(ov);
       out.lines[k] = lines(e);
       out.text[k] = e?.textContent?.trim().slice(0, 80);
     }
+    out.boxes.panel = box(bottom);
+    out.boxes.globePane = box(q('[data-testid=home-globe]'));
     for (const k of ['lang', 'cta', 'share']) {
       const e = k === 'share' ? q('[data-testid=share-light-button]') : els[k];
       if (!e) {
@@ -353,6 +334,26 @@ async function measure(browser, kind, locale) {
   if (a.atmosphere?.medianCenterX != null) {
     r.sphere.centerOffsetX_atmosphere = +(a.atmosphere.medianCenterX - vp.width / 2).toFixed(1);
   }
+  const pane = r.dom.boxes.globePane || r.dom.boxes.canvas;
+  if (pane && a.atmosphere?.medianCenterX != null) {
+    const paneCenterX = pane.x + pane.w / 2;
+    r.sphere.pane = { x: pane.x, y: pane.y, w: pane.w, h: pane.h, centerX: +paneCenterX.toFixed(1) };
+    r.sphere.centerOffsetX_pane = +(a.atmosphere.medianCenterX - paneCenterX).toFixed(1);
+  }
+  const globeBox = (() => {
+    const src = a.atmosphere || a.earth;
+    if (!src || src.left == null || src.right == null) return null;
+    return { x: src.left, y: src.top, r: src.right, b: src.bottom, w: +(src.right - src.left).toFixed(1), h: +(src.bottom - src.top).toFixed(1) };
+  })();
+  r.sphere.globeBox = globeBox;
+  const panel = r.dom.boxes.panel;
+  if (globeBox && panel) {
+    const overlapW = Math.max(0, Math.min(globeBox.r, panel.r) - Math.max(globeBox.x, panel.x));
+    const overlapH = Math.max(0, Math.min(globeBox.b, panel.b) - Math.max(globeBox.y, panel.y));
+    r.sphere.panelOverlapPx2 = +(overlapW * overlapH).toFixed(1);
+  } else {
+    r.sphere.panelOverlapPx2 = null;
+  }
   r.console = con.filter((c) => !/GL Driver|THREE\.|503|Failed to fetch locations|Database unavailable|GPU stall/.test(c));
   await ctx.close();
   return r;
@@ -389,11 +390,7 @@ function judge(r) {
   const textKeys = ['brand', 'tagline', 'cta', 'count', 'countLabel', 'hint'];
   for (const k of textKeys) {
     const clip = r.dom.clipped[k];
-    if (clip) fails.push(`${label} ${k} clipped: ${clip}`);
-    const ratio = r.dom.visibleRatio[k];
-    if (ratio && (ratio.w < 0.99 || ratio.h < 0.99 || ratio.area < 0.99)) {
-      fails.push(`${label} ${k} visible ratio w=${ratio.w} h=${ratio.h} area=${ratio.area} < 1`);
-    }
+    if (clip) fails.push(`${label} ${k} overflow > 1px: ${clip}`);
   }
   if (r.dom.overlaps.length) fails.push(`${label} overlaps: ${r.dom.overlaps.join('; ')}`);
   const ctaBox = r.dom.boxes.cta;
@@ -404,16 +401,22 @@ function judge(r) {
     }
     if (!r.dom.tappable.cta) fails.push(`${label} CTA not tappable`);
   }
-  if (r.kind === 'mobile') {
-    if (!r.sphere?.earth) fails.push(`${label} globe not detected`);
-    else {
-      if (r.sphere.pctOfVH < 60 || r.sphere.pctOfVH > 65) {
-        fails.push(`${label} globe ${r.sphere.pctOfVH}% VH outside 60–65%`);
-      }
-      const off = r.sphere.centerOffsetX_atmosphere;
-      if (off == null || Math.abs(off) > 5) {
-        fails.push(`${label} globe atmosphere center offset ${off}px > ±5`);
-      }
+  if (!r.sphere?.earth) fails.push(`${label} globe not detected`);
+  else if (r.kind === 'mobile') {
+    if (r.sphere.pctOfVH < 60 || r.sphere.pctOfVH > 65) {
+      fails.push(`${label} globe ${r.sphere.pctOfVH}% VH outside 60–65%`);
+    }
+    const off = r.sphere.centerOffsetX_atmosphere;
+    if (off == null || Math.abs(off) > 5) {
+      fails.push(`${label} globe atmosphere center offset ${off}px > ±5`);
+    }
+  } else {
+    const paneOff = r.sphere.centerOffsetX_pane;
+    if (paneOff == null || Math.abs(paneOff) > 5) {
+      fails.push(`${label} globe pane center offset ${paneOff}px > ±5`);
+    }
+    if ((r.sphere.panelOverlapPx2 || 0) > 4) {
+      fails.push(`${label} globe overlaps side panel ${r.sphere.panelOverlapPx2}px²`);
     }
   }
   if (!r.splash?.shown) {
