@@ -7,6 +7,7 @@ import FitSingleLine from '@/components/FitSingleLine';
 import InstallAppButton from '@/components/InstallAppButton';
 import IntroScreen, { useIntroEntered } from '@/components/IntroScreen';
 import LanguageSelector from '@/components/LanguageSelector';
+import { HOME_BRAND_DESKTOP_PX, HOME_BRAND_MOBILE_PX } from '@/lib/home-chrome';
 import WelcomePanel from '@/components/WelcomePanel';
 import { type Locale } from '@/i18n/config';
 import { isLocale, localeCookieString } from '@/i18n/resolve-locale';
@@ -235,8 +236,8 @@ export default function Home() {
             <FitSingleLine
               testId="home-brand"
               className="home-brand font-semibold leading-tight tracking-wide text-amber-50"
-              maxPx={48}
-              maxPxLg={54}
+              maxPx={HOME_BRAND_MOBILE_PX}
+              maxPxLg={HOME_BRAND_DESKTOP_PX}
             >
               {t('brand')}
             </FitSingleLine>
@@ -260,7 +261,7 @@ export default function Home() {
 
           <div
             data-testid="home-bottom-chrome"
-            className="home-bottom pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/40 via-[#04060e]/12 to-transparent px-1.5 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-3 lg:pointer-events-auto lg:static lg:w-[26rem] lg:min-h-0 lg:shrink-0 lg:items-center lg:overflow-y-auto lg:bg-none lg:p-8"
+            className="home-bottom pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-center bg-gradient-to-t from-[#04060e]/40 via-[#04060e]/12 to-transparent px-1.5 pb-[max(0.25rem,env(safe-area-inset-bottom))] pt-3 lg:pointer-events-auto lg:static lg:w-[26rem] lg:min-h-0 lg:shrink-0 lg:items-center lg:bg-none lg:p-8"
           >
             <WelcomePanel
               count={stats.total}

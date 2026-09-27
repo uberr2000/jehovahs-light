@@ -3,16 +3,24 @@
  * chunk is stale / missing arbitrary utilities. Inlined into the HTML
  * document (not only `/_next/static/chunks/*.css`).
  *
- * Type is 3× the current develop computed sizes (16px root), as px so a
- * tiny rem root cannot keep the pre-#19 2rem / 32px title. Compact
- * layout is viewport-sized so the WebGL canvas cannot collapse to the
- * 300×150 default.
- *
- * Mobile (390×844): brand ≤48 (single line), tagline 36, CTA 54,
- * count 96, label 36, hint 36.
- * Desktop (lg / 1440×900): brand 54, tagline 42, CTA 54, count 144,
- * label 42, hint 48.
+ * Type is 3× the current develop computed sizes (16px root), as px.
+ * No overflow:hidden clip caps — tagline and hint must stay fully visible
+ * (they may wrap or shrink, never clip). See docs/home-framing.md.
  */
+import {
+  HOME_BRAND_DESKTOP_PX,
+  HOME_BRAND_MOBILE_PX,
+  HOME_COUNT_DESKTOP_PX,
+  HOME_COUNT_MOBILE_PX,
+  HOME_CTA_PX,
+  HOME_HINT_DESKTOP_PX,
+  HOME_HINT_MOBILE_PX,
+  HOME_LABEL_DESKTOP_PX,
+  HOME_LABEL_MOBILE_PX,
+  HOME_TAGLINE_DESKTOP_PX,
+  HOME_TAGLINE_MOBILE_PX,
+} from '@/lib/home-chrome';
+
 export const HOME_CRITICAL_CSS = `
 html { font-size: 16px; }
 html, body { height: 100%; }
@@ -31,8 +39,7 @@ html, body { height: 100%; }
   right: 0 !important;
   top: 0 !important;
   z-index: 20;
-  max-height: 8.5rem;
-  overflow: hidden;
+  overflow: visible;
 }
 .home-header-titles {
   min-width: 0;
@@ -61,37 +68,39 @@ html, body { height: 100%; }
   right: 0 !important;
   bottom: 0 !important;
   z-index: 10;
-  max-height: 55%;
-  overflow: hidden;
+  overflow: visible;
 }
 .home-brand {
   display: block;
-  font-size: 48px !important;
+  font-size: ${HOME_BRAND_MOBILE_PX}px !important;
   line-height: 1.25 !important;
   white-space: nowrap !important;
   max-width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 .home-tagline {
-  font-size: 36px !important;
+  display: block;
+  font-size: ${HOME_TAGLINE_MOBILE_PX}px !important;
   line-height: 1.3 !important;
+  overflow: visible;
+  overflow-wrap: anywhere;
 }
 .home-cta {
-  font-size: 54px !important;
+  font-size: ${HOME_CTA_PX}px !important;
   line-height: 1.15 !important;
   min-height: 4.75rem !important;
   overflow: visible !important;
   white-space: normal;
 }
-.home-count { font-size: 96px !important; line-height: 1 !important; }
-.home-count-label { font-size: 36px !important; line-height: 1.1 !important; }
+.home-count { font-size: ${HOME_COUNT_MOBILE_PX}px !important; line-height: 1 !important; overflow: visible; }
+.home-count-label { font-size: ${HOME_LABEL_MOBILE_PX}px !important; line-height: 1.1 !important; overflow: visible; }
 .home-hint {
-  font-size: 36px !important;
-  line-height: 1.15 !important;
-  max-height: 4.6rem;
-  overflow: hidden;
+  font-size: ${HOME_HINT_MOBILE_PX}px !important;
+  line-height: 1.2 !important;
+  overflow: visible;
+  overflow-wrap: anywhere;
 }
-.home-hint-desktop { font-size: 36px !important; }
+.home-hint-desktop { font-size: ${HOME_HINT_MOBILE_PX}px !important; }
 .home-share, .home-share button {
   font-size: 14px !important;
   line-height: 1.2 !important;
@@ -107,7 +116,7 @@ html, body { height: 100%; }
   .home-header {
     position: static !important;
     flex-shrink: 0 !important;
-    max-height: 7.5rem;
+    overflow: visible;
     padding-top: 0.75rem !important;
     padding-bottom: 0.75rem !important;
   }
@@ -132,14 +141,14 @@ html, body { height: 100%; }
     width: 26rem !important;
     max-height: 100%;
     flex-shrink: 0 !important;
-    overflow-y: auto !important;
+    overflow: visible !important;
   }
-  .home-brand { font-size: 54px !important; }
-  .home-tagline { font-size: 42px !important; }
-  .home-cta { font-size: 54px !important; min-height: 4.75rem !important; }
-  .home-count { font-size: 144px !important; }
-  .home-count-label { font-size: 42px !important; }
+  .home-brand { font-size: ${HOME_BRAND_DESKTOP_PX}px !important; }
+  .home-tagline { font-size: ${HOME_TAGLINE_DESKTOP_PX}px !important; }
+  .home-cta { font-size: ${HOME_CTA_PX}px !important; min-height: 4.75rem !important; }
+  .home-count { font-size: ${HOME_COUNT_DESKTOP_PX}px !important; }
+  .home-count-label { font-size: ${HOME_LABEL_DESKTOP_PX}px !important; }
   .home-hint,
-  .home-hint-desktop { font-size: 48px !important; }
+  .home-hint-desktop { font-size: ${HOME_HINT_DESKTOP_PX}px !important; }
 }
 `;
