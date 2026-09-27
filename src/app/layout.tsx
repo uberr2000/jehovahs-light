@@ -19,14 +19,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "萬國之光 · Light of the Nations | Jehovah's Light",
+  title: "點亮地球 · Light Up the Earth | Jehovah's Light",
   description:
-    '一人一燈，照亮全地。若你信靠耶和華，在互動地球上點一盞燈，與世界各地的信心之光連成星海。 Light a lamp on the globe and join a sea of lights with believers around the world.',
-  keywords: ['Jehovah', 'Light', 'Faith', 'Global', 'Christian', 'Beacon', 'Prayer', '萬國之光'],
+    "讓神的光，從你所在之處開始。若你信靠耶和華，在互動地球上點一盞燈，與世界各地的信心之光連成星海。 Let God's light begin right where you are — light a lamp on the globe and join a sea of lights with believers around the world.",
+  keywords: ['Jehovah', 'Light', 'Faith', 'Global', 'Christian', 'Beacon', 'Prayer', '點亮地球', 'Light Up the Earth'],
   authors: [{ name: "Jehovah's Light" }],
   openGraph: {
-    title: '萬國之光 · Light of the Nations',
-    description: 'One soul, one lamp, lighting the whole earth.',
+    title: '點亮地球 · Light Up the Earth',
+    description: "讓神的光，從你所在之處開始。 Let God's light begin right where you are.",
     type: 'website',
     locale: 'en_US',
     alternateLocale: ['zh_TW', 'zh_CN'],

@@ -40,7 +40,7 @@ describe('share payload', () => {
     const url = siteShareUrl('https://jehovahs-light.ink.net.tw/?lat=25.03&lng=121.56#x');
     assert.equal(url, 'https://jehovahs-light.ink.net.tw/');
     const text = buildShareText(
-      'One soul, one lamp, lighting the whole earth. Light a lamp with us.',
+      "Let God's light begin right where you are. Light a lamp with us.",
       'A lamp is shining in Taipei, Taiwan.'
     );
     const clipboard = buildClipboardPayload(text, url);
