@@ -1,7 +1,10 @@
 Site icons (favicon.ico, icon-32/192/512.png, apple-touch-icon.png)
-Glossy blue plus / cross. Transparency is real alpha (the source
-checkerboard is not stored as pixels).
+Glowing warm light point with cross rays on a black rounded square
+(same artwork as the Open Graph image).
 
-Source artwork: Terry + 幕僚長 (attached PNG). Resized only — not redrawn.
+Source artwork: provided PNG set (favicon-16x16, favicon-32x32,
+apple-touch-icon 180, android-chrome 192/512). Copied as-is; only the
+48px ICO frame is downscaled from the 512 PNG. favicon.ico holds PNG
+frames at 16, 32, and 48.
 Also wired via Next file conventions: src/app/favicon.ico, icon.png,
 apple-icon.png.

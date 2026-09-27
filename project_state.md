@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (Intro splash before the globe, 14 locales)
+_Last updated: 2026-09-27 (New light-point favicon / app icons)
 
 ## Project name & stack summary
 
@@ -213,7 +213,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `docs/consent-memory.md` — IP + localStorage limitations
 - `eslint.config.mjs` — ignores `deploy/**`
 - `public/favicon.ico` / `icon-32.png` / `icon-192.png` / `icon-512.png`
-  / `apple-touch-icon.png` — glossy blue plus (alpha); also
+  / `apple-touch-icon.png` — glowing light point on black rounded
+  square (matches the OG image); ICO has 16/32/48 PNG frames; also
   `src/app/favicon.ico`, `icon.png`, `apple-icon.png`
 - `public/icon-SOURCE.txt` — icon artwork provenance
 - `src/app/layout.tsx` — `metadata.icons` for ico / 32 / 192 / 512 / apple 180
@@ -229,6 +230,13 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `src/app/layout.tsx` — viewport lock, html lang/dir, locale source;
   `generateMetadata` points `rel=manifest` at `/app-manifest?locale=`
   and sets `appleWebApp.title` from the current locale
+- `src/app/opengraph-image.png` + `twitter-image.png` (1024×537) and
+  matching `.alt.txt` — file-convention share images; Next emits
+  `og:image` / `twitter:image` with type, size, and alt.
+- `src/app/layout.tsx` Open Graph — `metadataBase` from
+  `NEXT_PUBLIC_APP_URL` (via `configuredShareUrl`), else the request
+  host, so crawlers get absolute `og:image` / `og:url`. Adds `og:url`,
+  `og:site_name`, and a `summary_large_image` X card.
 - `src/app/app-manifest/route.ts` — install manifest; `?locale=` wins,
   otherwise Accept-Language. `id` stays `/` so every language is one app.
   Not `manifest.webmanifest`: Next treats that name as a metadata file.
@@ -286,6 +294,12 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Replace favicon / app icons with the glowing light
+  point: `favicon.ico` (16/32/48), `icon-32/192/512.png`,
+  `apple-touch-icon.png`, and the `src/app` icon conventions.
+- Facebook Open Graph: OG/X image (glowing light point),
+  absolute URLs via `metadataBase`, `og:url` / `og:site_name`, X large
+  card. No `fb:app_id` (none configured).
 - Intro splash from `light-intro.html` on `/`: overlay
   above the globe with its own language picker, Enter fades into the
   main page, translated in 14 locales (`intro.tagline/title/enter`).
