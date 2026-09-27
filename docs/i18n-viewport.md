@@ -8,12 +8,19 @@
 - Globe3D OrbitControls: `enableZoom` is on for every viewport (drag rotate
   stays). The globe canvas uses `touch-action: none` so pinch/wheel zoom the
   camera, not the page. Compact viewports (`pointer: coarse` or
-  `max-width: 768px`) **init with a full-sphere fit** (`fitCameraDistance`
-  on the atmosphere + margin) so the whole Earth is visible with no crop.
-  Users can still pinch/scroll zoom in. Zoom range is
+  `max-width: 768px`) **frame by vertical FOV**: the Earth disk starts at
+  **60–65% of viewport height** on ~390×844 (`COMPACT_EARTH_HEIGHT_FILL
+  = 0.62`). Below `lg` the WebGL shell is also **pixel-locked** to the
+  visual viewport so R3F cannot stay at the default 300×150 drawing box.
+  Portrait width may crop slightly; the sphere stays horizontally
+  centered (±5px). Header and bottom chrome stay overlay. Type is **3×
+  current develop computed sizes** (see [home-framing.md](home-framing.md)),
+  not 3× the old 2rem / 32px scale. Share v1 sits in that overlay and
+  does not take flex height from the globe. Zoom range is
   `3.2` … `max(fullFitDistance, 9)`. Desktop still starts around distance 6
-  with zoom between 3.2 and 9. Hint copy is `home.rotateHint`
-  (“Drag or zoom…”) in all 14 locale files.
+  with zoom between 3.2 and 9; header/panel heights are capped. Hint
+  copy is `home.rotateHint` (“Drag or zoom…”) in all 14 locale files.
+  CI measures both viewports with Playwright (`npm run test:chrome`).
 
 ## Locale priority
 

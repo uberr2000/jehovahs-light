@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (New light-point favicon / app icons)
+_Last updated: 2026-09-27 (QA #20: 1px overflow + desktop pane center)
 
 ## Project name & stack summary
 
@@ -77,8 +77,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `GET /api/locations` `userConsent` (IP). No new consent endpoint.
 - Mobile **page** zoom locked (`viewport` initial-scale=1, maximum-scale=1,
   user-scalable=no). Globe pinch/scroll zoom is on (`enableZoom`, canvas
-  `touch-action: none`); compact camera frames the Earth disk at ~72% of
-  canvas height (camera `z` / vertical FOV, not width-limited fit), then
+  `touch-action: none`); compact camera frames the Earth disk at 60–65%
+  of viewport height on 390×844 (camera `z` / vertical FOV), then
   the user can zoom. Hint is “Drag or zoom…”.
   Layout is column on mobile (globe above panel) and row on desktop.
 - Home chrome matches v10 type scale: larger header title/tagline,
@@ -109,10 +109,20 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `icon-32.png` / `icon-192.png` / `icon-512.png`,
   `apple-touch-icon.png` (180), plus Next file conventions
   `src/app/favicon.ico`, `icon.png`, `apple-icon.png`. `layout`
-  `metadata.icons` points at the public files.
-- Compact globe camera inits with a full-sphere fit (atmosphere +
-  margin via `fitCameraDistance`) so the whole Earth is visible; users
-  can still zoom in. Desktop framing stays distance 6.
+  `metadata.icons` points at the public files. Icons left unchanged in
+  the live 390×844 type/Earth follow-up.
+- Live QA after #18/#19: HTML had ×3 `text-[6rem]` but computed title
+  stayed ~32px (pre-#19 `2rem`), and the Earth disk stayed ~80px. Chrome
+  type is now document-inlined **px** classes (`home-brand` ≤48px on
+  mobile = 3× develop’s 16px, not the old 96px) so a stale hashed
+  Tailwind chunk or a tiny rem root cannot keep 32px.
+  The compact WebGL shell is pixel-locked to the visual viewport so R3F
+  cannot sit at the default 300×150 box (~80px disk). Overlay chrome,
+  APIs, consent, land, stars, zoom, and favicons are unchanged.
+- Compact globe camera no longer width-fits atmosphere + margin (that
+  left a ~34% / tinier disk on 390×844). Default `position.z` uses
+  vertical FOV so the Earth disk is 60–65% of viewport height on 390×844.
+  Zoom-out still reaches the full-sphere fit; desktop stays at distance 6.
 - Share v1 (frontend-only): “Share the light” CTA on the home globe
   panel. Payload is site origin + invite copy; if a lamp is already lit,
   a city/region phrase from existing location data may be appended.
@@ -129,8 +139,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   set after mount. If the Clipboard API is blocked, sync `execCommand` runs first;
   if copy still fails, a compact select-to-copy field appears.
   Strings live in all 14 `home.*` locales. No new API, DB, short
-  links, tracking, or login gate. Overlay chrome / Earth ≥60% /
-  favicon / type fixes from #18–#20 are unchanged.
+  links, tracking, or login gate. The Share button stays compact in
+  the overlay bar and does not steal globe height.
 - Stats no longer treat a failed `GET /api/locations` as zeros; error + retry.
   Live `/api/locations` 500 is documented in `docs/locations-api.md`
   (likely host MySQL/.env; BigInt JSON serialize is also guarded in code).
@@ -189,9 +199,15 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `docs/globe-texture.md` — NASA Blue Marble source, credit, license
 - `public/globe/earth-blue-marble.jpg` — local 2048×1024 satellite map
 - `public/globe/SOURCE.txt` — asset provenance next to the JPEG
+- `src/lib/earth-framing.ts` — compact / desktop camera distance math
+- `src/lib/home-chrome.ts` — 3× type constants; `HOME_BRAND_PX = 48` on every viewport
+- `src/app/home-critical.ts` — document-inlined px type + viewport layout;
+  no header/hint clip caps (`overflow: visible` on chrome type)
+- `scripts/assert-earth-framing.mjs` — compact disk ≥60% of 844px height
 - `src/components/Globe3D.tsx` — R3F scene: Earth + beacons + own beacon,
-  OrbitControls rotate + zoom, compact **full-sphere fit** on init
-  (atmosphere + margin; no height-fill crop), then zoom, brighter Stars
+  OrbitControls rotate + zoom, compact height-fill framing (Earth disk
+  ≥60% of viewport height) then zoom, brighter Stars; below `lg` the
+  canvas box is `visualViewport` pixels (not `%` of a 0-height parent)
 - `src/components/globe/Earth.tsx` — Blue Marble + land/sea contrast shader;
   `LAND_LUMINANCE_FACTOR` (0.5 vs v0/develop land lift; sea unchanged)
 - `src/components/globe/Beacons.tsx` / `OwnBeacon.tsx` / `lat-lng.ts`
@@ -217,19 +233,31 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   square (matches the OG image); ICO has 16/32/48 PNG frames; also
   `src/app/favicon.ico`, `icon.png`, `apple-icon.png`
 - `public/icon-SOURCE.txt` — icon artwork provenance
-- `src/app/layout.tsx` — `metadata.icons` for ico / 32 / 192 / 512 / apple 180
-- `src/app/page.tsx` — header brand `1rem` / `1.125rem` (÷3 then ×0.5),
-  tagline `0.75rem` / `0.875rem` (÷3 then ×0.5); `main` is `h-[100dvh]`
-  with the globe `absolute inset-0` below `lg`; header + short bottom
-  bar overlay; `lg` stays header + row sidebar in-flow with the glass card
+- `src/app/layout.tsx` — `metadata.icons`, viewport lock, html lang/dir,
+  locale source, inlined `HOME_CRITICAL_CSS` (`<style href="home-critical">`)
+- `src/app/page.tsx` — header brand/tagline **3× current develop** via
+  `home-brand` / `home-tagline` (brand ≤48 every viewport, tagline 36 / 42);
+  `main` is `100dvh` with the globe `absolute inset-0` below `lg`;
+  header + short bottom bar overlay; `lg` stays header + row sidebar
+- `src/components/FitSingleLine.tsx` — shrink brand to one line until
+  `scrollWidth <= clientWidth` with an 8px safety margin
+- `scripts/measure-home-chrome.mjs` — Playwright render gates: click
+  Enter (no sessionStorage bypass); en + zh-TW at 390×844 and
+  1440×900; fail if overflow > 1px on the element or a clipping
+  ancestor; mobile globe center from the atmosphere limb; desktop
+  globe must sit ±5px of the left pane center and not overlap the
+  side panel
+- `docs/home-framing.md` — QA acceptance: Earth 60–65% VH, 3× type,
+  **no clipping** (≤1px overflow), desktop pane center, no overlap,
+  CI render measure
 - `src/app/` — pages and API routes
 - `src/i18n/config.ts` — 14 locales + native names
 - `src/i18n/resolve-locale.ts` — cookie / Accept-Language / navigator match
 - `src/i18n/messages/*.json` — en, zh-TW, zh-CN, es, pt, fr, de, ja, ko, ru, ar, id, th, vi
 - `src/components/LocaleNavigatorFallback.tsx` — navigator fallback when SSR defaulted
-- `src/app/layout.tsx` — viewport lock, html lang/dir, locale source;
-  `generateMetadata` points `rel=manifest` at `/app-manifest?locale=`
-  and sets `appleWebApp.title` from the current locale
+- `src/app/layout.tsx` — viewport lock, html lang/dir, locale source,
+  inlined `HOME_CRITICAL_CSS`; `generateMetadata` points `rel=manifest`
+  at `/app-manifest?locale=` and sets `appleWebApp.title` from the locale
 - `src/app/opengraph-image.png` + `twitter-image.png` (1024×537) and
   matching `.alt.txt` — file-convention share images; Next emits
   `og:image` / `twitter:image` with type, size, and alt.
@@ -286,14 +314,42 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - After #17 the canvas was full-viewport but compact OrbitControls still
   width-fit the atmosphere (camera ~14 on 390×844), so the Earth disk
   was a small circle in a sea of black. Compact default now uses
-  vertical FOV height-fill (~72%, `z` ≈ 6.7) so the disk is ≥60% of
-  viewport height. Zoom-out can still reach the full-sphere fit.
+  vertical FOV height-fill (60–65% of viewport height on 390×844) so
+  the disk is QA-gated, not the old 72% oversize. Zoom-out can still
+  reach the full-sphere fit.
 - The installed app name is fixed at install time. Changing the site
   language later does not rename the home-screen icon; delete and
   reinstall to pick up another locale.
+- Live after #18/#19 still showed title ~32px and Earth ~80px because
+  (1) ×3 type lived only as Tailwind `rem` utilities in a hashed CSS
+  chunk and (2) the WebGL canvas could remain the 300×150 default.
+  Document-inlined px + viewport pixel lock address both. QA then
+  rejected 72% fill and 4–6× type (96px title vs develop’s 16px).
+  Type is now 3× **current** develop computed sizes; Earth 60–65% VH.
+  Header/hint `max-height` + `overflow:hidden` caps were removed after
+  QA showed tagline/hint at 27–71% visible. Type may wrap or shrink
+  (FitSingleLine + 8px safety on brand); it must never clip.
+- Home chrome no-clipping: header and hint have no max-height clip
+  caps; brand FitSingleLine guarantees scrollWidth ≤ clientWidth;
+  brand is `HOME_BRAND_PX` (48) on every viewport. Playwright clicks
+  Enter and checks en + zh-TW at 390×844 and 1440×900.
 
 ## Recent Commits
 
+- QA #20 follow-up: overflow gate is absolute ≤1px on each chrome
+  element and clipping ancestor (no 99% visible-ratio); desktop globe
+  must be ±5px of the left pane center and must not overlap the side
+  panel. Docs updated. No extra line-height padding.
+- QA clip-fix #20: remove header/hint max-height clip caps so tagline
+  and hint are fully visible; FitSingleLine keeps brand
+  scrollWidth ≤ clientWidth (+8px); brand cap is `HOME_BRAND_PX` (48)
+  on every viewport; tagline/hint stay 3× (±10%) and may wrap, never
+  shrink. Playwright fails on clip / visible ratio, measures globe
+  center from the atmosphere limb, tests en + zh-TW at 390×844 and
+  1440×900, and clicks Enter (no sessionStorage bypass).
+- QA-fix #20: Earth 60–65% VH on 390×844; chrome type 3× current
+  develop (not the old 2rem scale); header/CTA/count/hint/share do not
+  overlap; Playwright render measurement in CI. Rebase onto `3f3273c`.
 - Replace favicon / app icons with the glowing light
   point: `favicon.ico` (16/32/48), `icon-32/192/512.png`,
   `apple-touch-icon.png`, and the `src/app` icon conventions.
@@ -308,11 +364,16 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   header install button (Chromium prompt / iOS hint), production-only
   service worker with an offline page. Manifest name follows the
   language picker via `?locale=`.
-
-
 - WelcomePanel lit state: title `lg:text-[1rem]` (was 0.9375rem),
   message `text-base` / `lg:text-[0.7rem]` (was `text-sm` / 0.5625rem);
   file reformatted to double quotes.
+- Rebase #20 onto latest develop (`32c8d33`, #22 share hrefs). Keep
+  develop’s 點亮地球 rebrand, WhatsApp/email, #22 SSR share helpers/tests,
+  #23 `ci.yml` deploy-after-CI, #24 `deploy/check-app-url.sh`.
+- Make live 390×844 actually show Earth ≥60% VH and ×3 type:
+  inline px chrome classes in the HTML document; pixel-lock the compact
+  WebGL canvas to the visual viewport; re-frame on resize. Favicons,
+  APIs, consent, land, stars, zoom unchanged.
 - Rebase Share hrefs (#22) onto `46ad8c5` (#24 APP_URL deploy guard).
   Keep develop’s `ci.yml` / deploy script / `docs/deploy.md` /
   `docs/ci-cd.md`. Merge this file’s #24 + #22 entries.
@@ -355,10 +416,6 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   with 14-locale copy; city/region phrase when a lamp is already lit;
   never put GPS in the share URL or text. Overlay / Earth ≥60% unchanged.
   ADR `docs/adr/013-share-v1.md` records the frontend-only decision.
-- Shrink home chrome type ÷3, then halve header brand and tagline
-  (brand ×0.5; tagline 缩小一倍 → ×0.5). Halve WelcomePanel /
-  LightLampButton / LampCounter text **and** button chrome to match.
-  Overlay / Earth ≥60% / APIs unchanged.
 - Replace default Next favicon with the glossy blue plus/cross
   (transparent alpha). Multi-size ICO + 32/192/512 PNGs + 180
   apple-touch; wire `metadata.icons`. Chrome type ×3 and Earth ≥60%
@@ -451,13 +508,19 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   column names stay `lit_locations` / `gps_consent` with the original
   snake_case columns so existing host tables are reused. Migrations are
   `CREATE TABLE IF NOT EXISTS`.
-- Top/bottom copy (header title/tagline, CTA, lamp count label, hint,
-  lit title/message) is sized at **÷3 of the prior ×3** scale so type
-  stays readable on ~390px. Below `lg`, chrome overlays a full-viewport
-  canvas; the bottom bar stays a short translucent strip. Compact
-  camera frames the Earth disk at ~72% of canvas height so the sphere
-  is ≥60% of viewport height. Desktop chrome stays an in-flow glass
-  card with distance-6 framing.
+- Top/bottom copy (header title/tagline, CTA, lamp count label, hint)
+  is sized **3× current develop computed sizes** (±10%) as document-
+  inlined px (`home-brand` ≤48 every viewport = `HOME_BRAND_PX`).
+  Brand stays one line (may shrink until scrollWidth fits). Tagline
+  and hint stay at 3× develop (±10%) and may wrap but must not shrink;
+  they must never be clipped — no `max-height` + `overflow:hidden` on
+  header/hint. Tailwind
+  `text-[6rem]` alone was not enough on live. Below `lg`, chrome
+  overlays a full-viewport canvas locked to visual-viewport pixels.
+  Compact camera frames the Earth disk at 60–65% of viewport height.
+  Desktop chrome stays an in-flow glass card with distance-6 framing.
+  Share v1 stays compact. CI Playwright (`npm run test:chrome`) clicks
+  Enter and measures en + zh-TW at both viewports.
 - Home chrome follows the v0 dark full-bleed + glass panel. Lighting a
   lamp still uses existing locations/consent APIs (not the zip’s
   `/api/lamps` or Postgres). v0 `zh-Hant` strings map to `zh-TW`; all 14
