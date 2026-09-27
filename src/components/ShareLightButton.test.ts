@@ -20,7 +20,11 @@ function hrefOf(html: string, testId: string): string {
   const tags = html.match(/<a\b[^>]*>/g) ?? [];
   const tag = tags.find((item) => item.includes(`data-testid="${testId}"`));
   const href = tag?.match(/href="([^"]*)"/)?.[1] ?? '';
-  return href.replace(/&amp;/g, '&');
+  return href
+    .replace(/&amp;/g, '&')
+    .replace(/&#x27;/gi, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&apos;/g, "'");
 }
 
 function expectedSocial() {
