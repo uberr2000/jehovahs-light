@@ -23,7 +23,7 @@ take effect. The default branch is unchanged; Production is untouched.
 | Install | `npm ci` |
 | Lint | `npm run lint` (`eslint` + `eslint-config-next` 16.2.4).
   `deploy/**` is ignored (PM2 CommonJS). |
-| Test | `npm test` (`node --experimental-strip-types --test src/lib/share.test.ts`) |
+| Test | `npm test` (`tsx --test` on share helpers + ShareLightButton render) |
 | Deploy guard fixtures | `bash deploy/check-app-url.test.sh` |
 | Build | `npm run build` (`postbuild` copies `public` + `.next/static` into standalone) |
 | Verify | `test -f .next/standalone/public/globe/earth-blue-marble.jpg` |
@@ -38,8 +38,8 @@ does not fail:
 - `PORT=3000` (CI only; does **not** change `package.json`)
 - `DB_HOST=127.0.0.1` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` (`ci`) —
   used by Drizzle at runtime and by `db:migrate` against the MySQL service
-- `NEXT_PUBLIC_APP_URL=https://example.invalid` (listed in `.env.example`;
-  unused in source at the time of writing)
+- `NEXT_PUBLIC_APP_URL=https://example.invalid` (Share v1 site root for
+  SSR social hrefs; listed in `.env.example`)
 
 ## Develop deploy — job `deploy-develop` in `.github/workflows/ci.yml`
 

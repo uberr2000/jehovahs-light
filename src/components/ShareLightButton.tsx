@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type MouseEvent, type ReactNode } from 'react';
+import { useEffect, useState, useSyncExternalStore, type MouseEvent, type ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import {
   assertSafeSharePayload,
@@ -8,13 +8,17 @@ import {
   buildShareText,
   canUseWebShare,
   copyToClipboard,
+  configuredShareUrl,
   formatPlaceLabel,
   prefersNativeShare,
   siteShareUrl,
   socialShareUrls,
   type PlaceFields,
-  type SocialNetwork,
 } from '@/lib/share';
+
+function subscribeShareUrl() {
+  return () => {};
+}
 
 export default function ShareLightButton({
   hasLit,
@@ -27,18 +31,31 @@ export default function ShareLightButton({
   const [copied, setCopied] = useState(false);
   const [manualText, setManualText] = useState<string | null>(null);
   const [shareState, setShareState] = useState('idle');
+  const shareUrl = useSyncExternalStore(
+    subscribeShareUrl,
+    siteShareUrl,
+    configuredShareUrl
+  );
 
   const placeLabel = formatPlaceLabel(place);
   const locationLine =
     hasLit && placeLabel ? t('shareLocation', { place: placeLabel }) : null;
 
   const getPayload = () => {
-    const url = siteShareUrl();
+    const url = siteShareUrl() || shareUrl;
     const text = buildShareText(t('shareText'), locationLine);
     const title = t('shareTitle');
     const clipboard = buildClipboardPayload(text, url);
     return { url, text, title, clipboard };
   };
+
+  const text = buildShareText(t('shareText'), locationLine);
+  const title = t('shareTitle');
+  const clipboard = buildClipboardPayload(text, shareUrl);
+  const socialSafe = Boolean(shareUrl) && assertSafeSharePayload(clipboard);
+  const social = socialSafe
+    ? socialShareUrls(text, shareUrl, title)
+    : { line: '#', facebook: '#', x: '#', whatsapp: '#', email: '#' };
 
   useEffect(() => {
     if (!copied && !manualText) return;
@@ -97,16 +114,8 @@ export default function ShareLightButton({
     await copyPayload(payload.clipboard);
   };
 
-  const handleSocialClick = (
-    event: MouseEvent<HTMLAnchorElement>,
-    network: SocialNetwork
-  ) => {
-    const payload = getPayload();
-    if (!assertSafeSharePayload(payload.clipboard) || !payload.url) {
-      event.preventDefault();
-      return;
-    }
-    event.currentTarget.href = socialShareUrls(payload.text, payload.url, payload.title)[network];
+  const handleSocialClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (!socialSafe) event.preventDefault();
   };
 
   return (
@@ -126,43 +135,43 @@ export default function ShareLightButton({
           className="hidden items-center gap-1 lg:flex"
         >
           <SocialLink
-            href="https://social-plugins.line.me/lineit/share"
+            href={social.line}
             label={t('shareViaLine')}
             testId="share-via-line"
-            onClick={(event) => handleSocialClick(event, 'line')}
+            onClick={handleSocialClick}
           >
             <LineGlyph />
           </SocialLink>
           <SocialLink
-            href="https://www.facebook.com/sharer/sharer.php"
+            href={social.facebook}
             label={t('shareViaFacebook')}
             testId="share-via-facebook"
-            onClick={(event) => handleSocialClick(event, 'facebook')}
+            onClick={handleSocialClick}
           >
             <FacebookGlyph />
           </SocialLink>
           <SocialLink
-            href="https://twitter.com/intent/tweet"
+            href={social.x}
             label={t('shareViaX')}
             testId="share-via-x"
-            onClick={(event) => handleSocialClick(event, 'x')}
+            onClick={handleSocialClick}
           >
             <XGlyph />
           </SocialLink>
           <SocialLink
-            href="https://wa.me/"
+            href={social.whatsapp}
             label={t('shareViaWhatsApp')}
             testId="share-via-whatsapp"
-            onClick={(event) => handleSocialClick(event, 'whatsapp')}
+            onClick={handleSocialClick}
           >
             <WhatsAppGlyph />
           </SocialLink>
           <SocialLink
-            href="mailto:"
+            href={social.email}
             label={t('shareViaEmail')}
             testId="share-via-email"
             newTab={false}
-            onClick={(event) => handleSocialClick(event, 'email')}
+            onClick={handleSocialClick}
           >
             <EmailGlyph />
           </SocialLink>

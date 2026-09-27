@@ -90,17 +90,28 @@ function stripTracking(url: URL): URL {
   return url;
 }
 
-/** Canonical site origin only — no query, hash, GPS, or PII. */
-export function siteShareUrl(origin?: string): string {
-  const raw =
-    origin ||
-    (typeof window !== 'undefined' ? window.location.origin : '') ||
-    '';
+function canonicalizeShareUrl(raw: string): string {
+  if (!raw) return '';
   try {
     return stripTracking(new URL(raw)).toString();
   } catch {
     return raw.split('?')[0].split('#')[0] || '';
   }
+}
+
+/** Env-only site root — safe for SSR / first paint (never reads `window`). */
+export function configuredShareUrl(): string {
+  return canonicalizeShareUrl(process.env.NEXT_PUBLIC_APP_URL || '');
+}
+
+/** Canonical site origin only — no query, hash, GPS, or PII. */
+export function siteShareUrl(origin?: string): string {
+  const raw =
+    origin ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (typeof window !== 'undefined' ? window.location.origin : '') ||
+    '';
+  return canonicalizeShareUrl(raw);
 }
 
 export function buildShareText(body: string, locationLine?: string | null): string {
