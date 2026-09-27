@@ -195,7 +195,8 @@ async function measure(browser, kind, locale) {
       };
     };
     const fs = (e) => (e ? parseFloat(getComputedStyle(e).fontSize) : null);
-    const isClipValue = (v) => v === 'hidden' || v === 'clip';
+    const isClipValue = (v) =>
+      v === 'hidden' || v === 'clip' || v === 'auto' || v === 'scroll';
     const clipAxes = (cs) => ({
       x: isClipValue(cs.overflowX) || isClipValue(cs.overflow),
       y: isClipValue(cs.overflowY) || isClipValue(cs.overflow),
@@ -334,11 +335,22 @@ async function measure(browser, kind, locale) {
   if (a.atmosphere?.medianCenterX != null) {
     r.sphere.centerOffsetX_atmosphere = +(a.atmosphere.medianCenterX - vp.width / 2).toFixed(1);
   }
+  if (a.atmosphere && a.atmosphere.top != null && a.atmosphere.bottom != null) {
+    const atmosphereCenterY = (a.atmosphere.top + a.atmosphere.bottom) / 2;
+    r.sphere.centerY_atmosphere = +atmosphereCenterY.toFixed(1);
+    r.sphere.centerOffsetY_atmosphere = +(atmosphereCenterY - vp.height / 2).toFixed(1);
+  }
   const pane = r.dom.boxes.globePane || r.dom.boxes.canvas;
   if (pane && a.atmosphere?.medianCenterX != null) {
     const paneCenterX = pane.x + pane.w / 2;
     r.sphere.pane = { x: pane.x, y: pane.y, w: pane.w, h: pane.h, centerX: +paneCenterX.toFixed(1) };
     r.sphere.centerOffsetX_pane = +(a.atmosphere.medianCenterX - paneCenterX).toFixed(1);
+  }
+  if (pane && a.atmosphere && a.atmosphere.top != null && a.atmosphere.bottom != null) {
+    const paneCenterY = pane.y + pane.h / 2;
+    const atmosphereCenterY = (a.atmosphere.top + a.atmosphere.bottom) / 2;
+    if (r.sphere.pane) r.sphere.pane.centerY = +paneCenterY.toFixed(1);
+    r.sphere.centerOffsetY_pane = +(atmosphereCenterY - paneCenterY).toFixed(1);
   }
   const globeBox = (() => {
     const src = a.atmosphere || a.earth;
@@ -410,10 +422,18 @@ function judge(r) {
     if (off == null || Math.abs(off) > 5) {
       fails.push(`${label} globe atmosphere center offset ${off}px > ±5`);
     }
+    const offY = r.sphere.centerOffsetY_atmosphere;
+    if (offY == null || Math.abs(offY) > 5) {
+      fails.push(`${label} globe atmosphere vertical center offset ${offY}px > ±5`);
+    }
   } else {
     const paneOff = r.sphere.centerOffsetX_pane;
     if (paneOff == null || Math.abs(paneOff) > 5) {
       fails.push(`${label} globe pane center offset ${paneOff}px > ±5`);
+    }
+    const paneOffY = r.sphere.centerOffsetY_pane;
+    if (paneOffY == null || Math.abs(paneOffY) > 5) {
+      fails.push(`${label} globe pane vertical center offset ${paneOffY}px > ±5`);
     }
     if ((r.sphere.panelOverlapPx2 || 0) > 4) {
       fails.push(`${label} globe overlaps side panel ${r.sphere.panelOverlapPx2}px²`);

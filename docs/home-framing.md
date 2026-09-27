@@ -14,10 +14,10 @@ only a camera-math sanity check and is **not** sufficient on its own.
 
 - Rendered globe **diameter in CSS pixels** is **60–65% of viewport
   height** (506–549px on 844px).
-- Horizontal **center is within ±5px** of the viewport midline,
-  measured on the **rendered globe / atmosphere limb**
-  (`medianCenterX` of rows whose both edges are visible), not the
-  canvas midpoint.
+- Horizontal **and vertical** center are within **±5px** of the
+  viewport midline, measured on the **rendered globe / atmosphere
+  limb** (`medianCenterX` of rows whose both edges are visible, and
+  the midpoint of atmosphere top/bottom), not the canvas midpoint.
 - Slight left/right cropping is allowed. Top/bottom must not clip the
   sphere off-screen.
 - Compact camera uses vertical-FOV height-fill
@@ -26,10 +26,10 @@ only a camera-math sanity check and is **not** sufficient on its own.
   so R3F cannot stay at the default 300×150 drawing box.
 
 Desktop (1440×900) keeps the existing distance-6 in-flow globe. The
-rendered globe center must sit within **±5px of the horizontal center
-of the left globe pane** (not the full viewport, which includes the
-side panel). The globe bounding box must **not overlap** the side
-panel. Header and side panel stay in normal flow (`overflow: visible`)
+rendered globe center must sit within **±5px of the horizontal and
+vertical center of the left globe pane** (not the full viewport, which
+includes the side panel). The globe bounding box must **not overlap**
+the side panel. Header and side panel stay in normal flow (`overflow: visible`)
 so they cannot steal globe height the way a 998px wrapping title did,
 and they must not clip type.
 
@@ -76,7 +76,8 @@ be fully visible at both viewports and both locales.
   desktop tagline, and ~58% / ~27% of the hint.
 - Absolute 1px overflow rule (no visible-ratio percent): on each of
   those elements **and** on any ancestor whose `overflow` /
-  `overflow-x` / `overflow-y` is `hidden` or `clip`,
+  `overflow-x` / `overflow-y` is `hidden`, `clip`, `auto`, or
+  `scroll`,
   `(scrollHeight - clientHeight) <= 1` and
   `(scrollWidth - clientWidth) <= 1`. Anything over 1px fails.
   Subpixel residuals of 1px are acceptable. Do **not** add
@@ -102,11 +103,12 @@ The measure script:
 - centers the globe using the atmosphere-limb median, not the canvas
   midpoint;
 - fails if tagline/hint are not 3× develop (±10%), if brand is over
-  48px or wraps, if any checked element or clipping ancestor overflows
-  by more than 1px, on chrome overlap / off-screen CTA, if the mobile
-  globe is outside 60–65% VH / not centered ±5px on the viewport, or
-  if the desktop globe is more than ±5px from its left-pane center or
-  overlaps the side panel.
+  48px or wraps, if any checked element or clipping ancestor
+  (`hidden` / `clip` / `auto` / `scroll`) overflows by more than 1px,
+  on chrome overlap / off-screen CTA, if the mobile globe is outside
+  60–65% VH / not centered ±5px on the viewport (X and Y), or if the
+  desktop globe is more than ±5px from its left-pane center (X and Y)
+  or overlaps the side panel.
 
 The `deploy-develop` job still `needs: lint-and-build` and still
 runs `deploy/check-app-url.sh` on the host. `deploy/` scripts are

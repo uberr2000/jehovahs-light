@@ -27,7 +27,9 @@ permissions:
 env:
   # Harmless placeholders so `next build` can see the same keys as .env.example.
   # DB_* is used at runtime by Drizzle (src/lib/db) and by `npm run db:migrate`.
-  # NEXT_PUBLIC_APP_URL is unused in source today but listed in .env.example.
+  # NEXT_PUBLIC_APP_URL is the public origin for share hrefs and metadata
+  # (og:url / metadataBase / og:image). CI uses a placeholder; #22 rules
+  # treat example.invalid as unset so this job does not bake fake URLs.
   # PORT is never written into package.json — "start" stays "next start".
   CI: true
   PORT: "3000"
@@ -334,3 +336,16 @@ jobs:
             bash deploy/pm2-sync.sh
 
             echo "deploy ok: ${DEPLOY_PATH} @ ${EXPECTED_SHA} (PM2 name jehovahs-light / ecosystem). PORT left unchanged in host .env."
+
+      # After SSH deploy succeeds, prove the public hostname serves THIS app.
+      # The live domain has been mis-routed to an unrelated Laravel site;
+      # a 200 from the wrong HTML must fail. Expected to stay red until
+      # DNS / Nginx / Cloudflare point https://jehovahs-light.ink.net.tw/
+      # at this Next.js process. Does not change deploy/ server config.
+      - name: Checkout public URL checker
+        uses: actions/checkout@v4
+
+      - name: Check public URL after deploy
+        env:
+          PUBLIC_CHECK_URL: https://jehovahs-light.ink.net.tw/
+        run: node scripts/check-public-url.mjs

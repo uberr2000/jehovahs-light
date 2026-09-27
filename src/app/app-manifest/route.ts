@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { loadMessages } from '@/i18n/load-messages';
 import { htmlDir, isLocale, resolveRequestLocale } from '@/i18n/resolve-locale';
+import { PWA_SHORT_NAME } from '@/lib/site-metadata';
 
 // Served from /app-manifest, not the manifest.webmanifest file convention:
 // Next treats that name as a metadata file and will not run a route handler.
@@ -19,7 +20,7 @@ export async function GET(request: NextRequest) {
     {
       id: '/',
       name: copy.brand,
-      short_name: copy.brand,
+      short_name: PWA_SHORT_NAME,
       description: copy.tagline,
       start_url: '/',
       scope: '/',
@@ -32,6 +33,12 @@ export async function GET(request: NextRequest) {
       icons: [
         { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
         { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+        {
+          src: '/icon-512-maskable.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'maskable',
+        },
       ],
     },
     {

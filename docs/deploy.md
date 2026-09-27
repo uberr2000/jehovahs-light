@@ -67,6 +67,13 @@ Fail closed when:
 
 Pass example log: `NEXT_PUBLIC_APP_URL host: jehovahs-light.ink.net.tw`
 
+After SSH deploy succeeds, CI also curls that public origin and fails
+unless the HTML is this Next.js app (title contains `點亮地球`),
+`/app-manifest` is 200, and `og:image` is a reachable image. That
+check lives in the workflow (`scripts/check-public-url.mjs`); it does
+not change `deploy/` server config. See [metadata.md](metadata.md)
+and [ci-cd.md](ci-cd.md).
+
 ## PM2
 
 `deploy/ecosystem.config.cjs` loads repo-root `.env` into the PM2 `env`

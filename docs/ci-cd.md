@@ -23,12 +23,14 @@ take effect. The default branch is unchanged; Production is untouched.
 | Install | `npm ci` |
 | Lint | `npm run lint` (`eslint` + `eslint-config-next` 16.2.4).
   `deploy/**` is ignored (PM2 CommonJS). |
-| Test | `npm test` (`tsx --test` on share helpers + ShareLightButton) |
+| Test | `npm test` (`tsx --test` on share helpers, site metadata,
+  locale default zh-TW, public-URL checker, ShareLightButton) |
 | Deploy guard fixtures | `bash deploy/check-app-url.test.sh` |
 | Build | `npm run build` (`postbuild` copies `public` + `.next/static` into standalone) |
 | Verify | `test -f .next/standalone/public/globe/earth-blue-marble.jpg` |
 | Render measure | `npx playwright install --with-deps chromium` then
-  `npm run test:chrome` (390×844 + 1440×900 Earth / type / overlap) |
+  `npm run test:chrome` (390×844 + 1440×900 Earth / type / overlap;
+  globe X+Y center; overflow hidden/clip/auto/scroll) |
 | Drizzle check | `npm run db:check` (`drizzle-kit check`, no live DB) |
 | Migrate | `npm run db:migrate` against an ephemeral MySQL 8 service
   (`DB_HOST=127.0.0.1`). Run twice to confirm `CREATE TABLE IF NOT EXISTS`
@@ -41,7 +43,8 @@ does not fail:
 - `DB_HOST=127.0.0.1` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` (`ci`) —
   used by Drizzle at runtime and by `db:migrate` against the MySQL service
 - `NEXT_PUBLIC_APP_URL=https://example.invalid` (listed in `.env.example`;
-  unused in source at the time of writing)
+  #22 placeholder rules treat this as unset so CI does not bake fake
+  `og:url` / share hrefs. Host builds use the real https origin.)
 
 ## Develop deploy — job `deploy-develop` in `.github/workflows/ci.yml`
 
@@ -127,6 +130,14 @@ a failing command still stops the deploy.
      then `pm2 start deploy/ecosystem.config.cjs --update-env`
    - **fails the deploy** unless `pm2 show jehovahs-light` script mentions
      `standalone/server.js` or `with-env.sh` (still `next start` → fail)
+10. After SSH succeeds, the runner curls the public origin
+    (`https://jehovahs-light.ink.net.tw/`) with
+    `scripts/check-public-url.mjs`. Fail unless `GET /` is 200 and
+    `<title>` contains `點亮地球`, `GET /app-manifest` is 200, and the
+    page’s `og:image` URL is 200 with an `image/*` type. A 200 from an
+    unrelated Laravel (or other) site is a failure — the live hostname
+    has been mis-routed. See [metadata.md](metadata.md). The host
+    `check-app-url.sh` guard and `needs: lint-and-build` stay in place.
 
 PM2 must start via `deploy/with-env.sh` → `node .next/standalone/server.js`.
 `startOrReload --update-env` re-reads the host `.env` through the ecosystem

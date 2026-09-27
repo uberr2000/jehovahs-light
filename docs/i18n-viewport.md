@@ -28,17 +28,19 @@
 2. SSR `Accept-Language` (when there is no valid cookie)
 3. `navigator.language` / `navigator.languages` (client, only if cookie and
    Accept-Language did not resolve)
-4. Fallback `en`
+4. Fallback `zh-TW`
 
 Unmatched tags, including unmatched region variants (`zh-HK`, `zh`, `zh-Hant`),
-map to `en`. Language-only locales still accept regional tags (`es-MX` → `es`,
+map to `zh-TW`. Language-only locales still accept regional tags (`es-MX` → `es`,
 `ja-JP` → `ja`, `en-US` → `en`). `zh-TW` and `zh-CN` require an exact match.
 
 RTL: `html dir="rtl"` only for `ar`.
 
 Choosing a language writes the `locale` cookie and reloads so SSR matches.
 v0 `zh-Hant` copy lives in `zh-TW` messages; detection still does not map
-unmatched `zh-Hant` / `zh-HK` to `zh-TW` (those fall back to `en`).
+unmatched `zh-Hant` / `zh-HK` onto `zh-TW` as a language match (those
+fall through to the `zh-TW` default). Open Graph `og:locale` follows the
+active UI locale (`zh_TW`, `en_US`, …). See [metadata.md](metadata.md).
 
 ## Supported locales
 

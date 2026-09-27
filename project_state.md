@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (QA #20: 1px overflow + desktop pane center)
+_Last updated: 2026-09-27 (OG/PWA/locale + post-deploy public URL check)
 
 ## Project name & stack summary
 
@@ -148,8 +148,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   intro, language selector) so Chinese/English stay readable.
 - 14 locales via next-intl messages: en, zh-TW, zh-CN, es, pt, fr, de,
   ja, ko, ru, ar, id, th, vi. Detection: locale cookie → SSR
-  Accept-Language → navigator.language → en. Unmatched (including
-  unmatched region variants like zh-HK) → en. `html dir=rtl` only for ar.
+  Accept-Language → navigator.language → zh-TW. Unmatched (including
+  unmatched region variants like zh-HK) → zh-TW. `html dir=rtl` only for ar.
 - Language cookie reload keeps the main page in the same tab (sessionStorage
   intro-dismissed); first visit still shows the lighthouse intro.
 - `npm run build` `postbuild` copies `public` + `.next/static` into
@@ -183,7 +183,8 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `inert` underneath so the globe loads while the intro plays. Enter fades
   out in 1s; sessionStorage `jl-intro-entered` skips it on reload in the
   same tab (e.g. language switch). Title/tagline use `Noto_Serif_TC` via
-  `next/font` (`preload: false`). Copy in `intro.*` for all 14 locales.
+  `next/font` (`preload: false`). `intro.title` is the localized brand
+  (點亮地球 / Light Up the Earth / …). Auto-close behavior unchanged.
 - `.env.example` — `PORT` + DB vars
 - `.github/workflows/ci.yml` — lint, `npm test`, URL-guard fixtures,
   build, migrate; develop SSH deploy job after CI on push/dispatch to
@@ -244,15 +245,24 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `scripts/measure-home-chrome.mjs` — Playwright render gates: click
   Enter (no sessionStorage bypass); en + zh-TW at 390×844 and
   1440×900; fail if overflow > 1px on the element or a clipping
-  ancestor; mobile globe center from the atmosphere limb; desktop
-  globe must sit ±5px of the left pane center and not overlap the
+  ancestor (`hidden` / `clip` / `auto` / `scroll`); mobile globe
+  center from the atmosphere limb (X and Y ±5px); desktop globe must
+  sit ±5px of the left pane center (X and Y) and not overlap the
   side panel
+- `src/lib/site-metadata.ts` — metadataBase / og:url / og:locale /
+  PWA short_name helper (`src/lib/site-metadata.test.ts`)
+- `scripts/check-public-url.mjs` — post-deploy public origin check
+  (`scripts/check-public-url.test.ts`)
+- `docs/metadata.md` — OG / PWA / post-deploy public URL check
+- `public/icon-512-maskable.png` — 512×512 maskable (artwork in 80%
+  safe zone); C2PA stripped from icon PNGs
 - `docs/home-framing.md` — QA acceptance: Earth 60–65% VH, 3× type,
   **no clipping** (≤1px overflow), desktop pane center, no overlap,
   CI render measure
 - `src/app/` — pages and API routes
 - `src/i18n/config.ts` — 14 locales + native names
-- `src/i18n/resolve-locale.ts` — cookie / Accept-Language / navigator match
+- `src/i18n/resolve-locale.ts` — cookie / Accept-Language / navigator match;
+  default `zh-TW` (`src/i18n/resolve-locale.test.ts` covers the 4 cases)
 - `src/i18n/messages/*.json` — en, zh-TW, zh-CN, es, pt, fr, de, ja, ko, ru, ar, id, th, vi
 - `src/components/LocaleNavigatorFallback.tsx` — navigator fallback when SSR defaulted
 - `src/app/layout.tsx` — viewport lock, html lang/dir, locale source,
@@ -261,12 +271,15 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `src/app/opengraph-image.png` + `twitter-image.png` (1024×537) and
   matching `.alt.txt` — file-convention share images; Next emits
   `og:image` / `twitter:image` with type, size, and alt.
-- `src/app/layout.tsx` Open Graph — `metadataBase` from
-  `NEXT_PUBLIC_APP_URL` (via `configuredShareUrl`), else the request
-  host, so crawlers get absolute `og:image` / `og:url`. Adds `og:url`,
-  `og:site_name`, and a `summary_large_image` X card.
+- `src/app/layout.tsx` Open Graph — `metadataBase` / `og:url` /
+  `og:image` / `twitter:image` from `NEXT_PUBLIC_APP_URL` via the #22
+  share helper only (no Host-header fallback; placeholders are unset).
+  `og:locale` follows the active language. X card is
+  `summary_large_image`. OG/twitter images are real PNGs. See
+  `docs/metadata.md`.
 - `src/app/app-manifest/route.ts` — install manifest; `?locale=` wins,
   otherwise Accept-Language. `id` stays `/` so every language is one app.
+  `short_name` is `點亮地球` (≤ 12). Includes a 512 maskable icon.
   Not `manifest.webmanifest`: Next treats that name as a metadata file.
 - `src/i18n/load-messages.ts` — shared locale → messages loader used by
   `request.ts` and `/app-manifest`
@@ -319,7 +332,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   reach the full-sphere fit.
 - The installed app name is fixed at install time. Changing the site
   language later does not rename the home-screen icon; delete and
-  reinstall to pick up another locale.
+  reinstall to pick up another locale. `short_name` is always 點亮地球.
+- Live `https://jehovahs-light.ink.net.tw/` has been mis-routed to an
+  unrelated Laravel site. The post-deploy public URL check is expected
+  to fail until DNS / Nginx / Cloudflare point the host at this app.
 - Live after #18/#19 still showed title ~32px and Earth ~80px because
   (1) ×3 type lived only as Tailwind `rem` utilities in a hashed CSS
   chunk and (2) the WebGL canvas could remain the 300×150 default.
@@ -336,6 +352,13 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Build on Terry’s OG/PWA work: absolute metadata URLs from
+  `NEXT_PUBLIC_APP_URL` only (no Host fallback); Twitter
+  `summary_large_image`; default locale zh-TW + 4 unit tests;
+  `og:locale` per language; real PNG OG images; 512 maskable icon;
+  `short_name` 點亮地球; splash title uses localized brand; post-deploy
+  public URL check; chrome measure adds vertical center + overflow
+  auto/scroll ancestors. Docs: `docs/metadata.md`.
 - QA #20 follow-up: overflow gate is absolute ≤1px on each chrome
   element and clipping ancestor (no 99% visible-ratio); desktop globe
   must be ±5px of the left pane center and must not overlap the side
@@ -500,10 +523,16 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   camera only (`touch-none` on the canvas). Compact viewports still frame
   the full globe first. Hint copy is `home.rotateHint` in all 14 locales.
 - Locale cookie is the user pick (and navigator fallback persist). SSR
-  uses Accept-Language when the cookie is missing. Unmatched region
-  variants (e.g. zh-HK) do not map to zh-TW/zh-CN. RTL only for `ar`.
-  UI strings live in next-intl `messages/*.json` (no duplicate hardcoded
-  maps, no translate API).
+  uses Accept-Language when the cookie is missing. Default when neither
+  is present (and when the language is unsupported) is `zh-TW`.
+  Unmatched region variants (e.g. zh-HK) do not fuzzy-map to zh-TW/zh-CN
+  as a language match; they fall through to that default. RTL only for
+  `ar`. UI strings live in next-intl `messages/*.json` (no duplicate
+  hardcoded maps, no translate API).
+- Share / OG absolute URLs never use the request Host header. They
+  follow the #22 `configuredShareUrl` placeholder rules. `og:locale`
+  is the active UI language. Develop deploy curls the public hostname
+  after SSH and fails if the HTML is not this app.
 - Database access is Drizzle-only (no Prisma, no dual ORM). Table and
   column names stay `lit_locations` / `gps_consent` with the original
   snake_case columns so existing host tables are reused. Migrations are
@@ -519,8 +548,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   overlays a full-viewport canvas locked to visual-viewport pixels.
   Compact camera frames the Earth disk at 60–65% of viewport height.
   Desktop chrome stays an in-flow glass card with distance-6 framing.
-  Share v1 stays compact. CI Playwright (`npm run test:chrome`) clicks
-  Enter and measures en + zh-TW at both viewports.
+  Share v1 stays compact.   CI Playwright (`npm run test:chrome`) clicks
+  Enter and measures en + zh-TW at both viewports, including vertical
+  globe center and overflow auto/scroll ancestors.
 - Home chrome follows the v0 dark full-bleed + glass panel. Lighting a
   lamp still uses existing locations/consent APIs (not the zip’s
   `/api/lamps` or Postgres). v0 `zh-Hant` strings map to `zh-TW`; all 14

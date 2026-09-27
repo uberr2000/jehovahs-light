@@ -18,7 +18,7 @@ export function isLocale(value: string | undefined | null): value is Locale {
  * Exact tags win (zh-TW, zh-CN). Language-only locales (es, pt, ja, …)
  * also accept regional variants (es-MX → es, ja-JP → ja, en-US → en).
  * Unmatched region variants of a region-specific locale do not fuzzy-map
- * (zh-HK / zh / zh-Hant → null → caller falls back to en).
+ * (zh-HK / zh / zh-Hant → null → caller falls back to DEFAULT_LOCALE, zh-TW).
  */
 export function matchLocale(tag: string | undefined | null): Locale | null {
   if (!tag) return null;

@@ -1,10 +1,12 @@
-Site icons (favicon.ico, icon-32/192/512.png, apple-touch-icon.png)
+Site icons (favicon.ico, icon-32/192/512.png, apple-touch-icon.png,
+icon-512-maskable.png)
 Glowing warm light point with cross rays on a black rounded square
 (same artwork as the Open Graph image).
 
 Source artwork: provided PNG set (favicon-16x16, favicon-32x32,
-apple-touch-icon 180, android-chrome 192/512). Copied as-is; only the
-48px ICO frame is downscaled from the 512 PNG. favicon.ico holds PNG
-frames at 16, 32, and 48.
+apple-touch-icon 180, android-chrome 192/512). C2PA `caBX` chunks
+stripped from the PNG icons. The 512 maskable icon is the same
+artwork inset in the 80% safe zone on opaque black.
+favicon.ico holds PNG frames at 16, 32, and 48.
 Also wired via Next file conventions: src/app/favicon.ico, icon.png,
 apple-icon.png.
