@@ -4,12 +4,12 @@
  * document (not only `/_next/static/chunks/*.css`).
  *
  * Type is 3× the current develop computed sizes (16px root), as px.
- * No overflow:hidden clip caps — tagline and hint must stay fully visible
- * (they may wrap or shrink, never clip). See docs/home-framing.md.
+ * No overflow:hidden clip caps — tagline and hint stay at 3×, may wrap,
+ * and must stay fully visible (never clip, never shrink). See
+ * docs/home-framing.md.
  */
 import {
-  HOME_BRAND_DESKTOP_PX,
-  HOME_BRAND_MOBILE_PX,
+  HOME_BRAND_PX,
   HOME_COUNT_DESKTOP_PX,
   HOME_COUNT_MOBILE_PX,
   HOME_CTA_PX,
@@ -72,7 +72,7 @@ html, body { height: 100%; }
 }
 .home-brand {
   display: block;
-  font-size: ${HOME_BRAND_MOBILE_PX}px !important;
+  font-size: ${HOME_BRAND_PX}px !important;
   line-height: 1.25 !important;
   white-space: nowrap !important;
   max-width: 100%;
@@ -143,7 +143,7 @@ html, body { height: 100%; }
     flex-shrink: 0 !important;
     overflow: visible !important;
   }
-  .home-brand { font-size: ${HOME_BRAND_DESKTOP_PX}px !important; }
+  .home-brand { font-size: ${HOME_BRAND_PX}px !important; }
   .home-tagline { font-size: ${HOME_TAGLINE_DESKTOP_PX}px !important; }
   .home-cta { font-size: ${HOME_CTA_PX}px !important; min-height: 4.75rem !important; }
   .home-count { font-size: ${HOME_COUNT_DESKTOP_PX}px !important; }

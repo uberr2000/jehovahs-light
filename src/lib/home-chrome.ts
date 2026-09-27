@@ -1,9 +1,11 @@
 /**
  * Home chrome type: 3× current develop computed sizes (16px root).
- * Desktop brand is a single constant so a later 48px cap is one-line.
+ * Brand cap is 48px on every viewport (one constant). Only the brand
+ * may shrink to stay on a single line. Tagline and hint stay at 3×.
  */
-export const HOME_BRAND_MOBILE_PX = 48;
-export const HOME_BRAND_DESKTOP_PX = 54;
+export const HOME_BRAND_PX = 48;
+export const HOME_BRAND_MOBILE_PX = HOME_BRAND_PX;
+export const HOME_BRAND_DESKTOP_PX = HOME_BRAND_PX;
 
 export const HOME_TAGLINE_MOBILE_PX = 36;
 export const HOME_TAGLINE_DESKTOP_PX = 42;

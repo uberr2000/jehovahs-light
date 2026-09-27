@@ -38,24 +38,26 @@ are interpolated into document-inlined `HOME_CRITICAL_CSS`.
 
 | Chrome | Mobile develop | ×3 target | Desktop develop | ×3 target |
 | --- | ---: | ---: | ---: | ---: |
-| Brand | 16 (`1rem`) | ≤48, one line | 18 (`1.125rem`) | 54 (`HOME_BRAND_DESKTOP_PX`) |
-| Tagline | 12 (`0.75rem`) | 36 | 14 (`0.875rem`) | 42 |
+| Brand | 16 (`1rem`) | ≤48, one line | 18 (`1.125rem`) | ≤48 (`HOME_BRAND_PX`) |
+| Tagline | 12 (`0.75rem`) | 36 (±10%) | 14 (`0.875rem`) | 42 (±10%) |
 | CTA | 18 (`1.125rem`) | 54 | 18 | 54 |
 | Count | 32 (`2rem`) | 96 | 48 (`3rem`) | 144 |
 | Label | 12 (`text-xs`) | 36 | 14 (`0.875rem`) | 42 |
-| Hint | 12 (`text-xs`) | 36 | 16 (`1rem`) | 48 |
+| Hint | 12 (`text-xs`) | 36 (±10%) | 16 (`1rem`) | 48 (±10%) |
 
-Brand **must stay a single line** (element height ≤ one line-height).
+Brand **must stay a single line** (element height ≤ one line-height)
+and is capped at **48px on every viewport** (`HOME_BRAND_PX`).
 `FitSingleLine` shrinks until `scrollWidth <= clientWidth` with an 8px
 safety margin. Long locales such as English “Light Up the Earth” may
-go below 48px. Desktop brand is **54px** (`HOME_BRAND_DESKTOP_PX`); a
-possible 48px desktop cap is a product decision and that constant is
-the only place to change it.
+go below 48px. **Only the brand may shrink.**
 
-Tagline and hint may wrap. On 390-wide they may also shrink below 3×
-(like the brand) if wrapping at 3× would clip or overlap. They must
-**never** be clipped. Do **not** 3× the old pre-#19 2rem / 32px scale
-(that produced a 96px title and a 998px header).
+Tagline and hint **stay at 3× develop (±10%)** and must **not** shrink.
+They may wrap to multiple lines. They must **never** be clipped. If
+keeping 3× wrapping text makes a hard limit (globe 60–65% VH, center
+±5px, no overlap, CTA on-screen) impossible at 390×844, keep the 3×
+sizes and report the heights/overlaps — do not shrink to paper over it.
+Do **not** 3× the old pre-#19 2rem / 32px scale (that produced a 96px
+title and a 998px header).
 
 Sizes live in document-inlined `HOME_CRITICAL_CSS`
 (`src/app/home-critical.ts`), not only hashed Tailwind rem utilities.
@@ -81,7 +83,8 @@ be fully visible at both viewports and both locales.
 
 The `home-shell` viewport lock (`overflow: hidden` on the 100dvh
 stage) is not a type cap: chrome must stay inside that stage by
-sizing/wrapping/shrinking, never by clipping ink.
+wrapping (tagline/hint) or shrinking (brand only), never by clipping
+ink.
 
 ## 4. CI
 
@@ -94,8 +97,9 @@ The measure script:
 - runs **en** and **zh-TW** at **390×844** and **1440×900**;
 - centers the globe using the atmosphere-limb median, not the canvas
   midpoint;
-- fails on clip / visible-ratio / overlap / off-screen CTA / mobile
-  globe outside 60–65% VH.
+- fails if tagline/hint are not 3× develop (±10%), if brand is over
+  48px or wraps, on clip / visible-ratio / overlap / off-screen CTA,
+  or if the mobile globe is outside 60–65% VH / not centered ±5px.
 
 The `deploy-develop` job still `needs: lint-and-build` and still
 runs `deploy/check-app-url.sh` on the host. `deploy/` scripts are

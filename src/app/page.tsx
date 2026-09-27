@@ -7,7 +7,7 @@ import FitSingleLine from '@/components/FitSingleLine';
 import InstallAppButton from '@/components/InstallAppButton';
 import IntroScreen, { useIntroEntered } from '@/components/IntroScreen';
 import LanguageSelector from '@/components/LanguageSelector';
-import { HOME_BRAND_DESKTOP_PX, HOME_BRAND_MOBILE_PX } from '@/lib/home-chrome';
+import { HOME_BRAND_PX } from '@/lib/home-chrome';
 import WelcomePanel from '@/components/WelcomePanel';
 import { type Locale } from '@/i18n/config';
 import { isLocale, localeCookieString } from '@/i18n/resolve-locale';
@@ -236,8 +236,7 @@ export default function Home() {
             <FitSingleLine
               testId="home-brand"
               className="home-brand font-semibold leading-tight tracking-wide text-amber-50"
-              maxPx={HOME_BRAND_MOBILE_PX}
-              maxPxLg={HOME_BRAND_DESKTOP_PX}
+              maxPx={HOME_BRAND_PX}
             >
               {t('brand')}
             </FitSingleLine>

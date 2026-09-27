@@ -27,7 +27,7 @@ const DEVELOP_BASELINE = {
 };
 const TARGET = {
   mobile: { brand: 48, tagline: 36, cta: 54, count: 96, countLabel: 36, hint: 36 },
-  desktop: { brand: 54, tagline: 42, cta: 54, count: 144, countLabel: 42, hint: 48 },
+  desktop: { brand: 48, tagline: 42, cta: 54, count: 144, countLabel: 42, hint: 48 },
 };
 
 function analyse(buf, dpr) {
@@ -377,10 +377,12 @@ function judge(r) {
     };
     if (k === 'brand') {
       if (actual == null || actual > tgt + 0.5) fails.push(`${label} brand ${actual}px > ${tgt}`);
-    } else if (actual > tgt + 0.5) {
-      fails.push(`${label} ${k} ${actual}px > ${tgt}`);
-    } else if (actual < tgt * 0.7 - 0.5) {
-      fails.push(`${label} ${k} ${actual}px shrank below 70% of ${tgt}`);
+    } else if (k === 'tagline' || k === 'hint') {
+      if (!within10(actual, tgt)) {
+        fails.push(`${label} ${k} ${actual}px is not 3× develop (${tgt} ±10%); tagline/hint must not shrink`);
+      }
+    } else if (!within10(actual, tgt)) {
+      fails.push(`${label} ${k} ${actual}px is not 3× develop (${tgt} ±10%)`);
     }
   }
   if ((r.dom.lines.brand || 99) > 1) fails.push(`${label} brand wraps to ${r.dom.lines.brand} lines`);

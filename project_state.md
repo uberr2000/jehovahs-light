@@ -200,7 +200,7 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `public/globe/earth-blue-marble.jpg` — local 2048×1024 satellite map
 - `public/globe/SOURCE.txt` — asset provenance next to the JPEG
 - `src/lib/earth-framing.ts` — compact / desktop camera distance math
-- `src/lib/home-chrome.ts` — 3× type constants; `HOME_BRAND_DESKTOP_PX = 54`
+- `src/lib/home-chrome.ts` — 3× type constants; `HOME_BRAND_PX = 48` on every viewport
 - `src/app/home-critical.ts` — document-inlined px type + viewport layout;
   no header/hint clip caps (`overflow: visible` on chrome type)
 - `scripts/assert-earth-framing.mjs` — compact disk ≥60% of 844px height
@@ -236,7 +236,7 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - `src/app/layout.tsx` — `metadata.icons`, viewport lock, html lang/dir,
   locale source, inlined `HOME_CRITICAL_CSS` (`<style href="home-critical">`)
 - `src/app/page.tsx` — header brand/tagline **3× current develop** via
-  `home-brand` / `home-tagline` (mobile ≤48 / 36, desktop 54 / 42);
+  `home-brand` / `home-tagline` (brand ≤48 every viewport, tagline 36 / 42);
   `main` is `100dvh` with the globe `absolute inset-0` below `lg`;
   header + short bottom bar overlay; `lg` stays header + row sidebar
 - `src/components/FitSingleLine.tsx` — shrink brand to one line until
@@ -328,18 +328,18 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   (FitSingleLine + 8px safety on brand); it must never clip.
 - Home chrome no-clipping: header and hint have no max-height clip
   caps; brand FitSingleLine guarantees scrollWidth ≤ clientWidth;
-  desktop brand is `HOME_BRAND_DESKTOP_PX` (54). Playwright clicks
+  brand is `HOME_BRAND_PX` (48) on every viewport. Playwright clicks
   Enter and checks en + zh-TW at 390×844 and 1440×900.
 
 ## Recent Commits
 
 - QA clip-fix #20: remove header/hint max-height clip caps so tagline
   and hint are fully visible; FitSingleLine keeps brand
-  scrollWidth ≤ clientWidth (+8px); desktop brand is
-  `HOME_BRAND_DESKTOP_PX` (54); Playwright fails on clip / visible
-  ratio, measures globe center from the atmosphere limb, tests en +
-  zh-TW at 390×844 and 1440×900, and clicks Enter (no sessionStorage
-  bypass).
+  scrollWidth ≤ clientWidth (+8px); brand cap is `HOME_BRAND_PX` (48)
+  on every viewport; tagline/hint stay 3× (±10%) and may wrap, never
+  shrink. Playwright fails on clip / visible ratio, measures globe
+  center from the atmosphere limb, tests en + zh-TW at 390×844 and
+  1440×900, and clicks Enter (no sessionStorage bypass).
 - QA-fix #20: Earth 60–65% VH on 390×844; chrome type 3× current
   develop (not the old 2rem scale); header/CTA/count/hint/share do not
   overlap; Playwright render measurement in CI. Rebase onto `3f3273c`.
@@ -503,11 +503,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `CREATE TABLE IF NOT EXISTS`.
 - Top/bottom copy (header title/tagline, CTA, lamp count label, hint)
   is sized **3× current develop computed sizes** (±10%) as document-
-  inlined px (`home-brand` ≤48 mobile / 54 desktop = 3× 16 / 18).
-  Desktop brand is the single constant `HOME_BRAND_DESKTOP_PX`.
+  inlined px (`home-brand` ≤48 every viewport = `HOME_BRAND_PX`).
   Brand stays one line (may shrink until scrollWidth fits). Tagline
-  and hint may wrap or shrink; they must never be clipped — no
-  `max-height` + `overflow:hidden` on header/hint. Tailwind
+  and hint stay at 3× develop (±10%) and may wrap but must not shrink;
+  they must never be clipped — no `max-height` + `overflow:hidden` on
+  header/hint. Tailwind
   `text-[6rem]` alone was not enough on live. Below `lg`, chrome
   overlays a full-viewport canvas locked to visual-viewport pixels.
   Compact camera frames the Earth disk at 60–65% of viewport height.
