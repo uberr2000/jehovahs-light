@@ -10,7 +10,12 @@ PORT still comes from the **host `.env` only**. `package.json` `"start"` stays
 
 ## CI — `.github/workflows/ci.yml`
 
-Runs on `pull_request` and `push` targeting **`develop`**.
+Runs on `pull_request` and `push` targeting **`develop`**, and on
+manual **`workflow_dispatch`**. Develop SSH deploy is a **later job in
+this same workflow** (`needs: lint-and-build`). It is **not** a
+separate `workflow_run` workflow — the repo default branch is `main`,
+so a `workflow_run` trigger that exists only on `develop` would never
+take effect. The default branch is unchanged; Production is untouched.
 
 | Step | Command |
 | --- | --- |
@@ -35,10 +40,30 @@ does not fail:
 - `NEXT_PUBLIC_APP_URL=https://example.invalid` (listed in `.env.example`;
   unused in source at the time of writing)
 
-## Develop deploy — `.github/workflows/deploy-develop.yml`
+## Develop deploy — job `deploy-develop` in `.github/workflows/ci.yml`
 
-Runs on **`push` to `develop`**. First live SSH deploy may fail until secrets
-exist; that is expected.
+Order: **CI first**, then deploy only if CI succeeded.
+
+| Trigger | CI (`lint-and-build`) | Deploy |
+| --- | --- | --- |
+| `pull_request` into `develop` | runs | **never** (`if` rejects PR events) |
+| `push` to `develop` | runs | runs only after CI is green |
+| `workflow_dispatch` on `develop` | runs first | runs after CI is green |
+| `workflow_dispatch` on any other ref | runs | **never** |
+
+The deploy job `if` is
+`github.ref == 'refs/heads/develop' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')`.
+A red CI skips deploy via `needs: lint-and-build`. Overlapping deploys
+share concurrency group `deploy-develop` with `cancel-in-progress: false`
+so they queue instead of racing. Develop CI runs themselves are not
+cancelled mid-SSH (`cancel-in-progress` is false when `github.ref` is
+`develop`).
+
+The remote script fetches and checks out **`github.sha`** (the commit
+this workflow just tested), then fails if `HEAD` is not that SHA. It
+does **not** `git pull` whatever `origin/develop` is at deploy time.
+
+First live SSH deploy may fail until secrets exist; that is expected.
 
 ### Required repository secrets
 
@@ -65,8 +90,9 @@ a failing command still stops the deploy.
    `git reset --hard` (same lesson as the ai.srdc.org.tw dirty `package.json`).
 3. Require host `.env` with `PORT` already set. The workflow never writes PORT
    and never edits `package.json`.
-4. `git fetch origin develop`, then `git pull --ff-only origin develop` when
-   already on `develop` (otherwise checkout `develop` and pull `--ff-only`).
+4. Fetch `origin/develop` and the tested SHA (`EXPECTED_SHA` =
+   `github.sha`). `git checkout -B develop <sha>` (not `git pull` of
+   the branch tip, not `git reset --hard`). Fail if `HEAD` ≠ that SHA.
 5. `npm ci` and `npm run build`. `postbuild`
    (`scripts/copy-standalone-assets.mjs`) copies `public` →
    `.next/standalone/public` and `.next/static` →
