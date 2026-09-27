@@ -3,19 +3,23 @@
 import { useTranslations } from 'next-intl';
 import LampCounter from '@/components/LampCounter';
 import LightLampButton from '@/components/LightLampButton';
+import ShareLightButton from '@/components/ShareLightButton';
+import type { PlaceFields } from '@/lib/share';
 
 export default function WelcomePanel({
   count,
   hasLit,
+  litPlace,
   statsStatus,
   onRetry,
   onLocationReceived,
 }: {
   count: number;
   hasLit: boolean;
+  litPlace?: PlaceFields | null;
   statsStatus: 'loading' | 'ok' | 'error';
   onRetry: () => void;
-  onLocationReceived: (lat: number, lng: number) => void;
+  onLocationReceived: (lat: number, lng: number, place?: PlaceFields | null) => void;
 }) {
   const t = useTranslations('home');
 
@@ -38,6 +42,7 @@ export default function WelcomePanel({
             </div>
             <LampCounter count={count} />
             <StatsError status={statsStatus} onRetry={onRetry} />
+            <ShareLightButton hasLit={hasLit} place={litPlace} />
             <div className="hidden lg:block">{hint}</div>
           </div>
         ) : (
@@ -45,6 +50,7 @@ export default function WelcomePanel({
             <LightLampButton onLocationReceived={onLocationReceived} />
             <LampCounter count={count} />
             <StatsError status={statsStatus} onRetry={onRetry} />
+            <ShareLightButton hasLit={hasLit} place={litPlace} />
             <div className="hidden lg:block">{hint}</div>
           </div>
         )}

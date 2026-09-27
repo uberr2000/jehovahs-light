@@ -18,6 +18,7 @@ Runs on `pull_request` and `push` targeting **`develop`**.
 | Install | `npm ci` |
 | Lint | `npm run lint` (`eslint` + `eslint-config-next` 16.2.4).
   `deploy/**` is ignored (PM2 CommonJS). |
+| Test | `npm test` (`node --experimental-strip-types --test src/lib/share.test.ts`) |
 | Build | `npm run build` (`postbuild` copies `public` + `.next/static` into standalone) |
 | Verify | `test -f .next/standalone/public/globe/earth-blue-marble.jpg` |
 | Drizzle check | `npm run db:check` (`drizzle-kit check`, no live DB) |

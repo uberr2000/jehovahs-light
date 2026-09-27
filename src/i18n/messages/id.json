@@ -65,6 +65,15 @@
     "errorGeneric": "Tidak dapat menemukan lokasi Anda. Silakan coba lagi.",
     "errorUnsupported": "Perangkat Anda tidak mendukung layanan lokasi.",
     "loadError": "Tidak dapat memuat terang saat ini.",
-    "retry": "Coba lagi"
+    "retry": "Coba lagi",
+    "shareButton": "Bagikan terang",
+    "shareTitle": "Bagikan terang",
+    "shareText": "Satu jiwa, satu pelita, menerangi seluruh bumi. Nyalakan pelita bersama kami.",
+    "shareCopied": "Tersalin — tempel di mana saja untuk membagikan.",
+    "shareSelect": "Pilih lalu salin:",
+    "shareLocation": "Sebuah pelita menyala di {place}.",
+    "shareViaLine": "Bagikan ke LINE",
+    "shareViaFacebook": "Bagikan ke Facebook",
+    "shareViaX": "Bagikan ke X"
   }
 }

@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { writeCachedConsent } from "@/lib/consent-cache";
+import { pickPlaceFields, type PlaceFields } from "@/lib/share";
 
 interface LightLampButtonProps {
-  onLocationReceived: (lat: number, lng: number) => void;
+  onLocationReceived: (lat: number, lng: number, place?: PlaceFields | null) => void;
 }
 
 type Status = "idle" | "locating" | "saving";
@@ -54,8 +55,13 @@ export default function LightLampButton({
             setError(t("errorGeneric"));
             return;
           }
-          await response.json().catch(() => ({}));
-          onLocationReceived(latitude, longitude);
+          const data = await response.json().catch(() => ({}));
+          const place = pickPlaceFields(
+            typeof data === "object" && data !== null && "location" in data
+              ? (data as { location?: unknown }).location
+              : null,
+          );
+          onLocationReceived(latitude, longitude, place);
         } catch {
           setError(t("errorGeneric"));
         } finally {

@@ -13,6 +13,7 @@ import {
   writeCachedConsent,
   normalizeConsent,
 } from '@/lib/consent-cache';
+import { resolveLitPlace, type PlaceFields } from '@/lib/share';
 
 const Globe3D = dynamic(() => import('@/components/Globe3D'), {
   ssr: false,
@@ -92,6 +93,7 @@ export default function Home() {
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(
     null
   );
+  const [litPlace, setLitPlace] = useState<PlaceFields | null>(null);
   const [statsStatus, setStatsStatus] = useState<StatsStatus>('loading');
 
   useEffect(() => {
@@ -158,7 +160,7 @@ export default function Home() {
     window.location.reload();
   };
 
-  const handleLocationReceived = (lat: number, lng: number) => {
+  const handleLocationReceived = (lat: number, lng: number, place?: PlaceFields | null) => {
     const consent: UserConsent = {
       consented: true,
       hasLocation: true,
@@ -168,6 +170,7 @@ export default function Home() {
     setUserLocation({ latitude: lat, longitude: lng });
     setUserConsent(consent);
     writeCachedConsent(consent);
+    if (place) setLitPlace(place);
     fetchLocationsPayload()
       .then((data) => {
         setLocations(data.locations);
@@ -207,6 +210,7 @@ export default function Home() {
   };
 
   const hasLit = Boolean(userConsent?.hasLocation || userLocation);
+  const resolvedPlace = resolveLitPlace(litPlace, userLocation, locations);
 
   return (
     <main className="relative h-[100dvh] w-full overflow-hidden bg-[#04060e] lg:flex lg:flex-col">
@@ -237,6 +241,7 @@ export default function Home() {
           <WelcomePanel
             count={stats.total}
             hasLit={hasLit}
+            litPlace={resolvedPlace}
             statsStatus={statsStatus}
             onRetry={handleRetryStats}
             onLocationReceived={handleLocationReceived}
