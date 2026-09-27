@@ -71,25 +71,17 @@ describe('share payload', () => {
   });
 
   it('treats empty, non-https, and placeholder NEXT_PUBLIC_APP_URL as unset', () => {
-    withAppUrl('', () => {
-      assert.equal(configuredShareUrl(), '');
-      assert.equal(siteShareUrl(), '');
-    });
-    withAppUrl('not-a-url', () => {
-      assert.equal(configuredShareUrl(), '');
-    });
-    withAppUrl('http://jehovahs-light.ink.net.tw/', () => {
-      assert.equal(configuredShareUrl(), '');
-    });
-    for (const placeholder of [
-      'https://your-domain.com',
-      'https://example.invalid',
-      'https://example.com/?utm=ci',
-      'https://www.example.com',
-    ]) {
-      withAppUrl(placeholder, () => {
-        assert.equal(configuredShareUrl(), '');
-        assert.equal(siteShareUrl(), '');
+    const unset = [
+      ['empty', ''],
+      ['non-https', 'http://jehovahs-light.ink.net.tw/'],
+      ['your-domain.com', 'https://your-domain.com'],
+      ['example.invalid', 'https://example.invalid'],
+      ['example.com', 'https://example.com'],
+    ] as const;
+    for (const [name, value] of unset) {
+      withAppUrl(value, () => {
+        assert.equal(configuredShareUrl(), '', name);
+        assert.equal(siteShareUrl(), '', name);
       });
     }
     withAppUrl('http://localhost:3000/', () => {

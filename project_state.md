@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (Share: ignore placeholder APP_URL; no ci.yml overlap)
+_Last updated: 2026-09-27 (Share hrefs on latest develop; no ci.yml overlap)
 
 ## Project name & stack summary
 
@@ -263,7 +263,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - Treat empty / non-https / placeholder `NEXT_PUBLIC_APP_URL` hosts
   (`your-domain.com`, `example.invalid`, `example.com`) as unset so SSR
   stays neutral and the client fills from `window.location.origin`.
-  localhost / 127.0.0.1 still allowed for local dev.
+  localhost / 127.0.0.1 still allowed for local dev. Tests set a real
+  https `NEXT_PUBLIC_APP_URL` inside each SSR case (never rely on CI’s
+  `example.invalid`). This PR does not change `.github/workflows/ci.yml`.
 - Pre-compute LINE / Facebook / X / WhatsApp share `href`s at render
   from `NEXT_PUBLIC_APP_URL`. Email `mailto:` is assigned after mount
   so Cloudflare Email Obfuscation cannot rewrite SSR HTML. Tests assert
