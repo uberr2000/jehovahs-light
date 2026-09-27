@@ -90,17 +90,61 @@ function stripTracking(url: URL): URL {
   return url;
 }
 
-/** Canonical site origin only — no query, hash, GPS, or PII. */
-export function siteShareUrl(origin?: string): string {
-  const raw =
-    origin ||
-    (typeof window !== 'undefined' ? window.location.origin : '') ||
-    '';
+const PLACEHOLDER_SHARE_HOSTS = new Set([
+  'your-domain.com',
+  'www.your-domain.com',
+  'example.invalid',
+  'www.example.invalid',
+  'example.com',
+  'www.example.com',
+]);
+
+function canonicalizeShareUrl(raw: string): string {
+  if (!raw) return '';
   try {
     return stripTracking(new URL(raw)).toString();
   } catch {
     return raw.split('?')[0].split('#')[0] || '';
   }
+}
+
+function isLocalDevHost(hostname: string): boolean {
+  return hostname === 'localhost' || hostname === '127.0.0.1';
+}
+
+/** Accept a real https site root, or http(s) localhost / 127.0.0.1 for local dev. */
+function usableShareUrl(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return '';
+  try {
+    const url = new URL(trimmed);
+    const host = url.hostname.toLowerCase();
+    if (PLACEHOLDER_SHARE_HOSTS.has(host)) return '';
+    const local = isLocalDevHost(host);
+    if (!local && url.protocol !== 'https:') return '';
+    if (local && url.protocol !== 'https:' && url.protocol !== 'http:') return '';
+    return stripTracking(url).toString();
+  } catch {
+    return '';
+  }
+}
+
+function envShareUrl(): string {
+  return usableShareUrl(process.env.NEXT_PUBLIC_APP_URL || '');
+}
+
+/** Env-only site root — safe for SSR / first paint (never reads `window`). */
+export function configuredShareUrl(): string {
+  return envShareUrl();
+}
+
+/** Canonical site origin only — no query, hash, GPS, or PII. */
+export function siteShareUrl(origin?: string): string {
+  if (origin) return canonicalizeShareUrl(origin);
+  return (
+    envShareUrl() ||
+    (typeof window !== 'undefined' ? canonicalizeShareUrl(window.location.origin) : '')
+  );
 }
 
 export function buildShareText(body: string, locationLine?: string | null): string {

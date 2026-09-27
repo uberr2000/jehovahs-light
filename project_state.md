@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (NEXT_PUBLIC_APP_URL deploy guard; 點亮地球 rebrand)
+_Last updated: 2026-09-27 (Share hrefs rebased on 46ad8c5; develop ci/deploy/docs kept)
 
 ## Project name & stack summary
 
@@ -120,7 +120,13 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   Mobile prefers `navigator.share` (title + text + url) and falls back
   to clipboard + “copied” toast on cancel/unavailable. Desktop copies
   the same payload and offers LINE / Facebook / X / WhatsApp deep links
-  in a new tab plus an email (`mailto:`, same tab) link. If the Clipboard API is blocked, sync `execCommand` runs first;
+  in a new tab plus an email (`mailto:`, same tab) link. LINE / Facebook /
+  X / WhatsApp `href`s are the full encoded URLs at first render (prefer
+  a real https `NEXT_PUBLIC_APP_URL`; empty / non-https / `your-domain.com`
+  / `example.invalid` / `example.com` are treated as unset). Email is **not** emitted as `mailto:` in SSR
+  HTML (Cloudflare Email Obfuscation would rewrite it to
+  `/cdn-cgi/l/email-protection#…`); the full `mailto:?subject=&body=` is
+  set after mount. If the Clipboard API is blocked, sync `execCommand` runs first;
   if copy still fails, a compact select-to-copy field appears.
   Strings live in all 14 `home.*` locales. No new API, DB, short
   links, tracking, or login gate. Overlay chrome / Earth ≥60% /
@@ -190,9 +196,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   stay usable without changing the desktop look. Below `lg` the bottom
   chrome stays a short translucent overlay.
 - `src/components/ShareLightButton.tsx` — Share the light CTA; Web Share
-  on mobile, clipboard toast + LINE/Facebook/X/WhatsApp/email on desktop
+  on mobile, clipboard toast + LINE/Facebook/X/WhatsApp/email on desktop;
+  LINE/FB/X/WhatsApp `href`s at SSR; email `mailto:` after mount
 - `src/lib/share.ts` — payload builders, city/region phrase (no GPS),
-  social deep links; `src/lib/share.test.ts` via `npm test`
+  social deep links; `src/lib/share.test.ts` +
+  `src/components/ShareLightButton.test.ts` via `npm test`
 - `docs/adr/013-share-v1.md` — frontend-only share decision, no PII / API
 - `src/components/LanguageSelector.tsx` — v0 pill chrome, all 14 locales
 - `src/lib/consent-cache.ts` — localStorage cache for intro skip
@@ -252,6 +260,20 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Rebase Share hrefs (#22) onto `46ad8c5` (#24 APP_URL deploy guard).
+  Keep develop’s `ci.yml` / deploy script / `docs/deploy.md` /
+  `docs/ci-cd.md`. Merge this file’s #24 + #22 entries.
+- Treat empty / non-https / placeholder `NEXT_PUBLIC_APP_URL` hosts
+  (`your-domain.com`, `example.invalid`, `example.com`) as unset so SSR
+  stays neutral and the client fills from `window.location.origin`.
+  localhost / 127.0.0.1 still allowed for local dev. Tests set a real
+  https `NEXT_PUBLIC_APP_URL` inside each SSR case (never rely on CI’s
+  `example.invalid`). This PR does not change `.github/workflows/ci.yml`.
+- Pre-compute LINE / Facebook / X / WhatsApp share `href`s at render
+  from `NEXT_PUBLIC_APP_URL`. Email `mailto:` is assigned after mount
+  so Cloudflare Email Obfuscation cannot rewrite SSR HTML. Tests assert
+  SSR hrefs for the four social links and all five after mount.
+  This PR does not change `ci.yml`. Production / main untouched.
 - Guard develop deploy on host `NEXT_PUBLIC_APP_URL` (https host, reject
   placeholders/local) before checkout/`npm ci`/build; fixture tests;
   rule documented in `docs/deploy.md`.
@@ -390,7 +412,12 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   a land-brighter-than-sea contrast boost (no hotlink). Land luminance
   after that lift is `LAND_LUMINANCE_FACTOR` (`0.5` vs v0; set `1` to
   restore). Sea mix is not scaled.
-- Share v1 is client-only. The share URL is `window.location.origin` with
-  query/hash stripped. Location copy is city/country from the existing
-  POST `/api/locations` body or a nearby row already on GET — never
-  lat-lng. No short links, pixels, or new routes.
+- Share v1 is client-only. The share URL prefers a real https
+  `NEXT_PUBLIC_APP_URL` (SSR + client). Empty, non-https, and placeholder
+  hosts (`your-domain.com` / `example.invalid` / `example.com`) are
+  treated as unset and fall back to `window.location.origin` after mount,
+  with query/hash stripped. Location copy is city/country from the
+  existing POST `/api/locations` body or a nearby row already on GET —
+  never lat-lng. LINE / Facebook / X / WhatsApp `href`s are the full
+  encoded deep links at render. Email `mailto:` is client-only after
+  mount (Cloudflare). No short links, pixels, or new routes.

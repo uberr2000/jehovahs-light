@@ -7,10 +7,22 @@ import {
   findNearbyPlace,
   formatPlaceLabel,
   pickPlaceFields,
+  configuredShareUrl,
   resolveLitPlace,
   siteShareUrl,
   socialShareUrls,
 } from './share.ts';
+
+function withAppUrl(value: string, fn: () => void) {
+  const previous = process.env.NEXT_PUBLIC_APP_URL;
+  process.env.NEXT_PUBLIC_APP_URL = value;
+  try {
+    fn();
+  } finally {
+    if (previous === undefined) delete process.env.NEXT_PUBLIC_APP_URL;
+    else process.env.NEXT_PUBLIC_APP_URL = previous;
+  }
+}
 
 describe('share payload', () => {
   it('formats city/region phrases and drops coordinate-like strings', () => {
@@ -51,32 +63,80 @@ describe('share payload', () => {
     assert.equal(assertSafeSharePayload('Meet at 25.0330, 121.5654'), false);
   });
 
-  it('encodes text + url on LINE / Facebook / X deep links', () => {
-    const text = 'Share the light';
-    const url = 'https://jehovahs-light.ink.net.tw/';
-    const social = socialShareUrls(text, url);
-    assert.match(social.line, /lineit\/share/);
-    assert.match(social.line, /url=https%3A%2F%2Fjehovahs-light/);
-    assert.match(social.line, /text=Share/);
-    assert.match(social.facebook, /sharer\.php/);
-    assert.match(social.facebook, /u=https%3A%2F%2Fjehovahs-light/);
-    assert.match(social.facebook, /quote=Share/);
-    assert.match(social.x, /twitter\.com\/intent\/tweet/);
-    assert.match(social.x, /text=Share/);
-    assert.match(social.x, /url=https%3A%2F%2Fjehovahs-light/);
+  it('prefers NEXT_PUBLIC_APP_URL as the share site root', () => {
+    withAppUrl('https://jehovahs-light.ink.net.tw/?utm=x#hash', () => {
+      assert.equal(configuredShareUrl(), 'https://jehovahs-light.ink.net.tw/');
+      assert.equal(siteShareUrl(), 'https://jehovahs-light.ink.net.tw/');
+    });
   });
 
-  it('builds WhatsApp / email links with text + url in one body', () => {
-    const social = socialShareUrls(
-      'Light a lamp with us.',
-      'https://jehovahs-light.ink.net.tw/',
-      'Share the light'
+  it('treats empty, non-https, and placeholder NEXT_PUBLIC_APP_URL as unset', () => {
+    const unset = [
+      ['empty', ''],
+      ['non-https', 'http://jehovahs-light.ink.net.tw/'],
+      ['your-domain.com', 'https://your-domain.com'],
+      ['example.invalid', 'https://example.invalid'],
+      ['example.com', 'https://example.com'],
+    ] as const;
+    for (const [name, value] of unset) {
+      withAppUrl(value, () => {
+        assert.equal(configuredShareUrl(), '', name);
+        assert.equal(siteShareUrl(), '', name);
+      });
+    }
+    withAppUrl('http://localhost:3000/', () => {
+      assert.equal(configuredShareUrl(), 'http://localhost:3000/');
+    });
+    withAppUrl('https://127.0.0.1:3000/', () => {
+      assert.equal(configuredShareUrl(), 'https://127.0.0.1:3000/');
+    });
+  });
+
+  it('falls back to window.origin when the env URL is a placeholder', () => {
+    const previous = (globalThis as { window?: unknown }).window;
+    (globalThis as { window?: { location: { origin: string } } }).window = {
+      location: { origin: 'https://jehovahs-light.ink.net.tw' },
+    };
+    try {
+      withAppUrl('https://example.invalid', () => {
+        assert.equal(configuredShareUrl(), '');
+        assert.equal(siteShareUrl(), 'https://jehovahs-light.ink.net.tw/');
+      });
+    } finally {
+      if (previous === undefined) delete (globalThis as { window?: unknown }).window;
+      else (globalThis as { window?: unknown }).window = previous;
+    }
+  });
+
+  it('initial social hrefs are the full encoded deep links', () => {
+    const text = 'Share the light\nA lamp is shining in Taipei, Taiwan.';
+    const url = 'https://jehovahs-light.ink.net.tw/';
+    const title = 'Share the light';
+    const social = socialShareUrls(text, url, title);
+    assert.equal(
+      social.line,
+      `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`
+    );
+    assert.equal(
+      social.facebook,
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`
+    );
+    assert.equal(
+      social.x,
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`
     );
     assert.equal(
       social.whatsapp,
-      'https://wa.me/?text=Light%20a%20lamp%20with%20us.%0Ahttps%3A%2F%2Fjehovahs-light.ink.net.tw%2F'
+      `https://wa.me/?text=${encodeURIComponent(`${text}\n${url}`)}`
     );
-    assert.match(social.email, /^mailto:\?subject=Share%20the%20light&body=/);
-    assert.match(social.email, /body=Light%20a%20lamp%20with%20us\.%0Ahttps%3A%2F%2Fjehovahs-light/);
+    assert.equal(
+      social.email,
+      `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${text}\n${url}`)}`
+    );
+    const joined = Object.values(social).join('\n');
+    assert.match(decodeURIComponent(social.line), /Taipei, Taiwan/);
+    assert.match(decodeURIComponent(social.whatsapp), /Taipei, Taiwan/);
+    assert.doesNotMatch(joined, /25\.033|121\.56/);
+    assert.equal(assertSafeSharePayload(`${text}\n${url}`), true);
   });
 });
