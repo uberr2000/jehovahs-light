@@ -42,7 +42,7 @@ export default function WelcomePanel({
               <h2 className="text-balance text-base font-semibold leading-snug tracking-tight text-amber-50 lg:text-[1rem] lg:leading-none">
                 {t("litTitle")}
               </h2>
-              <p className="text-pretty text-md leading-snug text-amber-100/75 lg:text-[0.7rem] lg:leading-tight">
+              <p className="text-pretty text-base leading-snug text-amber-100/75 lg:text-[0.7rem] lg:leading-tight">
                 {t("litMessage")}
               </p>
             </div>

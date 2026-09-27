@@ -260,10 +260,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
-- WelcomePanel: lit-state title `lg:text-[1rem]` (was 0.9375rem) and
-  message `lg:text-[0.7rem]` (was 0.5625rem); file reformatted to double
-  quotes. Mobile message class is `text-md`, which is not a default
-  Tailwind size (no effect).
+- WelcomePanel lit state: title `lg:text-[1rem]` (was 0.9375rem),
+  message `text-base` / `lg:text-[0.7rem]` (was `text-sm` / 0.5625rem);
+  file reformatted to double quotes.
 - Rebase Share hrefs (#22) onto `46ad8c5` (#24 APP_URL deploy guard).
   Keep develop’s `ci.yml` / deploy script / `docs/deploy.md` /
   `docs/ci-cd.md`. Merge this file’s #24 + #22 entries.
