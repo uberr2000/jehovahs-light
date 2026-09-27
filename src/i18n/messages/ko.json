@@ -64,6 +64,7 @@
     "litTitle": "당신의 등불이 빛나고 있습니다",
     "litMessage": "곳곳의 빛과 함께 빛나며 결코 사그라지지 않기를.",
     "counterLabel": "켜진 등불",
+    "countriesLabel": "{count}개국에서 빛나고 있습니다",
     "rotateHint": "지구본을 드래그하거나 확대하여 세계 곳곳의 빛을 보세요",
     "alreadyLit": "이미 등불을 켰습니다",
     "errorDenied": "지도에서 등불을 켜려면 위치 접근 권한이 필요합니다.",

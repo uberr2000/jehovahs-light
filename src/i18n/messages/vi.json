@@ -64,6 +64,7 @@
     "litTitle": "Ngọn đèn của bạn đang tỏa sáng",
     "litMessage": "Cầu mong nó sáng cùng ánh sáng khắp nơi, và không bao giờ tắt.",
     "counterLabel": "Ngọn đèn đã thắp",
+    "countriesLabel": "Tại {count} quốc gia",
     "rotateHint": "Kéo hoặc phóng to quả địa cầu để xem ánh sáng quanh thế giới",
     "alreadyLit": "Bạn đã thắp một ngọn đèn",
     "errorDenied": "Cần quyền truy cập vị trí để thắp ngọn đèn của bạn trên bản đồ.",

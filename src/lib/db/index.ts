@@ -4,7 +4,7 @@ import { getDb } from './client';
 import { gpsConsent, litLocations } from './schema';
 
 export { getDb, getPool } from './client';
-export { isDbConnectionError, dbErrorHttpResponse } from './errors';
+export { isDbConnectionError, isDuplicateKeyError, dbErrorHttpResponse } from './errors';
 export { gpsConsent, litLocations } from './schema';
 
 export interface LitLocation {
@@ -18,13 +18,12 @@ export interface LitLocation {
   created_at: Date;
 }
 
-export interface GpsConsent {
-  id: number;
-  ip_address: string;
-  consented: boolean;
-  latitude: number | null;
-  longitude: number | null;
-  created_at: Date;
+export interface VisitorLamp {
+  latitude: number;
+  longitude: number;
+  city: string | null;
+  country: string | null;
+  country_code: string | null;
 }
 
 function toCoord(value: unknown): number | null {
@@ -37,31 +36,29 @@ function toCoordRequired(value: unknown): number {
   return toCoord(value) ?? 0;
 }
 
-export async function getGpsConsentByIp(ipAddress: string): Promise<GpsConsent | null> {
+export async function getLampByVisitor(visitorId: string): Promise<VisitorLamp | null> {
   const db = getDb();
   const rows = await db
     .select({
-      id: gpsConsent.id,
-      ip_address: gpsConsent.ipAddress,
-      consented: gpsConsent.consented,
-      latitude: gpsConsent.latitude,
-      longitude: gpsConsent.longitude,
-      created_at: gpsConsent.createdAt,
+      latitude: litLocations.latitude,
+      longitude: litLocations.longitude,
+      city: litLocations.city,
+      country: litLocations.country,
+      country_code: litLocations.countryCode,
     })
-    .from(gpsConsent)
-    .where(eq(gpsConsent.ipAddress, ipAddress))
+    .from(litLocations)
+    .where(eq(litLocations.visitorId, visitorId))
     .limit(1);
 
   const row = rows[0];
   if (!row) return null;
 
   return {
-    id: toJsonNumber(row.id),
-    ip_address: row.ip_address,
-    consented: Boolean(row.consented),
-    latitude: toCoord(row.latitude),
-    longitude: toCoord(row.longitude),
-    created_at: row.created_at,
+    latitude: toCoordRequired(row.latitude),
+    longitude: toCoordRequired(row.longitude),
+    city: row.city,
+    country: row.country,
+    country_code: row.country_code,
   };
 }
 
@@ -99,7 +96,8 @@ export async function addLocation(
   userAgent?: string,
   city?: string,
   country?: string,
-  countryCode?: string
+  countryCode?: string,
+  visitorId?: string
 ): Promise<number> {
   const db = getDb();
   const result = await db.insert(litLocations).values({
@@ -110,6 +108,7 @@ export async function addLocation(
     city: city || null,
     country: country || null,
     countryCode: countryCode || null,
+    visitorId: visitorId || null,
   });
   return toJsonNumber(result[0].insertId);
 }
@@ -162,16 +161,4 @@ export async function getStats() {
     today: toJsonNumber(todayResult?.count),
     countries: toJsonNumber(countriesResult?.count),
   };
-}
-
-export async function checkLocationExists(latitude: number, longitude: number): Promise<boolean> {
-  const db = getDb();
-  const rows = await db
-    .select({ id: litLocations.id })
-    .from(litLocations)
-    .where(
-      sql`(6371 * acos(cos(radians(${latitude})) * cos(radians(${litLocations.latitude})) * cos(radians(${litLocations.longitude}) - radians(${longitude})) + sin(radians(${latitude})) * sin(radians(${litLocations.latitude})))) < 1`
-    )
-    .limit(1);
-  return rows.length > 0;
 }

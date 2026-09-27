@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { writeCachedConsent } from "@/lib/consent-cache";
 import { pickPlaceFields, type PlaceFields } from "@/lib/share";
+import { getVisitorId } from "@/lib/visitor-id";
 
 interface LightLampButtonProps {
   onLocationReceived: (lat: number, lng: number, place?: PlaceFields | null) => void;
@@ -49,19 +50,21 @@ export default function LightLampButton({
           const response = await fetch("/api/locations", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ latitude, longitude }),
+            body: JSON.stringify({ latitude, longitude, visitorId: getVisitorId() }),
           });
           if (!response.ok) {
             setError(t("errorGeneric"));
             return;
           }
-          const data = await response.json().catch(() => ({}));
-          const place = pickPlaceFields(
-            typeof data === "object" && data !== null && "location" in data
-              ? (data as { location?: unknown }).location
-              : null,
-          );
-          onLocationReceived(latitude, longitude, place);
+          const data: { location?: { latitude?: unknown; longitude?: unknown } } =
+            await response.json().catch(() => ({}));
+          const saved = data?.location;
+          const place = pickPlaceFields(saved ?? null);
+          if (typeof saved?.latitude === "number" && typeof saved?.longitude === "number") {
+            onLocationReceived(saved.latitude, saved.longitude, place);
+          } else {
+            onLocationReceived(latitude, longitude, place);
+          }
         } catch {
           setError(t("errorGeneric"));
         } finally {

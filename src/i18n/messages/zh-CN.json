@@ -64,6 +64,7 @@
     "litTitle": "你的灯已点亮",
     "litMessage": "愿它与各地的光一同闪耀，永不熄灭。",
     "counterLabel": "已点亮的灯",
+    "countriesLabel": "遍及 {count} 个国家",
     "rotateHint": "拖曳或缩放地球，看看世界各地的光",
     "alreadyLit": "你已经点亮了一盏灯",
     "errorDenied": "需要开启定位权限，才能在地图上点亮你的灯。",

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { writeCachedConsent } from '@/lib/consent-cache';
+import { getVisitorId } from '@/lib/visitor-id';
 
 interface GeoLocationButtonProps {
   onLocationReceived: (lat: number, lng: number) => void;
@@ -44,7 +45,7 @@ export default function GeoLocationButton({ onLocationReceived }: GeoLocationBut
           const response = await fetch('/api/locations', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ latitude, longitude }),
+            body: JSON.stringify({ latitude, longitude, visitorId: getVisitorId() }),
           });
 
           const data = await response.json();

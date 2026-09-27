@@ -1,4 +1,5 @@
-export const CONSENT_STORAGE_KEY = 'jehovahs-light:user-consent';
+/** v2: earlier values may have been copied from the IP lookup and are not this browser's own. */
+export const CONSENT_STORAGE_KEY = 'jehovahs-light:user-consent:v2';
 
 export interface CachedUserConsent {
   consented: boolean;
@@ -64,7 +65,7 @@ export function writeCachedConsent(consent: CachedUserConsent): void {
       JSON.stringify(normalizeConsent(consent))
     );
   } catch {
-    // Private mode / quota: IP-based GET /api/locations userConsent still applies.
+    // Private mode / quota: the lamp simply shows as unlit on the next visit.
   }
 }
 

@@ -1,49 +1,38 @@
-# GPS consent memory and intro skip
+# Lit state and per-person counting
 
-Returning visitors who have **already accepted** GPS sharing open the home
-globe with the glass welcome panel already in the **lit** state (own beacon
-on the globe). Decline is recorded (IP + optional local cache) but does
-**not** mark the lamp as lit.
+The home page shows the **lit** welcome panel only when **this browser**
+lit a lamp before. The server never tells a visitor they are lit based on IP.
 
-There is **no new consent API**. The frontend reuses:
+## Why not IP
 
-- `GET /api/locations` → `userConsent` (IP lookup via `gps_consent`)
-- `POST /api/locations` when the visitor shares coordinates
-- `POST /api/consent` when the visitor denies geolocation
+Several people on one home Wi-Fi (or carrier NAT, iCloud Private Relay)
+share one public IP. Keying the lit state on IP made the second and third
+person see “your lamp is shining” without ever lighting one, and the stats
+counted the household as one.
 
-Plus a **same-device localStorage cache**.
+## How it works now
 
-## How skip is decided
+- `localStorage` key `jehovahs-light:user-consent:v2` holds this browser's
+  own consent / coordinates. The `v2` suffix drops values copied from the
+  old IP lookup.
+- `localStorage` key `jehovahs-light:visitor-id` holds an anonymous UUID
+  (`src/lib/visitor-id.ts`), sent as `visitorId` on `POST /api/locations`.
+- `lit_locations.visitor_id` is `UNIQUE`: one row per browser. A second
+  POST from the same browser returns `alreadyExists: true` with the stored
+  location instead of inserting.
+- There is no 1 km duplicate check on the server any more. Three people at
+  one address make three rows; the globe merges lamps within 1 km into one
+  beacon (`src/lib/cluster-lamps.ts`), so the map still shows one light.
+- `GET /api/locations` returns only `locations` and `stats`; no
+  `userConsent`.
+- `POST /api/consent` (decline) and `gps_consent` are still written, but
+  never read to decide the lit state.
 
-On load:
+## Limitations
 
-1. Read `localStorage` key `jehovahs-light:user-consent`. If `consented` or
-   `hasLocation` is true, show the lit welcome panel immediately (and still
-   fetch locations in the background).
-2. Call existing `GET /api/locations`. If `userConsent` indicates the current
-   IP already accepted (or already has a stored lat/lng), show the lit panel
-   and refresh the localStorage cache.
-
-A first-time visitor with no cache and no IP match sees the “light a lamp”
-panel. After they share location, the client writes the cache so the next
-visit on that device opens in the lit state even if the public IP changes
-briefly.
-
-## Limitations (IP and cache)
-
-Consent on the server is **keyed by client IP** (`CF-Connecting-IP` /
-`X-Forwarded-For` / `X-Real-IP`). That is a convenience, not a login.
-
-- **Shared Wi-Fi / NAT**: another person on the same public IP may be treated
-  as already consented (intro skipped, “already shining” if that IP stored
-  coordinates).
-- **IP change / mobile networks**: a returning user may look new to the
-  server until localStorage answers.
-- **VPN / proxy**: the recorded IP may not match the next visit.
-- **New device or cleared site data**: localStorage is empty; skip then
-  depends only on IP `userConsent`.
-- **Private / strict storage**: if `localStorage` throws, only the IP path
-  remains.
-
-Do not treat this as an identity or security boundary. It only avoids
-repeating the GPS “light a lamp” prompt for likely-returning visitors.
+- **New device / cleared site data / another browser**: looks like a new
+  person and can light another lamp. Counting is per browser, not a login.
+- **Private mode**: storage may be wiped when the window closes, so the
+  lamp shows unlit on the next visit.
+- A POST without `visitorId` (stale cached client) still inserts a row with
+  `visitor_id = NULL`.

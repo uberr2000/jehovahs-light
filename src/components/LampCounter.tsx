@@ -36,24 +36,34 @@ function useAnimatedCount(target: number) {
   return display;
 }
 
-export default function LampCounter({ count }: { count: number }) {
+export default function LampCounter({ count, countries = 0 }: { count: number; countries?: number }) {
   const t = useTranslations('home');
   const display = useAnimatedCount(count);
 
   return (
-    <div className="flex items-center gap-2.5 lg:gap-2">
-      <span className="relative flex h-2.5 w-2.5 shrink-0 lg:h-2 lg:w-2" aria-hidden="true">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-300/60" />
-        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_16px_3px_rgba(245,180,90,0.85)] lg:h-2 lg:w-2 lg:shadow-[0_0_8px_1.5px_rgba(245,180,90,0.85)]" />
-      </span>
-      <div className="flex flex-row flex-wrap items-baseline gap-x-2 gap-y-0 leading-none lg:flex-col lg:gap-x-1 lg:leading-tight">
-        <span className="font-mono text-[2rem] font-semibold leading-none tabular-nums tracking-tight text-amber-50 lg:text-[3rem]">
-          {display.toLocaleString()}
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center gap-2.5 lg:gap-2">
+        <span className="relative flex h-2.5 w-2.5 shrink-0 lg:h-2 lg:w-2" aria-hidden="true">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-300/60" />
+          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-300 shadow-[0_0_16px_3px_rgba(245,180,90,0.85)] lg:h-2 lg:w-2 lg:shadow-[0_0_8px_1.5px_rgba(245,180,90,0.85)]" />
         </span>
-        <span className="text-xs uppercase leading-none tracking-[0.18em] text-amber-100/55 lg:text-[0.875rem] lg:tracking-[0.22em]">
-          {t('counterLabel')}
-        </span>
+        <div className="flex flex-row flex-wrap items-baseline gap-x-2 gap-y-0 leading-none lg:flex-col lg:gap-x-1 lg:leading-tight">
+          <span className="font-mono text-[2rem] font-semibold leading-none tabular-nums tracking-tight text-amber-50 lg:text-[3rem]">
+            {display.toLocaleString()}
+          </span>
+          <span className="text-xs uppercase leading-none tracking-[0.18em] text-amber-100/55 lg:text-[0.875rem] lg:tracking-[0.22em]">
+            {t('counterLabel')}
+          </span>
+        </div>
       </div>
+      {countries > 0 ? (
+        <p
+          data-testid="countries-count"
+          className="pl-5 text-xs leading-none text-amber-100/55 lg:pl-4 lg:text-[0.8rem]"
+        >
+          {t('countriesLabel', { count: countries })}
+        </p>
+      ) : null}
     </div>
   );
 }

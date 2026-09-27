@@ -17,6 +17,8 @@ export const litLocations = mysqlTable('lit_locations', {
   countryCode: varchar('country_code', { length: 8 }),
   ipAddress: varchar('ip_address', { length: 45 }),
   userAgent: varchar('user_agent', { length: 1024 }),
+  /** Anonymous per-browser id: one row per person, even on a shared IP. */
+  visitorId: varchar('visitor_id', { length: 36 }).unique(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

@@ -64,6 +64,7 @@
     "litTitle": "Pelita Anda menyala",
     "litMessage": "Kiranya ia bersinar bersama terang di mana-mana, dan tidak pernah padam.",
     "counterLabel": "Pelita yang dinyalakan",
+    "countriesLabel": "Di {count} negara",
     "rotateHint": "Seret atau zoom bola dunia untuk melihat terang di seluruh bumi",
     "alreadyLit": "Anda sudah menyalakan pelita",
     "errorDenied": "Izin lokasi diperlukan untuk menyalakan pelita Anda di peta.",

@@ -8,6 +8,7 @@ import type { PlaceFields } from "@/lib/share";
 
 export default function WelcomePanel({
   count,
+  countries,
   hasLit,
   litPlace,
   statsStatus,
@@ -15,6 +16,7 @@ export default function WelcomePanel({
   onLocationReceived,
 }: {
   count: number;
+  countries: number;
   hasLit: boolean;
   litPlace?: PlaceFields | null;
   statsStatus: "loading" | "ok" | "error";
@@ -46,7 +48,7 @@ export default function WelcomePanel({
                 {t("litMessage")}
               </p>
             </div>
-            <LampCounter count={count} />
+            <LampCounter count={count} countries={countries} />
             <StatsError status={statsStatus} onRetry={onRetry} />
             <ShareLightButton hasLit={hasLit} place={litPlace} />
             <div className="hidden lg:block">{hint}</div>
@@ -54,7 +56,7 @@ export default function WelcomePanel({
         ) : (
           <div className="flex flex-col gap-2 lg:gap-3">
             <LightLampButton onLocationReceived={onLocationReceived} />
-            <LampCounter count={count} />
+            <LampCounter count={count} countries={countries} />
             <StatsError status={statsStatus} onRetry={onRetry} />
             <ShareLightButton hasLit={hasLit} place={litPlace} />
             <div className="hidden lg:block">{hint}</div>

@@ -64,6 +64,7 @@
     "litTitle": "Sua lâmpada está brilhando",
     "litMessage": "Que ela brilhe junto com as luzes de todo lugar, e nunca se apague.",
     "counterLabel": "Lâmpadas acesas",
+    "countriesLabel": "{count, plural, one {Em # país} other {Em # países}}",
     "rotateHint": "Arraste ou dê zoom no globo para ver as luzes ao redor do mundo",
     "alreadyLit": "Você já acendeu uma lâmpada",
     "errorDenied": "É preciso permitir a localização para acender sua lâmpada no mapa.",

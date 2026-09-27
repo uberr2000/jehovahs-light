@@ -5,6 +5,7 @@ import { Canvas, useThree } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 
 import { Beacons, type BeaconPoint } from './globe/Beacons';
+import { clusterLamps } from '@/lib/cluster-lamps';
 import { Earth } from './globe/Earth';
 import { OwnBeacon } from './globe/OwnBeacon';
 
@@ -141,13 +142,14 @@ function EarthFallback() {
 function GlobeContent({ lightPoints, userLocation, onGlobeReady }: GlobeProps) {
   const ownLat = userLocation?.latitude;
   const ownLng = userLocation?.longitude;
+  const clustered = useMemo(() => clusterLamps(lightPoints), [lightPoints]);
   const beacons = useMemo(() => {
-    if (ownLat == null || ownLng == null) return lightPoints;
-    return lightPoints.filter(
+    if (ownLat == null || ownLng == null) return clustered;
+    return clustered.filter(
       (point) =>
         Math.abs(point.latitude - ownLat) > 0.05 || Math.abs(point.longitude - ownLng) > 0.05
     );
-  }, [lightPoints, ownLat, ownLng]);
+  }, [clustered, ownLat, ownLng]);
 
   return (
     <>

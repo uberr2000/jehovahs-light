@@ -64,6 +64,7 @@
     "litTitle": "Ta lampe brille",
     "litMessage": "Qu’elle brille avec les lumières partout dans le monde, et ne s’éteigne jamais.",
     "counterLabel": "Lampes allumées",
+    "countriesLabel": "Dans {count} pays",
     "rotateHint": "Fais glisser ou zoome le globe pour voir les lumières du monde",
     "alreadyLit": "Tu as déjà allumé une lampe",
     "errorDenied": "L’accès à la position est nécessaire pour allumer ta lampe sur la carte.",

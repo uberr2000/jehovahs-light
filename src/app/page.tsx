@@ -9,12 +9,7 @@ import LanguageSelector from '@/components/LanguageSelector';
 import WelcomePanel from '@/components/WelcomePanel';
 import { type Locale } from '@/i18n/config';
 import { isLocale, localeCookieString } from '@/i18n/resolve-locale';
-import {
-  readCachedConsent,
-  shouldSkipIntro,
-  writeCachedConsent,
-  normalizeConsent,
-} from '@/lib/consent-cache';
+import { readCachedConsent, shouldSkipIntro, writeCachedConsent } from '@/lib/consent-cache';
 import { resolveLitPlace, type PlaceFields } from '@/lib/share';
 
 const Globe3D = dynamic(() => import('@/components/Globe3D'), {
@@ -50,14 +45,12 @@ type StatsStatus = 'loading' | 'ok' | 'error';
 async function fetchLocationsPayload(): Promise<{
   locations: Location[];
   stats: StatsData;
-  userConsent: UserConsent | null;
 }> {
   const response = await fetch('/api/locations');
   let data: {
     error?: string;
     locations?: Location[];
     stats?: Partial<StatsData>;
-    userConsent?: UserConsent | null;
   } = {};
   try {
     data = await response.json();
@@ -74,7 +67,6 @@ async function fetchLocationsPayload(): Promise<{
       today: Number(data.stats?.today) || 0,
       countries: Number(data.stats?.countries) || 0,
     },
-    userConsent: data.userConsent ?? null,
   };
 }
 
@@ -105,8 +97,7 @@ export default function Home() {
     let cancelled = false;
 
     const cached = readCachedConsent();
-    const cacheSkipsIntro = shouldSkipIntro(cached);
-    if (cacheSkipsIntro && cached) {
+    if (shouldSkipIntro(cached) && cached) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage consent hydrate
       setUserConsent(cached);
       if (cached.hasLocation && cached.latitude != null && cached.longitude != null) {
@@ -124,22 +115,6 @@ export default function Home() {
         setLocations(data.locations);
         setStats(data.stats);
         setStatsStatus('ok');
-
-        if (data.userConsent) {
-          const fromApi = normalizeConsent(data.userConsent);
-          if (shouldSkipIntro(fromApi)) {
-            setUserConsent(fromApi);
-            writeCachedConsent(fromApi);
-            if (fromApi.hasLocation && fromApi.latitude != null && fromApi.longitude != null) {
-              setUserLocation({
-                latitude: fromApi.latitude,
-                longitude: fromApi.longitude,
-              });
-            }
-          } else if (!cacheSkipsIntro) {
-            setUserConsent(fromApi);
-          }
-        }
       } catch (error) {
         console.error('Failed to fetch locations:', error);
         if (!cancelled && !isPoll) {
@@ -194,19 +169,6 @@ export default function Home() {
         setLocations(data.locations);
         setStats(data.stats);
         setStatsStatus('ok');
-        if (data.userConsent) {
-          const fromApi = normalizeConsent(data.userConsent);
-          if (shouldSkipIntro(fromApi)) {
-            setUserConsent(fromApi);
-            writeCachedConsent(fromApi);
-            if (fromApi.hasLocation && fromApi.latitude != null && fromApi.longitude != null) {
-              setUserLocation({
-                latitude: fromApi.latitude,
-                longitude: fromApi.longitude,
-              });
-            }
-          }
-        }
       })
       .catch((error) => {
         console.error('Failed to fetch locations:', error);
@@ -256,6 +218,7 @@ export default function Home() {
           >
             <WelcomePanel
               count={stats.total}
+              countries={stats.countries}
               hasLit={hasLit}
               litPlace={resolvedPlace}
               statsStatus={statsStatus}

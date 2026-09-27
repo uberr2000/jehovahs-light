@@ -52,6 +52,15 @@ export function isDbConnectionError(error: unknown): boolean {
   return false;
 }
 
+export function isDuplicateKeyError(error: unknown): boolean {
+  return walkCauses(error).some(
+    (node) =>
+      typeof node === 'object' &&
+      node !== null &&
+      (node as { code?: unknown }).code === 'ER_DUP_ENTRY'
+  );
+}
+
 export function dbErrorHttpResponse(
   error: unknown,
   fallbackMessage: string

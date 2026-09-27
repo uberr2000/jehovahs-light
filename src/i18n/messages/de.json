@@ -64,6 +64,7 @@
     "litTitle": "Deine Lampe leuchtet",
     "litMessage": "Möge sie zusammen mit den Lichtern überall strahlen und nie verlöschen.",
     "counterLabel": "Entzündete Lampen",
+    "countriesLabel": "{count, plural, one {In # Land} other {In # Ländern}}",
     "rotateHint": "Ziehe oder zoome den Globus, um Lichter rund um die Welt zu sehen",
     "alreadyLit": "Du hast bereits eine Lampe entzündet",
     "errorDenied": "Standortzugriff ist nötig, um deine Lampe auf der Karte zu entzünden.",

@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (New light-point favicon / app icons)
+_Last updated: 2026-09-27 (Per-person lamp count, globe merge, country count)
 
 ## Project name & stack summary
 
@@ -72,9 +72,13 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   starfield denser/brighter (count 8000, factor 7, closer radius)
 - Globe light points / LightGlow (and user marker glow) are ~1/4 of the
   previous visual size (`pointsMaterial` 0.015; glow pulse 0.01–0.015)
-- Returning GPS-accepted visitors open the glass panel in the lit state:
-  localStorage cache `jehovahs-light:user-consent` plus existing
-  `GET /api/locations` `userConsent` (IP). No new consent endpoint.
+- Returning visitors open the glass panel in the lit state only from this
+  browser's localStorage (`jehovahs-light:user-consent:v2`); no IP lookup.
+- Per-person counting: anonymous `visitorId` (localStorage UUID) on POST,
+  `lit_locations.visitor_id` UNIQUE, no 1 km server dedupe. Same Wi-Fi =
+  one row per person; the globe merges lamps within 1 km into one beacon.
+- Home shows the country count under the lamp count
+  (`home.countriesLabel`, 14 locales, ICU plurals).
 - Mobile **page** zoom locked (`viewport` initial-scale=1, maximum-scale=1,
   user-scalable=no). Globe pinch/scroll zoom is on (`enableZoom`, canvas
   `touch-action: none`); compact camera frames the Earth disk at ~72% of
@@ -161,7 +165,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   assets; `db:generate` / `db:migrate` / `db:studio` / `db:check`
 - `scripts/copy-standalone-assets.mjs` — `public` + `.next/static` → standalone
 - `drizzle.config.ts` — dialect mysql; `DB_HOST` / `DB_USER` / `DB_PASSWORD` /
-  `DB_NAME`
+  `DB_NAME` (URL form when the password is empty, for passwordless local MySQL)
+- `drizzle/0001_visitor_id.sql` — adds `lit_locations.visitor_id` + UNIQUE
+- `src/lib/visitor-id.ts` — anonymous per-browser UUID in localStorage
+- `src/lib/cluster-lamps.ts` (+ `.test.ts`) — merge lamps within 1 km for the globe
 - `src/lib/db/schema.ts` — `lit_locations`, `gps_consent`
 - `src/lib/db/index.ts` — Drizzle queries (same `@/lib/db` exports)
 - `src/lib/db/errors.ts` — connection error → 503
@@ -258,9 +265,12 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 ## API Routes Summary
 
 - `GET /app-manifest?locale=` — web app manifest for install (not under `/api`)
-- `GET/POST /api/locations` — lit locations; GET also returns `userConsent`
-  (IP) used to skip intro. Connection failures: 503 `Database unavailable`.
-- `POST /api/consent` — GPS consent by IP (decline path; no new routes)
+- `GET /api/locations` — `{ locations, stats }` (no `userConsent`);
+  `stats.total` = people, `stats.countries` shown on home.
+- `POST /api/locations` — `{ latitude, longitude, visitorId }`; known
+  visitor → `alreadyExists` + stored `location`. Connection failures: 503
+  `Database unavailable`.
+- `POST /api/consent` — GPS decline by IP (recorded, never read for lit state)
 
 ## Known Issues
 
@@ -270,10 +280,15 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - Dirty host working tree aborts deploy (no `git reset --hard`)
 - If PM2 id 14 is still named `jehovahs-light.ink.net.tw`, CI aborts and
   asks for one-time `pm2 delete` + `pm2 start ecosystem` + `pm2 save`
-- GPS intro skip is IP + localStorage only: shared Wi-Fi / VPN / IP change
-  can mis-identify; new device or cleared storage falls back to IP
+- Lit state / counting is per browser, not a login: a new device, another
+  browser, or cleared site data counts as a new person
   (`docs/consent-memory.md`). Each new tab opens on the `IntroScreen`
   splash; after Enter, the glass panel with CTA “Let your light shine”.
+- Deploy must run `npm run db:migrate` (0001 `visitor_id`) before the new
+  code serves POSTs, or lighting a lamp fails.
+- Local dev: an empty `D:\workspace\INK\package-lock.json` made Turbopack
+  watch the whole parent folder (2 cores busy, 10–40 s requests). Renamed
+  to `.bak` on this machine; not a repo change.
 - Live `GET /api/locations` on jehovahs-light.ink.net.tw returns HTTP 500
   (`Failed to fetch locations`). UI now shows error + retry instead of
   silent zeros. Likely host MySQL/.env; BigInt JSON is guarded in code.
@@ -294,6 +309,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Count lamps per person: `visitor_id` column + migration, lit state from
+  this browser only (GET drops IP `userConsent`), globe merges lamps
+  within 1 km, country count under the lamp count in 14 locales.
 - Replace favicon / app icons with the glowing light
   point: `favicon.ico` (16/32/48), `icon-32/192/512.png`,
   `apple-touch-icon.png`, and the `src/app` icon conventions.
@@ -436,8 +454,11 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - Standalone `public` / `.next/static` copy lives in `npm run build`
   (`postbuild`) so local and host builds always produce a complete tree;
   the SSH workflow copy is kept as belt-and-suspenders.
-- Intro skip uses existing `userConsent` on `GET /api/locations` plus
-  localStorage; decline is remembered but does not skip the intro.
+- Lit state comes only from this browser's localStorage, never from IP
+  (shared Wi-Fi made strangers look lit). One DB row per anonymous
+  `visitor_id`; stats count people, and the globe (not the server) merges
+  nearby lamps so a household still shows one light. No country
+  leaderboard, only the count.
 - Mobile **page** zoom is locked via Next.js `viewport` export (not a raw
   meta tag). Globe OrbitControls `enableZoom` is on; pinch/wheel zoom the
   camera only (`touch-none` on the canvas). Compact viewports still frame

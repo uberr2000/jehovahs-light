@@ -1,8 +1,15 @@
 # Locations API and stats
 
-`GET /api/locations` returns lit points, aggregate stats, and IP `userConsent`.
-The home page stats (total / today / countries) come only from this response.
-Zeros are not invented on the client when the request fails.
+`GET /api/locations` returns lit points and aggregate stats (no per-IP
+`userConsent`; see `consent-memory.md`). `stats.total` counts people (one
+row per `visitor_id`), and `stats.countries` is shown under the lamp count.
+The home page stats come only from this response. Zeros are not invented on
+the client when the request fails.
+
+`POST /api/locations` takes `{ latitude, longitude, visitorId }`. A known
+`visitorId` returns `alreadyExists: true` plus the stored `location`;
+otherwise it reverse-geocodes and inserts. Requires migration
+`drizzle/0001_visitor_id.sql` (`npm run db:migrate`) before deploy.
 
 ## Live 500 (2026-09-16)
 

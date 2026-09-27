@@ -23,6 +23,12 @@ CREATE TABLE IF NOT EXISTS `lit_locations` (
   `country_code` varchar(8) DEFAULT NULL,
   `ip_address` varchar(45) DEFAULT NULL,
   `user_agent` varchar(1024) DEFAULT NULL,
+  `visitor_id` varchar(36) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `lit_locations_visitor_id_unique` (`visitor_id`)
 );
+
+-- Existing databases created before visitor_id (drizzle/0001_visitor_id.sql):
+-- ALTER TABLE `lit_locations` ADD `visitor_id` varchar(36);
+-- ALTER TABLE `lit_locations` ADD CONSTRAINT `lit_locations_visitor_id_unique` UNIQUE(`visitor_id`);
