@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-27 (Per-person lamp count, globe merge, country count)
+_Last updated: 2026-09-28 (Service worker retries a failed navigation preload)
 
 ## Project name & stack summary
 
@@ -253,8 +253,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   header install button: `beforeinstallprompt` on Chromium, iOS share hint
 - `src/components/ServiceWorkerRegister.tsx` — registers `/sw.js` in
   production only
-- `public/sw.js` + `public/offline.html` — navigation-only offline page;
-  API, JS, and images stay on the network
+- `public/sw.js` + `public/offline.html` — navigation-only offline page.
+  A failed navigation preload is retried with `fetch` before the offline
+  page; API, JS, and images stay on the network. Cache name
+  `jehovahs-light-offline-v2`.
 - `next.config.ts` — `Cache-Control: no-store` on `/sw.js`
 - Did not add `next-pwa` (webpack-only, unmaintained; Next 16 builds
   with Turbopack)
@@ -309,6 +311,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- Service worker no longer shows the offline page when navigation preload
+  fails once. It fetches the page again, and only then falls back to
+  `offline.html`. Cache bumped to `jehovahs-light-offline-v2` so existing
+  browsers pick up the new script without a manual cache clear.
 - Count lamps per person: `visitor_id` column + migration, lit state from
   this browser only (GET drops IP `userConsent`), globe merges lamps
   within 1 km, country count under the lamp count in 14 locales.

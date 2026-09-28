@@ -1,6 +1,6 @@
 // Only page navigations are handled: API calls, JS/CSS and images always go
 // straight to the network, so nothing here can serve a stale build.
-const CACHE = 'jehovahs-light-offline-v1';
+const CACHE = 'jehovahs-light-offline-v2';
 const OFFLINE_URL = '/offline.html';
 
 self.addEventListener('install', (event) => {
@@ -31,7 +31,12 @@ self.addEventListener('fetch', (event) => {
     (async () => {
       try {
         const preloaded = await event.preloadResponse;
-        return preloaded || (await fetch(event.request));
+        if (preloaded) return preloaded;
+      } catch {
+        // A failed preload is not "offline": fall through and fetch again.
+      }
+      try {
+        return await fetch(event.request);
       } catch {
         return (await caches.match(OFFLINE_URL)) || Response.error();
       }
