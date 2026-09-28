@@ -46,11 +46,11 @@ export async function promptInstall(): Promise<boolean> {
   return outcome === 'accepted';
 }
 
-const STANDALONE_QUERY = '(display-mode: standalone)';
+const INSTALLED_DISPLAY_QUERY = '(display-mode: fullscreen), (display-mode: standalone)';
 
 export function subscribeDisplayMode(listener: () => void): () => void {
   if (typeof window === 'undefined' || !window.matchMedia) return () => {};
-  const query = window.matchMedia(STANDALONE_QUERY);
+  const query = window.matchMedia(INSTALLED_DISPLAY_QUERY);
   query.addEventListener('change', listener);
   return () => query.removeEventListener('change', listener);
 }
@@ -58,7 +58,7 @@ export function subscribeDisplayMode(listener: () => void): () => void {
 export function isStandaloneDisplay(): boolean {
   if (typeof window === 'undefined') return false;
   const iosStandalone = (navigator as Navigator & { standalone?: boolean }).standalone === true;
-  return iosStandalone || Boolean(window.matchMedia?.(STANDALONE_QUERY).matches);
+  return iosStandalone || Boolean(window.matchMedia?.(INSTALLED_DISPLAY_QUERY).matches);
 }
 
 export function isIosDevice(): boolean {

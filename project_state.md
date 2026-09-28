@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-28 (Service worker retries a failed navigation preload)
+_Last updated: 2026-09-28 (Installed PWA opens fullscreen)
 
 ## Project name & stack summary
 
@@ -246,7 +246,9 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   `og:site_name`, and a `summary_large_image` X card.
 - `src/app/app-manifest/route.ts` — install manifest; `?locale=` wins,
   otherwise Accept-Language. `id` stays `/` so every language is one app.
-  Not `manifest.webmanifest`: Next treats that name as a metadata file.
+  `display` is `fullscreen` so a desktop install fills the screen (the
+  right-hand lamp panel needs a window at least 1024px wide). Not
+  `manifest.webmanifest`: Next treats that name as a metadata file.
 - `src/i18n/load-messages.ts` — shared locale → messages loader used by
   `request.ts` and `/app-manifest`
 - `src/components/InstallAppButton.tsx` + `src/lib/install-prompt.ts` —
@@ -305,12 +307,16 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
   was a small circle in a sea of black. Compact default now uses
   vertical FOV height-fill (~72%, `z` ≈ 6.7) so the disk is ≥60% of
   viewport height. Zoom-out can still reach the full-sphere fit.
-- The installed app name is fixed at install time. Changing the site
-  language later does not rename the home-screen icon; delete and
-  reinstall to pick up another locale.
+- The installed app name and display mode are fixed at install time.
+  Changing the site language later does not rename the home-screen icon,
+  and an app installed before `display: fullscreen` stays a resizable
+  window. Delete and reinstall to pick up another locale or fullscreen.
 
 ## Recent Commits
 
+- Installed PWA manifest `display` is `fullscreen`, so a new desktop
+  install fills the screen and the lamp panel on the right stays visible.
+  Already-installed apps keep their old window until reinstall.
 - Service worker no longer shows the offline page when navigation preload
   fails once. It fetches the page again, and only then falls back to
   `offline.html`. Cache bumped to `jehovahs-light-offline-v2` so existing

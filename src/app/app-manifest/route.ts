@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       description: copy.tagline,
       start_url: '/',
       scope: '/',
-      display: 'standalone',
+      display: 'fullscreen',
       background_color: '#04060e',
       theme_color: '#04060e',
       lang: locale,
