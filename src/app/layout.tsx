@@ -7,7 +7,7 @@ import LocaleNavigatorFallback from '@/components/LocaleNavigatorFallback';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 import { LOCALE_COOKIE } from '@/i18n/config';
 import { htmlDir, isLocale, resolveRequestLocale } from '@/i18n/resolve-locale';
-import { configuredShareUrl } from '@/lib/share';
+import { siteOrigin } from '@/lib/site-origin';
 import './globals.css';
 
 const geistSans = Geist({
@@ -21,32 +21,46 @@ const geistMono = Geist_Mono({
 });
 
 const OG_TITLE = '點亮地球 · Light Up the Earth';
-const OG_DESCRIPTION = "讓神的光，從你所在之處開始。 Let God's light begin right where you are.";
+const OG_DESCRIPTION =
+  '這是一盞為你而燃的燈，也是一盞等你傳下去的燈。願神的光，由你手中開始，照耀地球每一個角落。 A lamp lit for you, waiting to be passed on.';
 
-/** Crawlers need absolute og:image / og:url; fall back to the request host when the env is unset. */
-async function siteOrigin(): Promise<URL> {
-  const configured = configuredShareUrl();
-  if (configured) return new URL(configured);
-  const headerStore = await headers();
-  const host = headerStore.get('x-forwarded-host') ?? headerStore.get('host') ?? 'localhost:3000';
-  const proto = headerStore.get('x-forwarded-proto') ?? (host.startsWith('localhost') ? 'http' : 'https');
-  return new URL(`${proto}://${host}`);
-}
+const OG_LOCALE: Record<string, string> = {
+  en: 'en_US',
+  'zh-TW': 'zh_TW',
+  'zh-CN': 'zh_CN',
+  es: 'es_ES',
+  pt: 'pt_PT',
+  fr: 'fr_FR',
+  de: 'de_DE',
+  ja: 'ja_JP',
+  ko: 'ko_KR',
+  ru: 'ru_RU',
+  ar: 'ar_AR',
+  id: 'id_ID',
+  th: 'th_TH',
+  vi: 'vi_VN',
+};
 
 export async function generateMetadata(): Promise<Metadata> {
   const requested = await getLocale();
   const locale = isLocale(requested) ? requested : 'en';
   const brand = (await getTranslations('home'))('brand');
+  const ogLocale = OG_LOCALE[locale] ?? 'en_US';
 
   return {
   metadataBase: await siteOrigin(),
   title: "點亮地球 · Light Up the Earth | Jehovah's Light",
-  description:
-    "讓神的光，從你所在之處開始。若你信靠耶和華，在互動地球上點一盞燈，與世界各地的信心之光連成星海。 Let God's light begin right where you are — light a lamp on the globe and join a sea of lights with believers around the world.",
+  description: OG_DESCRIPTION,
   keywords: ['Jehovah', 'Light', 'Faith', 'Global', 'Christian', 'Beacon', 'Prayer', '點亮地球', 'Light Up the Earth'],
   authors: [{ name: "Jehovah's Light" }],
   applicationName: brand,
   manifest: `/app-manifest?locale=${locale}`,
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+  },
+  alternates: { canonical: '/' },
   appleWebApp: {
     capable: true,
     title: brand,
@@ -58,8 +72,8 @@ export async function generateMetadata(): Promise<Metadata> {
     url: '/',
     siteName: OG_TITLE,
     type: 'website',
-    locale: 'en_US',
-    alternateLocale: ['zh_TW', 'zh_CN'],
+    locale: ogLocale,
+    alternateLocale: Object.values(OG_LOCALE).filter((value) => value !== ogLocale),
   },
   twitter: {
     card: 'summary_large_image',
@@ -99,6 +113,16 @@ export default async function RootLayout({
     headerStore.get('accept-language')
   );
   const messages = await getMessages();
+  const origin = await siteOrigin();
+  const jsonLd = JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: OG_TITLE,
+    alternateName: "Jehovah's Light",
+    url: origin.toString(),
+    description: OG_DESCRIPTION,
+    inLanguage: locale,
+  }).replace(/</g, '\\u003c');
 
   return (
     <html
@@ -108,6 +132,7 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-[#04060e] text-amber-50">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
         <NextIntlClientProvider locale={locale} messages={messages}>
           <LocaleNavigatorFallback />
           <ServiceWorkerRegister />

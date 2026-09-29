@@ -1,6 +1,6 @@
 # project_state
 
-_Last updated: 2026-09-28 (Installed PWA opens fullscreen)
+_Last updated: 2026-09-29 (robots.txt, sitemap, canonical, JSON-LD)
 
 ## Project name & stack summary
 
@@ -263,11 +263,16 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 - Did not add `next-pwa` (webpack-only, unmaintained; Next 16 builds
   with Turbopack)
 - `docs/i18n-viewport.md` — page viewport lock + globe zoom + locale list
+- `src/lib/site-origin.ts` — public site root for metadata, robots, sitemap
+- `src/app/robots.ts` — allow `/`, disallow `/api/` and `/offline.html`
+- `src/app/sitemap.ts` — home URL only (locale is a cookie, not a path)
 - `src/lib/json-safe.ts` — BigInt-safe JSON for mysql2 COUNT / insertId
 - `docs/locations-api.md` — GET /api/locations 500 diagnosis
 
 ## API Routes Summary
 
+- `GET /robots.txt` — crawl rules; sitemap URL
+- `GET /sitemap.xml` — home page only
 - `GET /app-manifest?locale=` — web app manifest for install (not under `/api`)
 - `GET /api/locations` — `{ locations, stats }` (no `userConsent`);
   `stats.total` = people, `stats.countries` shown on home.
@@ -314,6 +319,10 @@ PM2 + Nginx. Production path `/var/www/html/jehovahs-light.ink.net.tw/`.
 
 ## Recent Commits
 
+- SEO: `robots.txt`, `sitemap.xml` (home only), canonical `/`, index/follow,
+  and WebSite JSON-LD. Meta description matches the new share copy.
+- `home.shareText` is the longer “lamp lit for you, pass it on” copy in all
+  14 locales. zh-TW uses the supplied wording; zh-CN is the simplified form.
 - Installed PWA manifest `display` is `fullscreen`, so a new desktop
   install fills the screen and the lamp panel on the right stays visible.
   Already-installed apps keep their old window until reinstall.
